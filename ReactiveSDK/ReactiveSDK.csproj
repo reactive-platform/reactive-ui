@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net481</TargetFramework>
+        <AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
+        <UnityAssembliesDir>$(LocalRefsDir)</UnityAssembliesDir>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <AssemblyName>ReactiveSDK</AssemblyName>
+        <RootNamespace>Reactive</RootNamespace>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\ReactiveUI\ReactiveUI.csproj">
+            <Name>ReactiveUI</Name>
+        </ProjectReference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>$(UnityAssembliesDir)\UnityEngine.CoreModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UI">
+            <HintPath>$(UnityAssembliesDir)\UnityEngine.UI.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.InputModule">
+            <HintPath>$(UnityAssembliesDir)\UnityEngine.InputModule.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+</Project>

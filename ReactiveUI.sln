@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveUI", "ReactiveUI\ReactiveUI.csproj", "{D0230F06-CBBB-4479-B6EE-B54D78D14D6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveSDK", "ReactiveSDK\ReactiveSDK.csproj", "{B370E61B-4459-465D-AE7C-F1097F36BC37}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D0230F06-CBBB-4479-B6EE-B54D78D14D6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0230F06-CBBB-4479-B6EE-B54D78D14D6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0230F06-CBBB-4479-B6EE-B54D78D14D6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0230F06-CBBB-4479-B6EE-B54D78D14D6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B370E61B-4459-465D-AE7C-F1097F36BC37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B370E61B-4459-465D-AE7C-F1097F36BC37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B370E61B-4459-465D-AE7C-F1097F36BC37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B370E61B-4459-465D-AE7C-F1097F36BC37}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
