@@ -8,27 +8,5 @@
         <AssemblyName>ReactiveUI</AssemblyName>
         <RootNamespace>Reactive</RootNamespace>
     </PropertyGroup>
-    <ItemGroup>
-        <Reference Include="UnityEngine">
-            <HintPath>$(UnityAssembliesDir)\UnityEngine.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.CoreModule">
-            <HintPath>$(UnityAssembliesDir)\UnityEngine.CoreModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.UI">
-            <HintPath>$(UnityAssembliesDir)\UnityEngine.UI.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.UIModule">
-            <HintPath>$(UnityAssembliesDir)\UnityEngine.UIModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.UIElementsModule">
-            <HintPath>$(UnityAssembliesDir)\UnityEngine.UIElementsModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.InputModule">
-            <HintPath>$(UnityAssembliesDir)\UnityEngine.InputModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.ImageConversionModule">
-            <HintPath>$(UnityAssembliesDir)\UnityEngine.ImageConversionModule.dll</HintPath>
-        </Reference>
-    </ItemGroup>
+    <Import Project="..\ReactiveUI.Unity.targets"/>
 </Project>
