@@ -4,11 +4,11 @@ namespace Reactive {
     internal class YogaContext {
         public YogaNode YogaNode {
             get {
-                _yogaNode.Touch();
+                _yogaNode ??= new();
                 return _yogaNode;
             }
         }
 
-        private YogaNode _yogaNode;
+        private YogaNode? _yogaNode;
     }
 }

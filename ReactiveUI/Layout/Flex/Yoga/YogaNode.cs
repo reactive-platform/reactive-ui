@@ -2,7 +2,11 @@ using System;
 using UnityEngine;
 
 namespace Reactive.Yoga {
-    internal struct YogaNode : IDisposable, IEquatable<YogaNode> {
+    internal class YogaNode : IDisposable, IEquatable<YogaNode> {
+        public YogaNode() {
+            Init();
+        }
+        
         #region Create & Dispose
 
         public bool IsInitialized { get; private set; }
@@ -15,7 +19,7 @@ namespace Reactive.Yoga {
 
         private IntPtr _nodePtr;
 
-        public void Touch() {
+        private void Init() {
             if (IsInitialized) return;
             _nodePtr = YogaNative.YGNodeNew();
             IsInitialized = true;

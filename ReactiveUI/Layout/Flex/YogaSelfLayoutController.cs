@@ -1,6 +1,6 @@
 namespace Reactive.Yoga {
     public sealed class YogaSelfLayoutController : YogaLayoutController {
-        private YogaNode _pseudoRootNode;
+        private YogaNode? _pseudoRootNode;
         private bool _pseudoParentConnected;
         private ILayoutItem? _layoutItem;
 
@@ -9,15 +9,15 @@ namespace Reactive.Yoga {
                 DisconnectPseudoRoot();
                 return;
             }
-            if (!_pseudoRootNode.IsInitialized) {
-                _pseudoRootNode.Touch();
+            if (!_pseudoRootNode.GetIsInitialized()) {
+                _pseudoRootNode = new();
                 _pseudoRootNode.StyleSetJustifyContent(Justify.Center);
                 _pseudoRootNode.StyleSetAlignItems(Align.Auto);
                 RecalculateInternal();
             }
             var recalculationRequired = false;
             if (!_pseudoParentConnected) {
-                _pseudoRootNode.InsertChild(YogaNode, 0);
+                _pseudoRootNode!.InsertChild(YogaNode, 0);
                 _pseudoParentConnected = true;
                 recalculationRequired = true;
             }
@@ -33,7 +33,7 @@ namespace Reactive.Yoga {
         }
 
         protected override void RecalculateInternal() {
-            if (!_pseudoRootNode.IsInitialized) {
+            if (!_pseudoRootNode.GetIsInitialized()) {
                 base.RecalculateInternal();
             } else if (_layoutItem is { LayoutModifier: YogaModifier mod }) {
                 CalculateRequiredAxis(mod, out var x, out var y);
@@ -48,7 +48,7 @@ namespace Reactive.Yoga {
 
         private void CalculatePseudoRoot(bool applyX, bool applyY) {
             //making dynamic axis the main one to stretch against the opposite axis if needed
-            _pseudoRootNode.StyleSetFlexDirection(applyX ? FlexDirection.Row : FlexDirection.Column);
+            _pseudoRootNode!.StyleSetFlexDirection(applyX ? FlexDirection.Row : FlexDirection.Column);
             _pseudoRootNode.StyleSetAlignItems(!applyX || !applyY ? Align.Stretch : Align.Auto);
             //calculating
             _pseudoRootNode.CalculateLayout(
@@ -69,8 +69,8 @@ namespace Reactive.Yoga {
         }
 
         private void DisconnectPseudoRoot() {
-            if (!_pseudoRootNode.IsInitialized || !_pseudoParentConnected) return;
-            _pseudoRootNode.RemoveAllChildren();
+            if (!_pseudoRootNode.GetIsInitialized() || !_pseudoParentConnected) return;
+            _pseudoRootNode!.RemoveAllChildren();
             _pseudoParentConnected = false;
         }
     }

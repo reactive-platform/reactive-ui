@@ -130,8 +130,8 @@ namespace Reactive.Yoga {
 
         public sealed override void ProvideContext(object? context) {
             if (context == null) {
-                if (_contextNode.IsInitialized) {
-                    _contextNode.RemoveAllChildren();
+                if (_contextNode.GetIsInitialized()) {
+                    _contextNode!.RemoveAllChildren();
                 }
                 _contextNode = default;
                 return;
@@ -158,14 +158,14 @@ namespace Reactive.Yoga {
 
         internal YogaNode YogaNode {
             get {
-                YogaNode node;
+                YogaNode? node;
                 if (UseIndependentLayout) {
-                    _layoutNode.Touch();
+                    _layoutNode = new();
                     node = _layoutNode;
                 } else {
                     node = _contextNode;
                 }
-                if (!node.IsInitialized) {
+                if (node is not { IsInitialized: true }) {
                     throw new Exception("Node was not initialized");
                 }
                 return node;
@@ -173,8 +173,8 @@ namespace Reactive.Yoga {
         }
 
         private bool _useIndependentLayout;
-        private YogaNode _layoutNode;
-        private YogaNode _contextNode;
+        private YogaNode? _layoutNode;
+        private YogaNode? _contextNode;
 
         public sealed override void Recalculate(bool root) {
             ReloadChildrenVisibility();
