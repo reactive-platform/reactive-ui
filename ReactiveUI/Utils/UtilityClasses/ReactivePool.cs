@@ -53,7 +53,7 @@ namespace Reactive {
     }
 
     [PublicAPI]
-    internal class ReactivePool<T> where T : IReactiveComponent, new() {
+    public class ReactivePool<T> where T : IReactiveComponent, new() {
         public IReadOnlyList<T> SpawnedComponents => _spawnedComponents;
         public bool DetachOnDespawn = true;
 
