@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Reactive {
-    internal class ObservableSet<T>(
+    [PublicAPI]
+    public class ObservableSet<T>(
         Action<T>? addedCallback = null,
         Action<T>? removedCallback = null,
         Action<IEnumerable<T>>? allRemovedCallback = null
@@ -14,7 +16,8 @@ namespace Reactive {
         allRemovedCallback
     );
 
-    internal class ObservableCollectionAdapter<T> : ICollection<T>, IReadOnlyCollection<T> {
+    [PublicAPI]
+    public class ObservableCollectionAdapter<T> : ICollection<T>, IReadOnlyCollection<T> {
         #region Adapter
 
         public ObservableCollectionAdapter(

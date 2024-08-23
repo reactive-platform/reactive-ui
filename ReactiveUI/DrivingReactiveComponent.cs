@@ -82,7 +82,7 @@ namespace Reactive {
 
         IEnumerable<ILayoutItem> ILayoutDriver.Children => Children;
 
-        private ObservableCollectionAdapter<ILayoutItem> _children = null!;
+        private ObservableSet<ILayoutItem> _children = null!;
 
         void ILayoutDriver.AppendChild(ILayoutItem item) {
             if (ContainsChild(item)) return;
@@ -187,8 +187,7 @@ namespace Reactive {
 
         protected sealed override void ConstructInternal() {
             base.ConstructInternal();
-            _children = new(
-                new HashSet<ILayoutItem>(layoutItemComparer),
+            _children = new ObservableSet<ILayoutItem>(
                 AppendChildInternal,
                 TruncateChildInternal,
                 TruncateChildrenInternal
