@@ -1,15 +1,15 @@
 <Project>
-	<PropertyGroup>
+    <PropertyGroup>
         <!-- Can be replaced by requiring project if needed -->
         <ReactiveDir>..\reactive-ui\ReactiveUI\</ReactiveDir>
         <ReactiveProject>$(ReactiveDir)\ReactiveUI.csproj</ReactiveProject>
     </PropertyGroup>
-	<ItemGroup>
+    <ItemGroup>
         <Reference Include="ReactiveUI">
             <HintPath>$(ReactiveDir)\bin\$(Configuration)\$(TargetFramework)\ReactiveUI.dll</HintPath>
         </Reference>
     </ItemGroup>
-	<Target Name="BuildReactiveUI" BeforeTargets="Build">
+    <Target Name="BuildReactiveUI" BeforeTargets="PrepareForBuild">
         <Message Importance="high" Text="Started building project: ReactiveUI"/>
         <!-- Restoring nugets -->
         <Message Importance="high" Text="Restoring nugets..."/>
