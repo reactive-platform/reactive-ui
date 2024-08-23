@@ -7,25 +7,6 @@ namespace Reactive {
     public static class AnimationExtensions {
         #region Transition Extensions
 
-        public static T WithTransitions<T, TValue>(
-            this T target,
-            Expression<Func<T, TValue>> expression,
-            params AnimationBuilder<TValue>[] builders
-        ) where T : IStateAnimationHost {
-            foreach (var builder in builders) {
-                WithTransition(
-                    target,
-                    out _,
-                    builder.state,
-                    expression,
-                    builder.value,
-                    builder.duration,
-                    builder.curve
-                );
-            }
-            return target;
-        }
-
         public static T WithTransition<T, TValue>(
             this T target,
             ComponentState state,
