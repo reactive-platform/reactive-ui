@@ -11,15 +11,17 @@ namespace Reactive {
             _valueInterpolator = valueInterpolator;
             _set = false;
             _setThisFrame = true;
+            _elapsedTime = 0f;
         }
 
         public T Value {
             get => _endValue;
             set {
                 if (_valueInterpolator.Equals(_endValue, value)) return;
-                _startValue = _endValue;
-                _set = false;
+                _startValue = CurrentValue;
+                _elapsedTime = 0f;
                 _endValue = value;
+                _set = false;
                 _setThisFrame = true;
             }
         }
@@ -43,17 +45,16 @@ namespace Reactive {
         private T _endValue;
         private T _startValue;
 
-        private float _targetProgress = 1f;
         private float _progress;
         private float _elapsedTime;
-        
+
         private bool _setThisFrame;
         private bool _set;
 
         public void ClearBindings() {
             ValueChangedEvent = null;
         }
-        
+
         public void OnUpdate() {
             if (_set) return;
             _elapsedTime += Time.deltaTime;
