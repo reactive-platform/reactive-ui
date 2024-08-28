@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.Pool;
 using Object = UnityEngine.Object;
 
 namespace Reactive {
@@ -28,7 +29,7 @@ namespace Reactive {
     }
 
     [PublicAPI]
-    public abstract partial class ReactiveComponentBase : ILayoutItem, IObservableHost, IReactiveComponent {
+    public abstract partial class ReactiveComponentBase : ILayoutItem, IObservableHost, IReactiveComponent, IEffectBinder, IReactiveModuleBinder {
         #region Factory
 
         [UsedImplicitly]
@@ -172,6 +173,55 @@ namespace Reactive {
 
         #endregion
 
+        #region Effects
+
+        public void BindEffect<T>(INotifyValueChanged<T> value, IEffect<T> effect) {
+            Host.BindEffect(value, effect);
+        }
+
+        public void UnbindEffect<T>(INotifyValueChanged<T> value, IEffect<T> effect) {
+            Host.UnbindEffect(value, effect);
+        }
+
+        #endregion
+
+        #region Modules
+
+        private HashSet<IReactiveModule>? _modules;
+
+        public void BindModule(IReactiveModule module) {
+            if (LoadModules()) {
+                _modules!.Add(module);
+            } else {
+                Host.BindModule(module);
+            }
+        }
+
+        public void UnbindModule(IReactiveModule module) {
+            if (LoadModules()) {
+                _modules!.Remove(module);
+            } else {
+                Host.UnbindModule(module);
+            }
+        }
+
+        private bool LoadModules() {
+            if (!IsInitialized) {
+                _modules = HashSetPool<IReactiveModule>.Get();
+            }
+            return !IsInitialized;
+        }
+
+        private void TransferModules() {
+            if (_modules == null) return;
+            foreach (var module in _modules) {
+                Host.BindModule(module);
+            }
+            HashSetPool<IReactiveModule>.Release(_modules);
+        }
+
+        #endregion
+
         #region Construct
 
         public RectTransform ContentTransform => _contentTransform ?? throw new UninitializedComponentException();
@@ -224,6 +274,7 @@ namespace Reactive {
             _reactiveHost = _content.GetOrAddComponent<ReactiveHost>();
             IsInitialized = true;
             _reactiveHost.AddComponent(this);
+            TransferModules();
         }
 
         private void ValidateExternalInteraction() {

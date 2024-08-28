@@ -28,12 +28,16 @@ namespace Reactive {
             }
             return false;
         }
-        
+
+        public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action) {
+            foreach (var item in enumerable) action(item);
+        }
+
         public static void Deconstruct<T1, T2>(this Tuple<T1, T2> tuple, out T1 var1, out T2 var2) {
             var1 = tuple.Item1;
             var2 = tuple.Item2;
         }
-        
+
         public static void Deconstruct<TKey, TValue>(this KeyValuePair<TKey, TValue> tuple, out TKey key, out TValue value) {
             key = tuple.Key;
             value = tuple.Value;

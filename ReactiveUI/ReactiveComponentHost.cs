@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Reactive {
     public abstract partial class ReactiveComponentBase {
         [RequireComponent(typeof(RectTransform))]
-        private class ReactiveHost : MonoBehaviour, ILayoutItem {
+        private class ReactiveHost : MonoBehaviour, ILayoutItem, IEffectBinder, IReactiveModuleBinder {
             #region LayoutItem
 
             public ILayoutDriver? LayoutDriver {
@@ -87,6 +87,49 @@ namespace Reactive {
 
             #endregion
 
+            #region Effects
+
+            private readonly Dictionary<object, HashSet<object>> _effects = new();
+
+            public void BindEffect<T>(INotifyValueChanged<T> value, IEffect<T> effect) {
+                if (!_effects.TryGetValue(value, out var effects)) {
+                    effects = new();
+                    _effects[value] = effects;
+                }
+                value.ValueChangedEvent += effect.Invoke;
+                effects.Add(effect);
+            }
+
+            public void UnbindEffect<T>(INotifyValueChanged<T> value, IEffect<T> effect) {
+                if (!_effects.TryGetValue(value, out var effects)) return;
+                value.ValueChangedEvent -= effect.Invoke;
+                effects.Remove(effect);
+            }
+
+            private void UnbindAllEffects() {
+                foreach (var (value, effects) in _effects) {
+                    var notifiable = (INotifyValueChanged)value;
+                    notifiable.ClearBindings();
+                    effects.Clear();
+                }
+            }
+
+            #endregion
+
+            #region Modules
+
+            private readonly HashSet<IReactiveModule> _modules = new();
+            
+            public void BindModule(IReactiveModule module) {
+                _modules.Add(module);
+            }
+
+            public void UnbindModule(IReactiveModule module) {
+                _modules.Remove(module);
+            }
+
+            #endregion
+
             #region Contexts
 
             private readonly Dictionary<Type, (object context, int members)> _contexts = new();
@@ -144,7 +187,7 @@ namespace Reactive {
 
             #endregion
 
-            #region Default Events
+            #region Events
 
             private RectTransform _rectTransform = null!;
 
@@ -159,6 +202,7 @@ namespace Reactive {
 
             private void Update() {
                 _components.ForEach(static x => x.OnUpdate());
+                _modules.ForEach(static x => x.OnUpdate());
             }
 
             private void LateUpdate() {
@@ -170,7 +214,9 @@ namespace Reactive {
             }
 
             private void OnDestroy() {
+                UnbindAllEffects();
                 _components.ForEach(static x => x.DestroyInternal());
+                _modules.ForEach(static x => x.OnDestroy());
                 IsDestroyed = true;
             }
 
