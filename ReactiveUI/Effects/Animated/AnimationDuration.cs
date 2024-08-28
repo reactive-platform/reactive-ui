@@ -11,7 +11,7 @@ namespace Reactive {
             return new FormatException("The input string was not in correct format. It must be a number with a time suffix");
         }
 
-        private static AnimationDuration CreateFromNumber(string str, float multiplier, int suffixLength = 1) {
+        private static AnimationDuration FromNumber(string str, float multiplier, int suffixLength = 1) {
             str = str.Remove(str.Length - suffixLength, suffixLength);
             if (!float.TryParse(str, out var num)) {
                 throw CreateInvalidFormatException();
@@ -23,10 +23,10 @@ namespace Reactive {
 
         public static implicit operator AnimationDuration(string str) {
             if (str.EndsWith("ms")) {
-                return CreateFromNumber(str, 0.001f, 2);
+                return FromNumber(str, 0.001f, 2);
             }
             if (str.EndsWith("s")) {
-                return CreateFromNumber(str, 1);
+                return FromNumber(str, 1);
             }
             throw CreateInvalidFormatException();
         }

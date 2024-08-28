@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
@@ -29,7 +28,7 @@ namespace Reactive {
     }
 
     [PublicAPI]
-    public abstract partial class ReactiveComponentBase : ILayoutItem, IObservableHost, IReactiveComponent, IStateAnimationHost {
+    public abstract partial class ReactiveComponentBase : ILayoutItem, IObservableHost, IReactiveComponent {
         #region Factory
 
         [UsedImplicitly]
@@ -143,35 +142,6 @@ namespace Reactive {
         protected void RefreshLayout() => Host.RefreshLayout();
 
         protected virtual void OnModifierUpdatedInternal() { }
-
-        #endregion
-
-        #region Animations
-
-        public IReadOnlyCollection<IAnimation> Animations => Host.AnimationHost.Animations;
-        private IStateAnimationHost AnimationHost => Host.AnimationHost;
-
-        protected virtual IEnumerable<ComponentState> ExtraStates => Array.Empty<ComponentState>();
-
-        /// <inheritdoc cref="IStateAnimationHost.AddStateAnimation"/>
-        public void AddStateAnimation(ComponentState selector, IAnimation animation) => AnimationHost.AddStateAnimation(selector, animation);
-
-        /// <inheritdoc cref="IStateAnimationHost.AddStateAnimation"/>
-        public void AddStateTransition(ComponentState selector, IAnimation animation) => AnimationHost.AddStateTransition(selector, animation);
-
-        /// <inheritdoc cref="IStateAnimationHost.AddAnimation"/>
-        public ComponentState? GetAnimationState(IAnimation animation) => AnimationHost.GetAnimationState(animation);
-
-        /// <inheritdoc cref="IStateAnimationHost.AddAnimation"/>
-        public void AddAnimation(IAnimation animation) => AnimationHost.AddAnimation(animation);
-
-        /// <inheritdoc cref="IStateAnimationHost.PauseAnimation"/>
-        public void PauseAnimation(IAnimation animation) => AnimationHost.PauseAnimation(animation);
-
-        /// <inheritdoc cref="IStateAnimationHost.ResumeAnimation"/>
-        public void ResumeAnimation(IAnimation animation) => AnimationHost.ResumeAnimation(animation);
-
-        protected void SetStateEnabled(ComponentState state, bool enabled) { }
 
         #endregion
 
@@ -306,20 +276,6 @@ namespace Reactive {
         protected virtual void OnLayoutRefresh() { }
         protected virtual void OnLayoutApply() { }
 
-        #endregion
-
-        #region PointerEvents
-
-        protected bool IsHovered => Host.IsHovered;
-        protected bool IsPressed => Host.IsPressed;
-        protected bool IsFocused => Host.IsFocused;
-
-        protected virtual void OnPointerDown(PointerEventData data) { }
-        protected virtual void OnPointerUp(PointerEventData data) { }
-        protected virtual void OnPointerEnter(PointerEventData data) { }
-        protected virtual void OnPointerExit(PointerEventData data) { }
-        protected virtual void OnPointerUpdated(PointerEventData data) { }
-        
         #endregion
     }
 }

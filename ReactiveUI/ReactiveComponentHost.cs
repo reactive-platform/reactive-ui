@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Reactive {
     public abstract partial class ReactiveComponentBase {
         [RequireComponent(typeof(RectTransform))]
-        private class ReactiveHost : MonoBehaviour, ILayoutItem, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler {
+        private class ReactiveHost : MonoBehaviour, ILayoutItem {
             #region LayoutItem
 
             public ILayoutDriver? LayoutDriver {
@@ -88,74 +87,6 @@ namespace Reactive {
 
             #endregion
 
-            #region Animations
-
-            public bool IsHovered { get; private set; }
-            public bool IsPressed { get; private set; }
-            public bool IsFocused => IsHovered || IsPressed;
-
-            public readonly AnimationHost AnimationHost = new();
-
-            private ComponentState _componentState;
-
-            public void OnPointerEnter(PointerEventData eventData) {
-                IsHovered = true;
-                RefreshComponentState();
-                foreach (var component in _components) {
-                    component.OnPointerEnter(eventData);
-                }
-                NotifyPointerUpdated(eventData);
-            }
-
-            public void OnPointerExit(PointerEventData eventData) {
-                IsHovered = false;
-                RefreshComponentState();
-                foreach (var component in _components) {
-                    component.OnPointerExit(eventData);
-                }
-                NotifyPointerUpdated(eventData);
-            }
-
-            public void OnPointerDown(PointerEventData eventData) {
-                IsPressed = true;
-                RefreshComponentState();
-                foreach (var component in _components) {
-                    component.OnPointerDown(eventData);
-                }
-                NotifyPointerUpdated(eventData);
-            }
-
-            public void OnPointerUp(PointerEventData eventData) {
-                IsPressed = false;
-                RefreshComponentState();
-                foreach (var component in _components) {
-                    component.OnPointerUp(eventData);
-                }
-                NotifyPointerUpdated(eventData);
-            }
-
-            private void RefreshComponentState() {
-                _componentState = ComponentState.Default;
-                if (IsHovered) {
-                    _componentState |= ComponentState.Hovered;
-                }
-                if (IsPressed) {
-                    _componentState |= ComponentState.Pressed;
-                }
-                if (IsHovered || IsPressed) {
-                    _componentState |= ComponentState.Focused;
-                }
-                AnimationHost.UpdateState(_componentState);
-            }
-
-            private void NotifyPointerUpdated(PointerEventData eventData) {
-                foreach (var component in _components) {
-                    component.OnPointerUpdated(eventData);
-                }
-            }
-
-            #endregion
-
             #region Contexts
 
             private readonly Dictionary<Type, (object context, int members)> _contexts = new();
@@ -204,13 +135,6 @@ namespace Reactive {
 
             public void AddComponent(ReactiveComponentBase comp) {
                 _components.Add(comp);
-                var states = AnimationHost.AvailableStates;
-                // we only keep extra states for the main component
-                if (_components.Count > 1) {
-                    var prev = _components[_components.Count - 2];
-                    states.RemoveRange(prev.ExtraStates);
-                }
-                states.AddRange(comp.ExtraStates);
                 if (IsStarted) comp.OnStart();
             }
 
@@ -234,7 +158,6 @@ namespace Reactive {
             }
 
             private void Update() {
-                AnimationHost.Update();
                 _components.ForEach(static x => x.OnUpdate());
             }
 
