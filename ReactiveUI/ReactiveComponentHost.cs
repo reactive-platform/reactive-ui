@@ -89,28 +89,59 @@ namespace Reactive {
 
             #region Effects
 
-            private readonly Dictionary<object, HashSet<object>> _effects = new();
+            private abstract class EffectBindingBase {
+                public abstract void UnbindAll();
+            }
+
+            private class EffectBinding<T> : EffectBindingBase {
+                public EffectBinding(INotifyValueChanged<T> value) {
+                    _value = value;
+                }
+
+                private readonly INotifyValueChanged<T> _value;
+                private readonly HashSet<IEffect<T>> _effects = new();
+
+                public void Bind(IEffect<T> effect) {
+                    _value.ValueChangedEvent += effect.Invoke;
+                    _effects.Add(effect);
+                }
+
+                public void Unbind(IEffect<T> effect) {
+                    if (!_effects.Contains(effect)) return;
+                    _value.ValueChangedEvent -= effect.Invoke;
+                    _effects.Remove(effect);
+                }
+
+                public override void UnbindAll() {
+                    foreach (var effect in _effects) {
+                        _value.ValueChangedEvent -= effect.Invoke;
+                    }
+                    _effects.Clear();
+                }
+            }
+
+            private readonly Dictionary<object, EffectBindingBase> _effects = new();
 
             public void BindEffect<T>(INotifyValueChanged<T> value, IEffect<T> effect) {
-                if (!_effects.TryGetValue(value, out var effects)) {
-                    effects = new();
-                    _effects[value] = effects;
+                EffectBinding<T> binding;
+                if (!_effects.TryGetValue(value, out var bin)) {
+                    binding = new EffectBinding<T>(value);
+                    _effects[value] = binding;
+                } else {
+                    binding = (EffectBinding<T>)bin;
                 }
-                value.ValueChangedEvent += effect.Invoke;
-                effects.Add(effect);
+                binding.Bind(effect);
             }
 
             public void UnbindEffect<T>(INotifyValueChanged<T> value, IEffect<T> effect) {
-                if (!_effects.TryGetValue(value, out var effects)) return;
-                value.ValueChangedEvent -= effect.Invoke;
-                effects.Remove(effect);
+                if (!_effects.TryGetValue(value, out var bin)) return;
+                var binding = (EffectBinding<T>)bin;
+                binding.Unbind(effect);
             }
 
             private void UnbindAllEffects() {
-                foreach (var (value, effects) in _effects) {
-                    var notifiable = (INotifyValueChanged)value;
-                    notifiable.ClearBindings();
-                    effects.Clear();
+                foreach (var (_, binding) in _effects) {
+                    binding.UnbindAll();
                 }
             }
 
@@ -119,7 +150,7 @@ namespace Reactive {
             #region Modules
 
             private readonly HashSet<IReactiveModule> _modules = new();
-            
+
             public void BindModule(IReactiveModule module) {
                 _modules.Add(module);
             }
