@@ -5,8 +5,8 @@
         <ReactiveProject>$(ReactiveDir)\ReactiveUI.csproj</ReactiveProject>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="ReactiveUI">
-            <HintPath>$(ReactiveDir)\bin\$(Configuration)\$(TargetFramework)\ReactiveUI.dll</HintPath>
+        <Reference Include="Reactive">
+            <HintPath>$(ReactiveDir)\bin\$(Configuration)\$(TargetFramework)\Reactive.dll</HintPath>
         </Reference>
     </ItemGroup>
     <Target Name="BuildReactiveUI" BeforeTargets="PrepareForBuild">
