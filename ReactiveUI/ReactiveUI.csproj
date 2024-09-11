@@ -5,7 +5,7 @@
         <UnityAssembliesDir>$(LocalRefsDir)</UnityAssembliesDir>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
-        <AssemblyName>ReactiveUI</AssemblyName>
+        <AssemblyName>Reactive</AssemblyName>
         <RootNamespace>Reactive</RootNamespace>
     </PropertyGroup>
     <Import Project="..\ReactiveUI.Unity.targets"/>
