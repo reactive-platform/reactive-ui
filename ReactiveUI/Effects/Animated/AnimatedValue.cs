@@ -37,6 +37,7 @@ namespace Reactive {
         public T CurrentValue => _valueInterpolator.Lerp(_startValue, _endValue, _progress);
 
         public AnimationDuration Duration { get; set; }
+        public AnimationCurve Curve { get; set; } = AnimationCurve.Exponential;
         public Action<AnimatedValue<T>>? OnFinish { get; set; }
 
         public event Action<T>? ValueChangedEvent;
@@ -59,6 +60,7 @@ namespace Reactive {
             if (_set) return;
             _elapsedTime += Time.deltaTime;
             Progress = Mathf.Clamp01(_elapsedTime / Duration);
+            Progress = Curve.Evaluate(Progress);
             //finishing
             if (_elapsedTime >= Duration) {
                 _set = true;

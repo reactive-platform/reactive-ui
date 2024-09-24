@@ -14,11 +14,13 @@ namespace Reactive {
             T initialValue,
             IValueInterpolator<T> interpolator,
             AnimationDuration duration,
+            AnimationCurve? curve = null,
             Action<AnimatedValue<T>>? onFinish = null
         ) {
             var value = new AnimatedValue<T>(initialValue, interpolator) {
                 Duration = duration,
-                OnFinish = onFinish
+                OnFinish = onFinish,
+                Curve = curve ?? AnimationCurve.Exponential
             };
             binder.BindModule(value);
             return value;
@@ -28,6 +30,7 @@ namespace Reactive {
             IReactiveModuleBinder binder,
             Color initialValue,
             AnimationDuration duration,
+            AnimationCurve? curve = null,
             Action<AnimatedValue<Color>>? onFinish = null
         ) {
             return RememberAnimated(
@@ -35,6 +38,7 @@ namespace Reactive {
                 initialValue,
                 ColorValueInterpolator.Instance,
                 duration,
+                curve,
                 onFinish
             );
         }
@@ -43,6 +47,7 @@ namespace Reactive {
             IReactiveModuleBinder binder,
             Vector2 initialValue,
             AnimationDuration duration,
+            AnimationCurve? curve = null,
             Action<AnimatedValue<Vector2>>? onFinish = null
         ) {
             return RememberAnimated(
@@ -50,6 +55,7 @@ namespace Reactive {
                 initialValue,
                 Vector2ValueInterpolator.Instance,
                 duration,
+                curve,
                 onFinish
             );
         }
@@ -58,6 +64,7 @@ namespace Reactive {
             IReactiveModuleBinder binder,
             Vector3 initialValue,
             AnimationDuration duration,
+            AnimationCurve? curve = null,
             Action<AnimatedValue<Vector3>>? onFinish = null
         ) {
             return RememberAnimated(
@@ -65,6 +72,7 @@ namespace Reactive {
                 initialValue,
                 Vector3ValueInterpolator.Instance,
                 duration,
+                curve,
                 onFinish
             );
         }
@@ -73,6 +81,7 @@ namespace Reactive {
             IReactiveModuleBinder binder,
             float initialValue,
             AnimationDuration duration,
+            AnimationCurve? curve = null,
             Action<AnimatedValue<float>>? onFinish = null
         ) {
             return RememberAnimated(
@@ -80,6 +89,7 @@ namespace Reactive {
                 initialValue,
                 SingleValueInterpolator.Instance,
                 duration,
+                curve,
                 onFinish
             );
         }
