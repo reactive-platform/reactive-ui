@@ -204,16 +204,16 @@ namespace Reactive {
 
         internal YogaNode YogaNode {
             get {
-                if (!_node.IsInitialized) {
+                if (!(_node?.IsInitialized ?? false)) {
                     throw new Exception("Node was not initialized");
                 }
                 return _node;
             }
         }
 
-        private bool HasValidNode => _node.IsInitialized;
+        private bool HasValidNode => _node?.IsInitialized ?? false;
 
-        private YogaNode _node;
+        private YogaNode? _node;
 
         protected override void OnLayoutItemUpdate() {
             RefreshSize();
