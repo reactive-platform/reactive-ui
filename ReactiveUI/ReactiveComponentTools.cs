@@ -4,6 +4,8 @@ using UnityEngine;
 namespace Reactive;
 
 public partial class ReactiveComponentBase {
+    #region Remember
+
     protected static ObservableValue<TValue> Remember<TValue>(TValue initialValue) {
         return new ObservableValue<TValue>(initialValue);
     }
@@ -53,4 +55,18 @@ public partial class ReactiveComponentBase {
     ) {
         return ValueUtils.RememberAnimated(this, initialValue, interpolator, duration, curve, onFinish);
     }
+
+    #endregion
+    
+    #region Animate
+    
+    protected IObjectAnimator<T> Animate<T>(
+        Action<T, float> callback,
+        AnimationDuration duration,
+        AnimationCurve? curve = null
+    ) {
+        return ValueUtils.Animate(this, callback, duration, curve);
+    }
+    
+    #endregion
 }

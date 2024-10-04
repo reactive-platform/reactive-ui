@@ -5,6 +5,12 @@ using UnityEngine;
 namespace Reactive {
     [PublicAPI]
     public static class ValueUtils {
+        #region Remember
+
+        
+
+        #endregion
+        
         public static ObservableValue<T> Remember<T>(T initialValue) {
             return new ObservableValue<T>(initialValue);
         }
@@ -92,6 +98,20 @@ namespace Reactive {
                 curve,
                 onFinish
             );
+        }
+        
+        public static IObjectAnimator<T> Animate<T>(
+            IReactiveModuleBinder binder,
+            Action<T, float> callback,
+            AnimationDuration duration,
+            AnimationCurve? curve = null
+        ) {
+            var animator = new ObjectAnimator<T>(callback) {
+                Duration = duration,
+                Curve = curve ?? AnimationCurve.Exponential
+            };
+            binder.BindModule(animator);
+            return animator;
         }
     }
 }
