@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace Reactive {
+    [PublicAPI]
     public static class CollectionExtensions {
         public static void RemoveValue<TKey, TValue>(
             this IDictionary<TKey, TValue> dictionary,
@@ -29,6 +31,15 @@ namespace Reactive {
             return false;
         }
 
+        public static int FindIndex<T>(this IEnumerable<T> collection, T item) {
+            var index = 0;
+            foreach (var i in collection) {
+                if (i?.Equals(item) ?? false) return index;
+                index++;
+            }
+            return -1;
+        }
+        
         public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action) {
             foreach (var item in enumerable) action(item);
         }
