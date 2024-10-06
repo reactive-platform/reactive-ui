@@ -29,6 +29,7 @@ namespace Reactive {
                 Progress = 0f;
             }
             _isFinished = false;
+            OnUpdate();
         }
 
         public void StopAnimation(bool finish = false) {
