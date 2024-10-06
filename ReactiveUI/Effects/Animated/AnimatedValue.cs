@@ -52,6 +52,13 @@ namespace Reactive {
         private bool _setThisFrame;
         private bool _set;
 
+        public void SetValueImmediate(T value) {
+            _set = true;
+            Progress = 1f;
+            _endValue = _valueInterpolator.Lerp(_startValue, _endValue, 1f);
+            FinishAnimation();
+        }
+        
         public void ClearBindings() {
             ValueChangedEvent = null;
         }
@@ -63,12 +70,16 @@ namespace Reactive {
             Progress = Curve.Evaluate(Progress);
             //finishing
             if (_elapsedTime >= Duration) {
-                _set = true;
-                _elapsedTime = 0f;
-                OnFinish?.Invoke(this);
+                FinishAnimation();
             }
         }
 
+        private void FinishAnimation() {
+            _set = true;
+            _elapsedTime = 0f;
+            OnFinish?.Invoke(this);
+        }
+        
         void IReactiveModule.OnDestroy() { }
     }
 }
