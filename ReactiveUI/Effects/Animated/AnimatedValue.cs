@@ -54,10 +54,10 @@ namespace Reactive {
 
         public void SetValueImmediate(T value) {
             _set = true;
-            Progress = 1f;
             _startValue = value;
             _endValue = value;
             _endValue = _valueInterpolator.Lerp(_startValue, _endValue, 1f);
+            Progress = 1f;
             FinishAnimation();
         }
         
