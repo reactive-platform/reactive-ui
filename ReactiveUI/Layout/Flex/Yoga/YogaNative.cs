@@ -3,6 +3,10 @@ using System.Runtime.InteropServices;
 
 namespace Reactive.Yoga {
     internal static class YogaNative {
+        static YogaNative() {
+            YogaConfig.Default.SetPointScaleFactor(0f);
+        }
+
         private const string YogaDllName = "yoga";
 
         #region YGBindings
