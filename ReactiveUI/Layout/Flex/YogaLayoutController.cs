@@ -160,7 +160,7 @@ namespace Reactive.Yoga {
             get {
                 YogaNode? node;
                 if (UseIndependentLayout) {
-                    _layoutNode = new();
+                    _layoutNode ??= new();
                     node = _layoutNode;
                 } else {
                     node = _contextNode;
