@@ -19,8 +19,12 @@ namespace Reactive {
             set {
                 if (_valueInterpolator.Equals(_endValue, value)) return;
                 _startValue = CurrentValue;
-                _elapsedTime = 0f;
                 _endValue = value;
+                if (Mode is InterpolationMode.TimeDelta) {
+                    _progress = 0f;
+                } else {
+                    _elapsedTime = 0f;
+                }
                 _set = false;
                 _setThisFrame = true;
             }
@@ -37,7 +41,7 @@ namespace Reactive {
         public T CurrentValue => _valueInterpolator.Lerp(_startValue, _endValue, _progress);
 
         public InterpolationMode Mode { get; set; } = InterpolationMode.Curve;
-        public float LerpFactor { get; set; }
+        public float LerpFactor { get; set; } = 10f;
 
         public AnimationDuration Duration { get; set; }
         public AnimationCurve Curve { get; set; } = AnimationCurve.Exponential;

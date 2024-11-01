@@ -17,15 +17,15 @@ namespace Reactive {
             IValueInterpolator<T> interpolator,
             AnimationDuration duration,
             float lerpFactor = 10f,
-            Optional<AnimationCurve> curve = default,
+            AnimationCurve? curve = null,
             Action<AnimatedValue<T>>? onFinish = null
         ) {
             var value = new AnimatedValue<T>(initialValue, interpolator) {
                 Duration = duration,
                 OnFinish = onFinish,
-                Curve = curve.GetValueOrDefault(AnimationCurve.Linear),
+                Curve = curve ?? AnimationCurve.Linear,
                 LerpFactor = 10f,
-                Mode = curve.HasValue ? InterpolationMode.Curve : InterpolationMode.TimeDelta
+                Mode = curve != null ? InterpolationMode.Curve : InterpolationMode.TimeDelta
             };
             binder.BindModule(value);
             return value;
@@ -36,7 +36,7 @@ namespace Reactive {
             Color initialValue,
             AnimationDuration duration,
             float lerpFactor = 10f,
-            Optional<AnimationCurve> curve = default,
+            AnimationCurve? curve = null,
             Action<AnimatedValue<Color>>? onFinish = null
         ) {
             return RememberAnimated(
@@ -55,7 +55,7 @@ namespace Reactive {
             Vector2 initialValue,
             AnimationDuration duration,
             float lerpFactor = 10f,
-            Optional<AnimationCurve> curve = default,
+            AnimationCurve? curve = null,
             Action<AnimatedValue<Vector2>>? onFinish = null
         ) {
             return RememberAnimated(
@@ -74,7 +74,7 @@ namespace Reactive {
             Vector3 initialValue,
             AnimationDuration duration,
             float lerpFactor = 10f,
-            Optional<AnimationCurve> curve = default,
+            AnimationCurve? curve = null,
             Action<AnimatedValue<Vector3>>? onFinish = null
         ) {
             return RememberAnimated(
@@ -93,7 +93,7 @@ namespace Reactive {
             float initialValue,
             AnimationDuration duration,
             float lerpFactor = 10f,
-            Optional<AnimationCurve> curve = default,
+            AnimationCurve? curve = null,
             Action<AnimatedValue<float>>? onFinish = null
         ) {
             return RememberAnimated(
