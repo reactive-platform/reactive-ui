@@ -36,6 +36,9 @@ namespace Reactive {
 
         public T CurrentValue => _valueInterpolator.Lerp(_startValue, _endValue, _progress);
 
+        public InterpolationMode Mode { get; set; } = InterpolationMode.Curve;
+        public float LerpFactor { get; set; }
+
         public AnimationDuration Duration { get; set; }
         public AnimationCurve Curve { get; set; } = AnimationCurve.Exponential;
         public Action<AnimatedValue<T>>? OnFinish { get; set; }
@@ -60,19 +63,27 @@ namespace Reactive {
             Progress = 1f;
             FinishAnimation();
         }
-        
+
         public void ClearBindings() {
             ValueChangedEvent = null;
         }
 
         public void OnUpdate() {
             if (_set) return;
-            _elapsedTime += Time.deltaTime;
-            Progress = Mathf.Clamp01(_elapsedTime / Duration);
-            Progress = Curve.Evaluate(Progress);
-            //finishing
-            if (_elapsedTime >= Duration) {
-                FinishAnimation();
+            if (Mode is InterpolationMode.Curve) {
+                _elapsedTime += Time.deltaTime;
+                Progress = Mathf.Clamp01(_elapsedTime / Duration);
+                Progress = Curve.Evaluate(Progress);
+                //finishing
+                if (_elapsedTime >= Duration) {
+                    FinishAnimation();
+                }
+            } else {
+                if (Math.Abs(1f - Progress) < 1e-6) {
+                    FinishAnimation();
+                    return;
+                }
+                Progress = Mathf.Lerp(Progress, 1f, Time.deltaTime * LerpFactor);
             }
         }
 
@@ -81,7 +92,7 @@ namespace Reactive {
             _elapsedTime = 0f;
             OnFinish?.Invoke(this);
         }
-        
+
         void IReactiveModule.OnDestroy() { }
     }
 }

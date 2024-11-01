@@ -7,10 +7,6 @@ namespace Reactive {
     public static class ValueUtils {
         #region Remember
 
-        
-
-        #endregion
-        
         public static ObservableValue<T> Remember<T>(T initialValue) {
             return new ObservableValue<T>(initialValue);
         }
@@ -20,13 +16,16 @@ namespace Reactive {
             T initialValue,
             IValueInterpolator<T> interpolator,
             AnimationDuration duration,
-            AnimationCurve? curve = null,
+            float lerpFactor = 10f,
+            Optional<AnimationCurve> curve = default,
             Action<AnimatedValue<T>>? onFinish = null
         ) {
             var value = new AnimatedValue<T>(initialValue, interpolator) {
                 Duration = duration,
                 OnFinish = onFinish,
-                Curve = curve ?? AnimationCurve.Exponential
+                Curve = curve.GetValueOrDefault(AnimationCurve.Linear),
+                LerpFactor = 10f,
+                Mode = curve.HasValue ? InterpolationMode.Curve : InterpolationMode.TimeDelta
             };
             binder.BindModule(value);
             return value;
@@ -36,7 +35,8 @@ namespace Reactive {
             IReactiveModuleBinder binder,
             Color initialValue,
             AnimationDuration duration,
-            AnimationCurve? curve = null,
+            float lerpFactor = 10f,
+            Optional<AnimationCurve> curve = default,
             Action<AnimatedValue<Color>>? onFinish = null
         ) {
             return RememberAnimated(
@@ -44,6 +44,7 @@ namespace Reactive {
                 initialValue,
                 ColorValueInterpolator.Instance,
                 duration,
+                lerpFactor,
                 curve,
                 onFinish
             );
@@ -53,7 +54,8 @@ namespace Reactive {
             IReactiveModuleBinder binder,
             Vector2 initialValue,
             AnimationDuration duration,
-            AnimationCurve? curve = null,
+            float lerpFactor = 10f,
+            Optional<AnimationCurve> curve = default,
             Action<AnimatedValue<Vector2>>? onFinish = null
         ) {
             return RememberAnimated(
@@ -61,6 +63,7 @@ namespace Reactive {
                 initialValue,
                 Vector2ValueInterpolator.Instance,
                 duration,
+                lerpFactor,
                 curve,
                 onFinish
             );
@@ -70,7 +73,8 @@ namespace Reactive {
             IReactiveModuleBinder binder,
             Vector3 initialValue,
             AnimationDuration duration,
-            AnimationCurve? curve = null,
+            float lerpFactor = 10f,
+            Optional<AnimationCurve> curve = default,
             Action<AnimatedValue<Vector3>>? onFinish = null
         ) {
             return RememberAnimated(
@@ -78,6 +82,7 @@ namespace Reactive {
                 initialValue,
                 Vector3ValueInterpolator.Instance,
                 duration,
+                lerpFactor,
                 curve,
                 onFinish
             );
@@ -87,7 +92,8 @@ namespace Reactive {
             IReactiveModuleBinder binder,
             float initialValue,
             AnimationDuration duration,
-            AnimationCurve? curve = null,
+            float lerpFactor = 10f,
+            Optional<AnimationCurve> curve = default,
             Action<AnimatedValue<float>>? onFinish = null
         ) {
             return RememberAnimated(
@@ -95,11 +101,12 @@ namespace Reactive {
                 initialValue,
                 SingleValueInterpolator.Instance,
                 duration,
+                lerpFactor,
                 curve,
                 onFinish
             );
         }
-        
+
         public static IObjectAnimator<T> Animate<T>(
             IReactiveModuleBinder binder,
             Action<T, float> callback,
@@ -113,5 +120,7 @@ namespace Reactive {
             binder.BindModule(animator);
             return animator;
         }
+
+        #endregion
     }
 }

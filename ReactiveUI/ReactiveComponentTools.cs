@@ -13,47 +13,52 @@ public partial class ReactiveComponentBase {
     protected AnimatedValue<Color> RememberAnimated(
         Color initialValue,
         AnimationDuration animationDuration,
-        AnimationCurve? curve = null,
+        float lerpFactor = 10f,
+        Optional<AnimationCurve> curve = default,
         Action<AnimatedValue<Color>>? onFinish = null
     ) {
-        return ValueUtils.RememberAnimatedColor(this, initialValue, animationDuration, curve, onFinish);
+        return ValueUtils.RememberAnimatedColor(this, initialValue, animationDuration, lerpFactor, curve, onFinish);
     }
 
     protected AnimatedValue<Vector2> RememberAnimated(
         Vector2 initialValue,
         AnimationDuration animationDuration,
-        AnimationCurve? curve = null,
+        float lerpFactor = 10f,
+        Optional<AnimationCurve> curve = default,
         Action<AnimatedValue<Vector2>>? onFinish = null
     ) {
-        return ValueUtils.RememberAnimatedVector(this, initialValue, animationDuration, curve, onFinish);
+        return ValueUtils.RememberAnimatedVector(this, initialValue, animationDuration, lerpFactor, curve, onFinish);
     }
 
     protected AnimatedValue<Vector3> RememberAnimated(
         Vector3 initialValue,
         AnimationDuration animationDuration,
-        AnimationCurve? curve = null,
+        float lerpFactor = 10f,
+        Optional<AnimationCurve> curve = default,
         Action<AnimatedValue<Vector3>>? onFinish = null
     ) {
-        return ValueUtils.RememberAnimatedVector(this, initialValue, animationDuration, curve, onFinish);
+        return ValueUtils.RememberAnimatedVector(this, initialValue, animationDuration, lerpFactor, curve, onFinish);
     }
 
     protected AnimatedValue<float> RememberAnimated(
         float initialValue,
         AnimationDuration animationDuration,
-        AnimationCurve? curve = null,
+        float lerpFactor = 10f,
+        Optional<AnimationCurve> curve = default,
         Action<AnimatedValue<float>>? onFinish = null
     ) {
-        return ValueUtils.RememberAnimatedFloat(this, initialValue, animationDuration, curve, onFinish);
+        return ValueUtils.RememberAnimatedFloat(this, initialValue, animationDuration, lerpFactor, curve, onFinish);
     }
 
     protected AnimatedValue<TValue> RememberAnimated<TValue>(
         TValue initialValue,
         IValueInterpolator<TValue> interpolator,
         AnimationDuration duration,
-        AnimationCurve? curve = null,
+        float lerpFactor = 10f,
+        Optional<AnimationCurve> curve = default,
         Action<AnimatedValue<TValue>>? onFinish = null
     ) {
-        return ValueUtils.RememberAnimated(this, initialValue, interpolator, duration, curve, onFinish);
+        return ValueUtils.RememberAnimated(this, initialValue, interpolator, duration, lerpFactor, curve, onFinish);
     }
 
     #endregion
