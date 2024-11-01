@@ -20,7 +20,7 @@ namespace Reactive {
                 if (_valueInterpolator.Equals(_endValue, value)) return;
                 _startValue = CurrentValue;
                 _endValue = value;
-                if (Mode is InterpolationMode.TimeDelta) {
+                if (Duration.Unit is DurationUnit.TimeDeltaFactor) {
                     _progress = 0f;
                 } else {
                     _elapsedTime = 0f;
@@ -40,11 +40,8 @@ namespace Reactive {
 
         public T CurrentValue => _valueInterpolator.Lerp(_startValue, _endValue, _progress);
 
-        public InterpolationMode Mode { get; set; } = InterpolationMode.Curve;
-        public float LerpFactor { get; set; } = 10f;
-
         public AnimationDuration Duration { get; set; }
-        public AnimationCurve Curve { get; set; } = AnimationCurve.Exponential;
+        public AnimationCurve Curve { get; set; } = AnimationCurve.Linear;
         public Action<AnimatedValue<T>>? OnFinish { get; set; }
 
         public event Action<T>? ValueChangedEvent;
@@ -74,20 +71,17 @@ namespace Reactive {
 
         public void OnUpdate() {
             if (_set) return;
-            if (Mode is InterpolationMode.Curve) {
+            
+            if (Duration.Unit is DurationUnit.Seconds) {
                 _elapsedTime += Time.deltaTime;
                 Progress = Mathf.Clamp01(_elapsedTime / Duration);
-                Progress = Curve.Evaluate(Progress);
-                //finishing
-                if (_elapsedTime >= Duration) {
-                    FinishAnimation();
-                }
             } else {
-                if (Math.Abs(1f - Progress) < 1e-6) {
-                    FinishAnimation();
-                    return;
-                }
-                Progress = Mathf.Lerp(Progress, 1f, Time.deltaTime * LerpFactor);
+                Progress = Mathf.Lerp(Progress, 1f, Time.deltaTime * Duration);
+            }
+            Progress = Curve.Evaluate(Progress);
+            //finishing
+            if (Math.Abs(1f - Progress) < 1e-6) {
+                FinishAnimation();
             }
         }
 

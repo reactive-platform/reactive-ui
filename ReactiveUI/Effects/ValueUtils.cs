@@ -16,16 +16,13 @@ namespace Reactive {
             T initialValue,
             IValueInterpolator<T> interpolator,
             AnimationDuration duration,
-            float lerpFactor = 10f,
             AnimationCurve? curve = null,
             Action<AnimatedValue<T>>? onFinish = null
         ) {
             var value = new AnimatedValue<T>(initialValue, interpolator) {
                 Duration = duration,
                 OnFinish = onFinish,
-                Curve = curve ?? AnimationCurve.Linear,
-                LerpFactor = 10f,
-                Mode = curve != null ? InterpolationMode.Curve : InterpolationMode.TimeDelta
+                Curve = curve ?? AnimationCurve.Linear
             };
             binder.BindModule(value);
             return value;
@@ -35,7 +32,6 @@ namespace Reactive {
             IReactiveModuleBinder binder,
             Color initialValue,
             AnimationDuration duration,
-            float lerpFactor = 10f,
             AnimationCurve? curve = null,
             Action<AnimatedValue<Color>>? onFinish = null
         ) {
@@ -44,7 +40,6 @@ namespace Reactive {
                 initialValue,
                 ColorValueInterpolator.Instance,
                 duration,
-                lerpFactor,
                 curve,
                 onFinish
             );
@@ -54,7 +49,6 @@ namespace Reactive {
             IReactiveModuleBinder binder,
             Vector2 initialValue,
             AnimationDuration duration,
-            float lerpFactor = 10f,
             AnimationCurve? curve = null,
             Action<AnimatedValue<Vector2>>? onFinish = null
         ) {
@@ -63,7 +57,6 @@ namespace Reactive {
                 initialValue,
                 Vector2ValueInterpolator.Instance,
                 duration,
-                lerpFactor,
                 curve,
                 onFinish
             );
@@ -73,7 +66,6 @@ namespace Reactive {
             IReactiveModuleBinder binder,
             Vector3 initialValue,
             AnimationDuration duration,
-            float lerpFactor = 10f,
             AnimationCurve? curve = null,
             Action<AnimatedValue<Vector3>>? onFinish = null
         ) {
@@ -82,7 +74,6 @@ namespace Reactive {
                 initialValue,
                 Vector3ValueInterpolator.Instance,
                 duration,
-                lerpFactor,
                 curve,
                 onFinish
             );
@@ -92,7 +83,6 @@ namespace Reactive {
             IReactiveModuleBinder binder,
             float initialValue,
             AnimationDuration duration,
-            float lerpFactor = 10f,
             AnimationCurve? curve = null,
             Action<AnimatedValue<float>>? onFinish = null
         ) {
@@ -101,7 +91,6 @@ namespace Reactive {
                 initialValue,
                 SingleValueInterpolator.Instance,
                 duration,
-                lerpFactor,
                 curve,
                 onFinish
             );
