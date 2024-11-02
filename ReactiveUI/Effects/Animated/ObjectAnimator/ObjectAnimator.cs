@@ -45,16 +45,26 @@ namespace Reactive {
 
         public void OnUpdate() {
             if (IsFinished) return;
-            _elapsedTime += Time.deltaTime;
-            Progress = Mathf.Clamp01(_elapsedTime / Duration);
+            
+            if (Duration.Unit is DurationUnit.Seconds) {
+                _elapsedTime += Time.deltaTime;
+                Progress = Mathf.Clamp01(_elapsedTime / Duration);
+            } else {
+                Progress = Mathf.Lerp(Progress, 1f, Time.deltaTime * Duration);
+            }
             Progress = Curve.Evaluate(Progress);
             _callback(_instance!, Progress);
             //finishing
-            if (_elapsedTime >= Duration) {
-                _isFinished = true;
-                _elapsedTime = 0f;
-                AnimationFinishedEvent?.Invoke();
+            if (Math.Abs(1f - Progress) < 1e-6) {
+                FinishAnimation();
             }
+        }
+
+        private void FinishAnimation() {
+            _isFinished = true;
+            _elapsedTime = 0f;
+            Progress = 0f;
+            AnimationFinishedEvent?.Invoke();
         }
 
         void IReactiveModule.OnDestroy() { }
