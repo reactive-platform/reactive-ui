@@ -24,7 +24,7 @@ namespace Reactive {
             return comp.WithModifier(null);
         }
 
-        public static T Bind<T>(this T comp, ref T variable) where T : IReactiveComponent {
+        public static T Bind<T, TBind>(this T comp, ref TBind variable) where T : TBind, IReactiveComponent {
             variable = comp;
             return comp;
         }
