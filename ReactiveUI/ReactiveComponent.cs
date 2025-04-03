@@ -29,7 +29,7 @@ namespace Reactive {
     }
 
     [PublicAPI]
-    public abstract partial class ReactiveComponentBase : ILayoutItem, IObservableHost, IReactiveComponent, IEffectBinder, IReactiveModuleBinder {
+    public abstract partial class ReactiveComponentBase : IReactiveComponent, IObservableHost, IEffectBinder, IReactiveModuleBinder {
         #region Factory
 
         [UsedImplicitly]
