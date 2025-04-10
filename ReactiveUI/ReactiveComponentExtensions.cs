@@ -39,7 +39,7 @@ namespace Reactive {
             return comp;
         }
 
-        public static RectTransform Use(this ReactiveComponentBase comp, GameObject parent) {
+        public static RectTransform Use(this ReactiveComponent comp, GameObject parent) {
             comp.Use(parent.GetOrAddComponent<RectTransform>());
             return comp.ContentTransform;
         }

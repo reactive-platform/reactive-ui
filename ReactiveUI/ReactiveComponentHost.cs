@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace Reactive {
-    public abstract partial class ReactiveComponentBase {
+    public abstract partial class ReactiveComponent {
         [RequireComponent(typeof(RectTransform))]
         private class ReactiveHost : MonoBehaviour, ILayoutItem, IEffectBinder, IReactiveModuleBinder {
             #region LayoutItem
@@ -37,9 +37,6 @@ namespace Reactive {
                 }
             }
 
-            public float? DesiredHeight => _components.LastOrDefault()?.DesiredHeight;
-            public float? DesiredWidth => _components.LastOrDefault()?.DesiredWidth;
-
             public bool WithinLayout {
                 get => Enabled || WithinLayoutIfDisabled;
                 set {
@@ -54,16 +51,24 @@ namespace Reactive {
 
             private ILayoutDriver? _layoutDriver;
             private ILayoutModifier? _modifier;
+            private bool _beingRecalculated;
 
-            bool IEquatable<ILayoutItem>.Equals(ILayoutItem other) {
-                return ReferenceEquals(other, this) || _components.Any(x => x == other);
+            public RectTransform BeginApply() {
+                if (_beingRecalculated) {
+                    throw new InvalidOperationException("Cannot begin layout application as it's already started");
+                }
+
+                _beingRecalculated = true;
+                return _rectTransform;
             }
 
-            public void ApplyTransforms(Action<RectTransform> applicator) {
-                _beingRecalculated = true;
-                applicator(_rectTransform);
+            public void EndApply() {
                 _beingRecalculated = false;
                 _components.ForEach(static x => x.OnLayoutApply());
+            }
+
+            public bool Equals(ILayoutItem other) {
+                return ReferenceEquals(other, this) || _components.Any(x => x == other);
             }
 
             #endregion
@@ -71,18 +76,19 @@ namespace Reactive {
             #region Layout
 
             private bool _recalculationScheduled;
-            private bool _beingRecalculated;
 
             public void RefreshLayout() {
-                if (_beingRecalculated) return;
+                if (_beingRecalculated) {
+                    return;
+                }
+
                 HandleModifierUpdated();
                 _components.ForEach(static x => x.OnLayoutRefresh());
             }
 
             private void HandleModifierUpdated() {
-                _modifier?.ReloadLayoutItem(this);
                 ModifierUpdatedEvent?.Invoke(this);
-                _components.ForEach(static x => x.OnModifierUpdatedInternal());
+                _components.ForEach(static x => x.OnModifierUpdated());
             }
 
             #endregion
@@ -205,14 +211,14 @@ namespace Reactive {
             public bool IsStarted { get; private set; }
             public bool IsDestroyed { get; private set; }
 
-            private readonly List<ReactiveComponentBase> _components = new();
+            private readonly List<ReactiveComponent> _components = new();
 
-            public void AddComponent(ReactiveComponentBase comp) {
+            public void AddComponent(ReactiveComponent comp) {
                 _components.Add(comp);
                 if (IsStarted) comp.OnStart();
             }
 
-            public void RemoveComponent(ReactiveComponentBase comp) {
+            public void RemoveComponent(ReactiveComponent comp) {
                 _components.Remove(comp);
             }
 
@@ -241,7 +247,7 @@ namespace Reactive {
                     RefreshLayout();
                     _recalculationScheduled = false;
                 }
-                _components.ForEach(static x => x.OnLateUpdateInternal());
+                _components.ForEach(static x => x.OnLateUpdate());
             }
 
             private void OnDestroy() {

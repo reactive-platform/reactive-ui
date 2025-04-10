@@ -1,8 +1,10 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Reactive.Yoga;
 
 namespace Reactive {
-    public class YogaModifier : ModifierBase<YogaModifier> {
+    [PublicAPI]
+    public class YogaModifier : LayoutModifierBase<YogaModifier> {
         #region Properties
 
         public PositionType PositionType {
@@ -11,7 +13,7 @@ namespace Reactive {
                 _positionType = value;
                 if (!HasValidNode) return;
                 YogaNode.StyleSetPositionType(value);
-                Refresh();
+                NotifyModifierUpdated();
             }
         }
 
@@ -21,7 +23,7 @@ namespace Reactive {
                 _alignSelf = value;
                 if (!HasValidNode) return;
                 YogaNode.StyleSetAlignSelf(value);
-                Refresh();
+                NotifyModifierUpdated();
             }
         }
 
@@ -31,7 +33,7 @@ namespace Reactive {
                 _flexBasis = value;
                 if (!HasValidNode) return;
                 YogaNode.StyleSetFlexBasis(value);
-                Refresh();
+                NotifyModifierUpdated();
             }
         }
 
@@ -41,7 +43,7 @@ namespace Reactive {
                 _flexGrow = value;
                 if (!HasValidNode) return;
                 YogaNode.StyleSetFlexGrow(value);
-                Refresh();
+                NotifyModifierUpdated();
             }
         }
 
@@ -51,7 +53,7 @@ namespace Reactive {
                 _flexShrink = value;
                 if (!HasValidNode) return;
                 YogaNode.StyleSetFlexShrink(value);
-                Refresh();
+                NotifyModifierUpdated();
             }
         }
 
@@ -61,7 +63,7 @@ namespace Reactive {
                 _position = value;
                 if (!HasValidNode) return;
                 RefreshPosition();
-                Refresh();
+                NotifyModifierUpdated();
             }
         }
 
@@ -70,8 +72,9 @@ namespace Reactive {
             set {
                 _size = value;
                 if (!HasValidNode) return;
-                RefreshSize();
-                Refresh();
+                YogaNode.StyleSetWidth(_size.x);
+                YogaNode.StyleSetHeight(_size.y);
+                NotifyModifierUpdated();
             }
         }
 
@@ -82,7 +85,7 @@ namespace Reactive {
                 if (!HasValidNode) return;
                 YogaNode.StyleSetMinWidth(value.x);
                 YogaNode.StyleSetMinHeight(value.y);
-                Refresh();
+                NotifyModifierUpdated();
             }
         }
 
@@ -93,7 +96,7 @@ namespace Reactive {
                 if (!HasValidNode) return;
                 YogaNode.StyleSetMaxWidth(value.x);
                 YogaNode.StyleSetMaxHeight(value.y);
-                Refresh();
+                NotifyModifierUpdated();
             }
         }
 
@@ -103,7 +106,7 @@ namespace Reactive {
                 _aspectRatio = value;
                 if (!HasValidNode) return;
                 YogaNode.StyleSetAspectRatio(value.value);
-                Refresh();
+                NotifyModifierUpdated();
             }
         }
 
@@ -113,7 +116,7 @@ namespace Reactive {
                 _margin = value;
                 if (!HasValidNode) return;
                 RefreshMargin();
-                Refresh();
+                NotifyModifierUpdated();
             }
         }
 
@@ -143,20 +146,6 @@ namespace Reactive {
             YogaNode.StyleSetPosition(Edge.Right, _position.right);
         }
 
-        private void RefreshSize() {
-            if (_size.x.unit is Unit.Auto && (LayoutItem?.DesiredWidth.HasValue ?? false)) {
-                YogaNode.StyleSetWidth(LayoutItem.DesiredWidth!.Value);
-            } else {
-                YogaNode.StyleSetWidth(_size.x);
-            }
-
-            if (_size.y.unit is Unit.Auto && (LayoutItem?.DesiredHeight.HasValue ?? false)) {
-                YogaNode.StyleSetHeight(LayoutItem.DesiredHeight!.Value);
-            } else {
-                YogaNode.StyleSetHeight(_size.y);
-            }
-        }
-
         private void RefreshAllProperties() {
             YogaNode.StyleSetPositionType(_positionType);
             YogaNode.StyleSetAlignSelf(_alignSelf);
@@ -168,9 +157,10 @@ namespace Reactive {
             YogaNode.StyleSetMaxWidth(_maxSize.x);
             YogaNode.StyleSetMaxHeight(_maxSize.y);
             YogaNode.StyleSetAspectRatio(_aspectRatio.value);
+            YogaNode.StyleSetWidth(_size.x);
+            YogaNode.StyleSetHeight(_size.y);
             RefreshMargin();
             RefreshPosition();
-            RefreshSize();
         }
 
         #endregion
@@ -182,20 +172,23 @@ namespace Reactive {
         public override object CreateContext() => new YogaContext();
 
         public override void ProvideContext(object? context) {
-            if (context == null) {
-                if (!HasValidNode) return;
-                //clearing properties to prevent size lock on this node
+            if (context != null) {
+                _node = ((YogaContext)context).YogaNode;
+                RefreshAllProperties();
+                return;
+            }
+
+            if (HasValidNode) {
+                // Clearing properties to prevent size lock on this node
                 _minSize = YogaVector.Undefined;
                 _maxSize = YogaVector.Undefined;
                 _size = YogaVector.Undefined;
                 _margin = YogaFrame.Undefined;
                 _aspectRatio = YogaValue.Undefined;
+                
                 RefreshAllProperties();
-                _node = default;
-                return;
+                _node = null;
             }
-            _node = ((YogaContext)context).YogaNode;
-            RefreshAllProperties();
         }
 
         #endregion
@@ -215,8 +208,11 @@ namespace Reactive {
 
         private YogaNode? _node;
 
-        protected override void OnLayoutItemUpdate() {
-            RefreshSize();
+        public override void ExposeLayoutItem(ILayoutItem item) {
+            if (item is ILeafLayoutItem leaf) {
+                // TODO: add leaf handling
+                throw new NotImplementedException();
+            }
         }
 
         public override void CopyFromSimilar(YogaModifier similar) {
@@ -233,7 +229,7 @@ namespace Reactive {
             AspectRatio = similar.AspectRatio;
             Margin = similar.Margin;
             SuppressRefresh = false;
-            Refresh();
+            NotifyModifierUpdated();
         }
 
         #endregion

@@ -127,8 +127,7 @@ namespace Reactive {
             Wrap wrap = Wrap.NoWrap,
             Overflow overflow = Overflow.Visible,
             YogaFrame? padding = null,
-            YogaVector? gap = null,
-            bool independentLayout = false
+            YogaVector? gap = null
         ) where T : ILayoutDriver {
             return AsYogaFlexGroup<T, YogaLayoutController>(
                 component,
@@ -140,8 +139,7 @@ namespace Reactive {
                 wrap,
                 overflow,
                 padding,
-                gap,
-                independentLayout
+                gap
             );
         }
 
@@ -155,8 +153,7 @@ namespace Reactive {
             Wrap wrap = Wrap.NoWrap,
             Overflow overflow = Overflow.Visible,
             YogaFrame? padding = null,
-            YogaVector? gap = null,
-            bool independentLayout = false
+            YogaVector? gap = null
         ) where T : ILayoutDriver {
             return AsYogaFlexGroup(
                 component,
@@ -168,8 +165,7 @@ namespace Reactive {
                 wrap,
                 overflow,
                 padding,
-                gap,
-                independentLayout
+                gap
             );
         }
 
@@ -186,10 +182,9 @@ namespace Reactive {
             Wrap wrap = Wrap.NoWrap,
             Overflow overflow = Overflow.Visible,
             YogaFrame? padding = null,
-            YogaVector? gap = null,
-            bool independentLayout = false
+            YogaVector? gap = null
         ) where T : ILayoutDriver {
-            return AsYogaFlexGroup<T, YogaSelfLayoutController>(
+            return AsYogaFlexGroup<T, YogaLayoutController>(
                 component,
                 out _,
                 direction,
@@ -199,14 +194,13 @@ namespace Reactive {
                 wrap,
                 overflow,
                 padding,
-                gap,
-                independentLayout
+                gap
             );
         }
 
         public static T AsRootFlexGroup<T>(
             this T component,
-            out YogaSelfLayoutController layoutController,
+            out YogaLayoutController layoutController,
             FlexDirection direction = FlexDirection.Row,
             Justify justifyContent = Justify.SpaceAround,
             Align alignItems = Align.Stretch,
@@ -214,8 +208,7 @@ namespace Reactive {
             Wrap wrap = Wrap.NoWrap,
             Overflow overflow = Overflow.Visible,
             YogaFrame? padding = null,
-            YogaVector? gap = null,
-            bool independentLayout = false
+            YogaVector? gap = null
         ) where T : ILayoutDriver {
             return AsYogaFlexGroup(
                 component,
@@ -227,8 +220,7 @@ namespace Reactive {
                 wrap,
                 overflow,
                 padding,
-                gap,
-                independentLayout
+                gap
             );
         }
 
@@ -246,8 +238,7 @@ namespace Reactive {
             Wrap wrap = Wrap.NoWrap,
             Overflow overflow = Overflow.Visible,
             YogaFrame? padding = null,
-            YogaVector? gap = null,
-            bool independentLayout = false
+            YogaVector? gap = null
         ) where T : ILayoutDriver where TController : YogaLayoutController, new() {
             if (component.LayoutController is not TController controller) {
                 controller = new();
@@ -261,7 +252,6 @@ namespace Reactive {
             controller.Overflow = overflow;
             controller.Padding = padding ?? controller.Padding;
             controller.Gap = gap ?? controller.Gap;
-            controller.UseIndependentLayout = independentLayout;
 
             layoutController = controller;
             return component;
@@ -300,7 +290,8 @@ namespace Reactive {
         }
 
         public static ILayoutItem WithRectExpand(this ILayoutItem component) {
-            component.ApplyTransforms(x => x.WithRectExpand());
+            component.BeginApply().WithRectExpand();
+            component.EndApply();
             return component;
         }
 

@@ -10,7 +10,7 @@ namespace Reactive.Yoga {
             set {
                 _overflow = value;
                 YogaNode.StyleSetOverflow(_overflow);
-                Refresh();
+                NotifyControllerUpdated();
             }
         }
 
@@ -19,7 +19,7 @@ namespace Reactive.Yoga {
             set {
                 _direction = value;
                 YogaNode.StyleSetDirection(_direction);
-                Refresh();
+                NotifyControllerUpdated();
             }
         }
 
@@ -28,7 +28,7 @@ namespace Reactive.Yoga {
             set {
                 _flexDirection = value;
                 YogaNode.StyleSetFlexDirection(_flexDirection);
-                Refresh();
+                NotifyControllerUpdated();
             }
         }
 
@@ -37,7 +37,7 @@ namespace Reactive.Yoga {
             set {
                 _flexWrap = value;
                 YogaNode.StyleSetFlexWrap(_flexWrap);
-                Refresh();
+                NotifyControllerUpdated();
             }
         }
 
@@ -46,7 +46,7 @@ namespace Reactive.Yoga {
             set {
                 _justifyContent = value;
                 YogaNode.StyleSetJustifyContent(_justifyContent);
-                Refresh();
+                NotifyControllerUpdated();
             }
         }
 
@@ -55,7 +55,7 @@ namespace Reactive.Yoga {
             set {
                 _alignItems = value;
                 YogaNode.StyleSetAlignItems(_alignItems);
-                Refresh();
+                NotifyControllerUpdated();
             }
         }
 
@@ -64,7 +64,7 @@ namespace Reactive.Yoga {
             set {
                 _alignContent = value;
                 YogaNode.StyleSetAlignContent(_alignContent);
-                Refresh();
+                NotifyControllerUpdated();
             }
         }
 
@@ -73,7 +73,7 @@ namespace Reactive.Yoga {
             set {
                 _padding = value;
                 RefreshPadding();
-                Refresh();
+                NotifyControllerUpdated();
             }
         }
 
@@ -82,7 +82,7 @@ namespace Reactive.Yoga {
             set {
                 _gap = value;
                 RefreshGap();
-                Refresh();
+                NotifyControllerUpdated();
             }
         }
 
@@ -136,6 +136,7 @@ namespace Reactive.Yoga {
                 _contextNode = default;
                 return;
             }
+            
             var c = (YogaContext)context;
             _contextNode = c.YogaNode;
             RefreshAllProperties();
@@ -145,84 +146,80 @@ namespace Reactive.Yoga {
 
         #region Calculations
 
-        public bool UseIndependentLayout {
-            get => _useIndependentLayout;
-            set {
-                var oldNode = YogaNode;
-                _useIndependentLayout = value;
-                var newNode = YogaNode;
-                ReloadChildrenInternal(newNode, oldNode);
-                RefreshAllProperties();
-            }
-        }
-
-        internal YogaNode YogaNode {
+        private YogaNode YogaNode {
             get {
-                YogaNode? node;
-                if (UseIndependentLayout) {
-                    _layoutNode ??= new();
-                    node = _layoutNode;
-                } else {
-                    node = _contextNode;
-                }
-                if (node is not { IsInitialized: true }) {
+                if (_contextNode is not { IsInitialized: true }) {
                     throw new Exception("Node was not initialized");
                 }
-                return node;
+                
+                return _contextNode;
             }
         }
 
-        private bool _useIndependentLayout;
-        private YogaNode? _layoutNode;
         private YogaNode? _contextNode;
 
-        public sealed override void Recalculate(bool root) {
+        public sealed override void Recalculate(ILayoutItem item) {
+            var transform = item.BeginApply();
+            var rect = transform.rect;
+            
+            YogaNode.CalculateLayout(rect.width, rect.height, Direction);
+            YogaNode.ApplyTo(transform);
+            
+            item.EndApply();
+        }
+
+        public override void PrepareForRecalculation() {
             ReloadChildrenVisibility();
-            if (!root && !UseIndependentLayout) return;
-            RecalculateInternal();
         }
-
-        protected virtual void RecalculateInternal() {
-            YogaNode.CalculateLayout(Rect.width, Rect.height, Direction);
-        }
-
-        public sealed override void ApplyChildren() {
-            foreach (var (child, node) in _nodes) {
-                child.ApplyTransforms(x => node.ApplyTo(x));
-            }
-        }
-
+        
         private void ReloadChildrenVisibility() {
             foreach (var (child, node) in _nodes) {
                 node.StyleSetDisplay(child.WithinLayout ? Display.Flex : Display.None);
             }
         }
 
-        public override void ApplySelf(ILayoutItem item) { }
-
         #endregion
 
         #region Children
 
+        public override int ChildCount => _nodes.Count;
+        
         private readonly Dictionary<ILayoutItem, YogaNode> _nodes = new();
-        private IEnumerable<ILayoutItem>? _children;
+        
+        public override void InsertChild(ILayoutItem comp, int index) {
+            if (comp.LayoutModifier is not YogaModifier modifier) {
+                return;
+            }
+            
+            if (_nodes.ContainsKey(comp)) {
+                return;
+            }
+            
+            YogaNode.InsertChild(modifier.YogaNode, index);
+            
+            _nodes.Add(comp, modifier.YogaNode);
+        }
+        
+        public override void RemoveChild(ILayoutItem comp) {
+            if (!_nodes.TryGetValue(comp, out var node)) {
+                return;
+            }
 
-        public sealed override void ReloadChildren(IEnumerable<ILayoutItem> children) {
-            _children = children;
-            ReloadChildrenInternal(YogaNode, null);
+            YogaNode.RemoveChild(node);
+            
+            _nodes.Remove(comp);
         }
 
-        private protected virtual void ReloadChildrenInternal(YogaNode node, YogaNode? fromNode) {
-            if (_children == null) return;
-            fromNode?.RemoveAllChildren();
-            node.RemoveAllChildren();
+        public override void RemoveAllChildren() {
+            YogaNode.RemoveAllChildren();
             _nodes.Clear();
-            var index = 0;
-            foreach (var child in _children) {
-                if (child.LayoutModifier is not YogaModifier modifier) continue;
-                node.InsertChild(modifier.YogaNode, index);
-                _nodes[child] = modifier.YogaNode;
-                index++;
+        }
+
+        public sealed override void ApplyChildren() {
+            foreach (var (child, node) in _nodes) {
+                var rect = child.BeginApply();
+                node.ApplyTo(rect);
+                child.EndApply();
             }
         }
 

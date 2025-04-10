@@ -10,32 +10,13 @@ using Object = UnityEngine.Object;
 
 namespace Reactive {
     [PublicAPI]
-    public abstract class ReactiveComponent : ReactiveComponentBase {
-        #region Overrides
-
-        protected sealed override void ConstructInternal() {
-            base.ConstructInternal();
-        }
-
-        protected sealed override void OnModifierUpdatedInternal() {
-            base.OnModifierUpdatedInternal();
-        }
-
-        protected sealed override void OnLateUpdateInternal() {
-            base.OnLateUpdateInternal();
-        }
-
-        #endregion
-    }
-
-    [PublicAPI]
-    public abstract partial class ReactiveComponentBase : IReactiveComponent, IObservableHost, IEffectBinder, IReactiveModuleBinder {
+    public abstract partial class ReactiveComponent : IReactiveComponent, IObservableHost, IEffectBinder, IReactiveModuleBinder {
         #region Factory
 
         [UsedImplicitly]
-        private ReactiveComponentBase(bool _) { }
+        private ReactiveComponent(bool _) { }
 
-        protected ReactiveComponentBase() {
+        protected ReactiveComponent() {
             ConstructAndInit();
         }
 
@@ -43,7 +24,7 @@ namespace Reactive {
         private static readonly object[] dummyParams = { false };
 
         public static T Lazy<T>() where T : ReactiveComponent, new() {
-            _lazyConstructor ??= typeof(ReactiveComponentBase).GetConstructor(
+            _lazyConstructor ??= typeof(ReactiveComponent).GetConstructor(
                 ReflectionUtils.DefaultFlags,
                 null,
                 new[] { typeof(bool) },
@@ -120,29 +101,31 @@ namespace Reactive {
             }
         }
 
-        float? ILayoutItem.DesiredHeight => Host.DesiredHeight;
-        float? ILayoutItem.DesiredWidth => Host.DesiredWidth;
-
         public bool WithinLayoutIfDisabled {
             get => _reactiveHost!.WithinLayoutIfDisabled;
             set => _reactiveHost!.WithinLayoutIfDisabled = value;
         }
-
-        protected virtual float? DesiredHeight => null;
-        protected virtual float? DesiredWidth => null;
 
         public event Action<ILayoutItem>? ModifierUpdatedEvent {
             add => Host.ModifierUpdatedEvent += value;
             remove => Host.ModifierUpdatedEvent -= value;
         }
 
-        bool IEquatable<ILayoutItem>.Equals(ILayoutItem other) => ((ILayoutItem)Host).Equals(other);
+        public RectTransform BeginApply() {
+            return Host.BeginApply();
+        }
 
-        void ILayoutItem.ApplyTransforms(Action<RectTransform> applicator) => Host.ApplyTransforms(applicator);
+        public void EndApply() {
+            Host.EndApply();
+        }
 
-        protected void RefreshLayout() => Host.RefreshLayout();
+        bool IEquatable<ILayoutItem>.Equals(ILayoutItem other) {
+            return Host.Equals(other);
+        }
 
-        protected virtual void OnModifierUpdatedInternal() { }
+        protected void RefreshLayout() {
+            Host.RefreshLayout();
+        }
 
         #endregion
 
@@ -247,7 +230,7 @@ namespace Reactive {
         private ReactiveHost? _reactiveHost;
 
         /// <summary>
-        /// Constructs and reparents the component if needed
+        /// Constructs and reparents the component if needed.
         /// </summary>
         public GameObject Use(Transform? parent = null) {
             ValidateExternalInteraction();
@@ -258,13 +241,11 @@ namespace Reactive {
         }
 
         private void ConstructAndInit() {
-            _observableHost = new(this);
-            ConstructInternal();
-            OnInitialize();
-        }
+            if (IsInitialized) {
+                throw new InvalidOperationException();
+            }
 
-        protected virtual void ConstructInternal() {
-            if (IsInitialized) throw new InvalidOperationException();
+            _observableHost = new(this);
             OnInstantiate();
 
             _content = Construct();
@@ -275,6 +256,8 @@ namespace Reactive {
             IsInitialized = true;
             _reactiveHost.AddComponent(this);
             TransferModules();
+
+            OnInitialize();
         }
 
         private void ValidateExternalInteraction() {
@@ -295,7 +278,7 @@ namespace Reactive {
         #region Destroy
 
         /// <summary>
-        /// Destroys the component
+        /// Destroys the component.
         /// </summary>
         public void Destroy() {
             Object.Destroy(Content);
@@ -311,10 +294,6 @@ namespace Reactive {
 
         #region Events
 
-        protected virtual void OnLateUpdateInternal() {
-            OnLateUpdate();
-        }
-
         protected virtual void OnInstantiate() { }
         protected virtual void OnInitialize() { }
         protected virtual void OnUpdate() { }
@@ -324,6 +303,8 @@ namespace Reactive {
         protected virtual void OnEnable() { }
         protected virtual void OnDisable() { }
         protected virtual void OnRectDimensionsChanged() { }
+        
+        protected virtual void OnModifierUpdated() { }
         protected virtual void OnLayoutRefresh() { }
         protected virtual void OnLayoutApply() { }
 

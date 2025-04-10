@@ -263,22 +263,18 @@ namespace Reactive.Yoga {
 
         #endregion
 
-        #region YGNode
-
-        public void CalculateLayout(float availableWidth, float availableHeight, Direction ownerDirection) {
-            YogaNative.YGNodeCalculateLayout(NodePtr, availableWidth, availableHeight, ownerDirection);
-        }
-
+        #region Children
+        
         public void InsertChild(YogaNode child, int index) {
-            YogaNative.YGNodeInsertChildSafe(NodePtr, child.NodePtr, index);
+            YogaNative.YGNodeInsertChild(NodePtr, child.NodePtr, index);
         }
 
         public void RemoveChild(YogaNode child) {
-            YogaNative.YGNodeRemoveChildSafe(NodePtr, child.NodePtr);
+            YogaNative.YGNodeRemoveChild(NodePtr, child.NodePtr);
         }
 
         public void RemoveAllChildren() {
-            YogaNative.YGNodeRemoveAllChildrenSafe(NodePtr);
+            YogaNative.YGNodeRemoveAllChildren(NodePtr);
         }
 
         #endregion
@@ -305,10 +301,17 @@ namespace Reactive.Yoga {
             rectTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Top, LayoutGetTop(), LayoutGetHeight());
             rectTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, LayoutGetLeft(), LayoutGetWidth());
         }
+        
+        public void CalculateLayout(float availableWidth, float availableHeight, Direction ownerDirection) {
+            YogaNative.YGNodeCalculateLayout(NodePtr, availableWidth, availableHeight, ownerDirection);
+        }
 
-        public void ApplySizeTo(RectTransform rectTransform, bool applyX, bool applyY) {
-            if (applyX) rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, LayoutGetWidth());
-            if (applyY) rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, LayoutGetHeight());
+        public bool GetHasNewLayout() {
+            return YogaNative.YGNodeGetHasNewLayout(NodePtr);
+        }
+
+        public void SetHasNewLayout(bool hasNewLayout) {
+            YogaNative.YGNodeSetHasNewLayout(NodePtr, hasNewLayout);
         }
 
         #endregion

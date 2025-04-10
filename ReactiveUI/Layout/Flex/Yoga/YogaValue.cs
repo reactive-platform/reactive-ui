@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 
 namespace Reactive.Yoga {
     [PublicAPI]
-    public struct YogaValue {
+    public struct YogaValue : IEquatable<YogaValue> {
         public YogaValue(float value, Unit unit) {
             this.value = value;
             this.unit = unit;
@@ -18,11 +17,29 @@ namespace Reactive.Yoga {
         public Unit unit;
 
         public override string ToString() {
-            return $"{value}.{unit}";
+            if (unit is Unit.Undefined) {
+                return "undefined";
+            }
+
+            if (unit is Unit.Auto) {
+                return "auto";
+            }
+            
+            var unt = unit switch {
+                Unit.Percent => "%",
+                Unit.Point => "pt",
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            
+            return $"{value}{unt}";
         }
 
         public static YogaValue Percent(float value) {
             return new YogaValue(value, Unit.Percent);
+        }
+        
+        public static YogaValue Point(float value) {
+            return new YogaValue(value, Unit.Point);
         }
 
         public static implicit operator YogaValue(float value) {
@@ -48,7 +65,7 @@ namespace Reactive.Yoga {
         }
 
         public static bool operator !=(YogaValue left, YogaValue right) {
-            return left.unit != right.unit || (left.unit is not Unit.Undefined && Math.Abs(left.value - right.value) >= 0.001f);
+            return !(left == right);
         }
 
         public bool Equals(YogaValue other) {

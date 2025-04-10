@@ -8,59 +8,58 @@ namespace Reactive.Yoga {
         }
 
         private const string YogaDllName = "yoga";
-
-        #region YGBindings
-
-        public enum YGLogLevel {
-            YGLogLevelError,
-            YGLogLevelWarn,
-            YGLogLevelInfo,
-            YGLogLevelDebug,
-            YGLogLevelVerbose,
-            YGLogLevelFatal
-        }
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void YGLoggerDelegate(string message, YGLogLevel logLevel);
-
-        [DllImport(YogaDllName, EntryPoint = "YGBindingsSetLogger")]
-        public static extern void YGBindingsSetLogger(YGLoggerDelegate callback);
-
-        #endregion
-
+        
         #region YGConfig
 
-        [DllImport(YogaDllName, EntryPoint = "YGConfigGetDefault")]
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void YGLoggerDelegate(IntPtr config, IntPtr node, LogLevel logLevel, string format, IntPtr args);
+
+        [DllImport(YogaDllName)]
         public static extern IntPtr YGConfigGetDefault();
 
-        [DllImport(YogaDllName, EntryPoint = "YGConfigSetPointScaleFactor")]
+        [DllImport(YogaDllName)]
         public static extern void YGConfigSetPointScaleFactor(IntPtr ptr, float factor);
+        
+        [DllImport(YogaDllName)]
+        public static extern void YGConfigSetLogger(IntPtr ptr, YGLoggerDelegate factor);
 
         #endregion
 
         #region YGNode
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeNew")]
+        [DllImport(YogaDllName)]
         public static extern IntPtr YGNodeNew();
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeFree")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeFree(IntPtr node);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeCalculateLayout")]
-        public static extern void YGNodeCalculateLayout(IntPtr node, float availableWidth, float availableHeight, Direction ownerDirection);
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeInsertChild(IntPtr node, IntPtr child, int index);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeInsertChildSafe")]
-        public static extern void YGNodeInsertChildSafe(IntPtr node, IntPtr child, int index);
-
-        [DllImport(YogaDllName, EntryPoint = "YGNodeRemoveChildSafe")]
-        public static extern void YGNodeRemoveChildSafe(IntPtr node, IntPtr child);
-
-        [DllImport(YogaDllName, EntryPoint = "YGNodeRemoveAllChildrenSafe")]
-        public static extern void YGNodeRemoveAllChildrenSafe(IntPtr node);
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeRemoveChild(IntPtr node, IntPtr child);
+        
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeRemoveAllChildren(IntPtr node);
 
         #endregion
 
         #region YGNodeLayout
+        
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void YGMeasureFunc(IntPtr node, float width, MeasureMode widthMode, float height, MeasureMode heightMode);
+
+        [DllImport(YogaDllName)]
+        public static extern bool YGNodeSetMeasureFunc(IntPtr node, YGMeasureFunc? measureFunc);
+        
+        [DllImport(YogaDllName)]
+        public static extern bool YGNodeGetHasNewLayout(IntPtr node);
+        
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeSetHasNewLayout(IntPtr node, bool value);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeCalculateLayout(IntPtr node, float availableWidth, float availableHeight, Direction ownerDirection);
 
         [DllImport(YogaDllName, EntryPoint = "YGNodeLayoutGetLeft")]
         public static extern float YGNodeLayoutGetLeft(IntPtr node);

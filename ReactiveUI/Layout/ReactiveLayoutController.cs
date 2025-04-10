@@ -8,23 +8,21 @@ namespace Reactive {
     public abstract class ReactiveLayoutController : ILayoutController {
         #region LayoutController
 
-        protected Rect Rect { get; private set; }
+        public abstract int ChildCount { get; }
         
         public event Action? LayoutControllerUpdatedEvent;
 
-        public void ReloadDimensions(Rect controllerRect) {
-            Rect = controllerRect;
-        }
-
-        protected void Refresh() {
+        protected void NotifyControllerUpdated() {
             LayoutControllerUpdatedEvent?.Invoke();
         }
 
-        public virtual void ReloadChildren(IEnumerable<ILayoutItem> children) { }
-
-        public abstract void Recalculate(bool root);
+        public abstract void InsertChild(ILayoutItem comp, int index);
+        public abstract void RemoveChild(ILayoutItem comp);
+        public abstract void RemoveAllChildren();
         public abstract void ApplyChildren();
-        public abstract void ApplySelf(ILayoutItem item);
+        
+        public abstract void Recalculate(ILayoutItem comp);
+        public virtual void PrepareForRecalculation() { }
 
         #endregion
 
