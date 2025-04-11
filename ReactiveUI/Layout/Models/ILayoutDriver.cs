@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Reactive {
     /// <summary>
@@ -7,10 +8,12 @@ namespace Reactive {
     /// </summary>
     [PublicAPI]
     public interface ILayoutDriver {
+        /// <summary>
+        /// An observable collection with children.
+        /// </summary>
+        ICollection<ILayoutItem> Children { get; }
         ILayoutController? LayoutController { get; set; }
-
-        void AppendChild(ILayoutItem comp);
-        void TruncateChild(ILayoutItem comp);
+        
         void RecalculateLayout();
     }
 }

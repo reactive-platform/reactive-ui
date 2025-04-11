@@ -16,8 +16,8 @@ namespace Reactive {
                     // do not change! truncation before assignment can cause deadlock!
                     var oldDriver = _layoutDriver;
                     _layoutDriver = value;
-                    oldDriver?.TruncateChild(this);
-                    _layoutDriver?.AppendChild(this);
+                    oldDriver?.Children.Remove(this);
+                    _layoutDriver?.Children.Add(this);
                 }
             }
 
