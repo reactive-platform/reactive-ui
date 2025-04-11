@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace Reactive {
-    public abstract partial class ReactiveComponent {
+    public partial class ReactiveComponent {
         [RequireComponent(typeof(RectTransform))]
         private class ReactiveHost : MonoBehaviour, ILayoutItem, IEffectBinder, IReactiveModuleBinder {
             #region LayoutItem

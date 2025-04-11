@@ -10,13 +10,13 @@ using Object = UnityEngine.Object;
 
 namespace Reactive {
     [PublicAPI]
-    public abstract partial class ReactiveComponent : IReactiveComponent, IObservableHost, IEffectBinder, IReactiveModuleBinder {
+    public partial class ReactiveComponent : IReactiveComponent, IObservableHost, IEffectBinder, IReactiveModuleBinder {
         #region Factory
 
         [UsedImplicitly]
         private ReactiveComponent(bool _) { }
 
-        protected ReactiveComponent() {
+        public ReactiveComponent() {
             ConstructAndInit();
         }
 
