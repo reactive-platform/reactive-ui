@@ -23,7 +23,12 @@ namespace Reactive {
         public static Texture2D? CreateTexture(byte[] bytes) {
             if (bytes.Length == 0) return null;
             var texture = new Texture2D(1, 1, TextureFormat.RGBA32, false, false);
-            return texture.LoadImage(bytes) ? texture : null;
+            try {
+                texture.LoadRawTextureData(bytes);
+            } catch {
+                return null;
+            }
+            return texture;
         }
 
         public static Sprite? CreateSprite(byte[] image) {
