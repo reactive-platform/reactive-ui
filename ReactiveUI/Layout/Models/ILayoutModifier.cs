@@ -13,6 +13,6 @@ namespace Reactive {
         /// Exposes a layout item in case the modifier needs to access impl-specific properties.
         /// </summary>
         /// <param name="item">The item modifier belongs to.</param>
-        void ExposeLayoutItem(ILayoutItem item);
+        void ExposeLayoutItem(ILayoutItem? item);
     }
 }

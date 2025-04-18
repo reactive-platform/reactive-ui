@@ -1,5 +1,3 @@
-using System;
-
 namespace Reactive.Yoga {
     public enum Align {
         Auto,
@@ -110,11 +108,11 @@ namespace Reactive.Yoga {
     }
 
     public enum LogLevel {
-        YGLogLevelError,
-        YGLogLevelWarn,
-        YGLogLevelInfo,
-        YGLogLevelDebug,
-        YGLogLevelVerbose,
-        YGLogLevelFatal
+        Error,
+        Warn,
+        Info,
+        Debug,
+        Verbose,
+        Fatal
     }
 }

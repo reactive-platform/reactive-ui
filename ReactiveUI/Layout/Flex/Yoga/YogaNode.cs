@@ -1,40 +1,73 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Reactive.Yoga {
     internal class YogaNode : IDisposable, IEquatable<YogaNode> {
-        public YogaNode() {
-            Init();
-        }
-        
-        #region Create & Dispose
+        #region Factory
 
-        public bool IsInitialized { get; private set; }
+        private YogaNode() { }
 
-        private IntPtr NodePtr {
-            get => _nodePtr == IntPtr.Zero ?
-                throw new UnassignedReferenceException("YogaNode was not initialized") :
-                _nodePtr;
-        }
+        private static readonly Dictionary<IntPtr, YogaNode> managedNodes = new();
 
-        private IntPtr _nodePtr;
+        public static YogaNode New() {
+            var node = new YogaNode {
+                _nodePtr = YogaNative.YGNodeNew()
+            };
 
-        private void Init() {
-            if (IsInitialized) return;
-            _nodePtr = YogaNative.YGNodeNew();
-            IsInitialized = true;
+            managedNodes.Add(node._nodePtr, node);
+
+            return node;
         }
 
-        public void Dispose() {
-            if (NodePtr == IntPtr.Zero) return;
-            YogaNative.YGNodeFree(NodePtr);
-            _nodePtr = IntPtr.Zero;
-            IsInitialized = false;
+        public static YogaNode? GetManaged(IntPtr ptr) {
+            if (ptr == IntPtr.Zero) {
+                return null;
+            }
+
+            if (!managedNodes.TryGetValue(ptr, out var node)) {
+                throw WrapperMissing(ptr);
+            }
+
+            return node;
+        }
+
+        public static YogaNode GetManagedOrThrow(IntPtr ptr) {
+            return GetManaged(ptr) ?? throw WrapperMissing(ptr);
+        }
+
+        private static Exception WrapperMissing(IntPtr ptr) {
+            return new InvalidOperationException($"Managed wrapper for pointer {ptr.ToString()} was not presented");
         }
 
         #endregion
 
-        #region Impl
+        #region State
+
+        public bool IsInitialized => _nodePtr != IntPtr.Zero;
+
+        private IntPtr NodePtr {
+            get {
+                if (_nodePtr == IntPtr.Zero) {
+                    throw new InvalidOperationException("YogaNode was not initialized");
+                }
+
+                return _nodePtr;
+            }
+        }
+
+        private IntPtr _nodePtr;
+
+        public void Dispose() {
+            if (NodePtr == IntPtr.Zero) {
+                return;
+            }
+
+            YogaNative.YGNodeFree(NodePtr);
+
+            managedNodes.Remove(_nodePtr);
+            _nodePtr = IntPtr.Zero;
+        }
 
         public bool Equals(YogaNode other) {
             return NodePtr == other.NodePtr;
@@ -264,9 +297,40 @@ namespace Reactive.Yoga {
         #endregion
 
         #region Children
-        
+
+        // Just for easier debugging
+        public IEnumerable<YogaNode> Children {
+            get {
+                var count = GetChildCount();
+
+                for (var i = 0; i < count; i++) {
+                    yield return GetChild(i);
+                }
+            }
+        }
+
+        public YogaNode? GetParent() {
+            var ptr = YogaNative.YGNodeGetParent(NodePtr);
+
+            return GetManaged(ptr);
+        }
+
         public void InsertChild(YogaNode child, int index) {
+            if (index < 0 || index > GetChildCount()) {
+                throw new ArgumentOutOfRangeException(nameof(child), "Index must be >= zero and <= child count");
+            }
+
             YogaNative.YGNodeInsertChild(NodePtr, child.NodePtr, index);
+        }
+
+        public int GetChildCount() {
+            return YogaNative.YGNodeGetChildCount(NodePtr);
+        }
+
+        public YogaNode GetChild(int index) {
+            var ptr = YogaNative.YGNodeGetChild(NodePtr, index);
+
+            return GetManagedOrThrow(ptr);
         }
 
         public void RemoveChild(YogaNode child) {
@@ -281,6 +345,19 @@ namespace Reactive.Yoga {
 
         #region Layout
 
+        // This field is crucial as runtime does not track references passed to the native code, so GC can
+        // easily collect the delegate. This would cause a crash when native code attempts to call the delegate
+        private YGMeasureFunc? _measureFunc;
+
+        public void SetMeasureFunc(YGMeasureFunc? measureFunc) {
+            _measureFunc = measureFunc;
+            YogaNative.YGNodeSetMeasureFunc(NodePtr, measureFunc);
+        }
+
+        public bool HasMeasureFunc() {
+            return YogaNative.YGNodeHasMeasureFunc(NodePtr);
+        }
+        
         public float LayoutGetLeft() {
             return YogaNative.YGNodeLayoutGetLeft(NodePtr);
         }
@@ -301,7 +378,7 @@ namespace Reactive.Yoga {
             rectTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Top, LayoutGetTop(), LayoutGetHeight());
             rectTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, LayoutGetLeft(), LayoutGetWidth());
         }
-        
+
         public void CalculateLayout(float availableWidth, float availableHeight, Direction ownerDirection) {
             YogaNative.YGNodeCalculateLayout(NodePtr, availableWidth, availableHeight, ownerDirection);
         }

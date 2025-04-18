@@ -124,7 +124,15 @@ namespace Reactive {
         }
 
         protected void RefreshLayout() {
-            Host.RefreshLayout();
+            Host.ScheduleLayoutRecalculation();
+        }
+
+        public override bool Equals(object? obj) {
+            return Host.Equals(obj);
+        }
+
+        public override int GetHashCode() {
+            return Host.GetHashCode();
         }
 
         #endregion
@@ -304,8 +312,19 @@ namespace Reactive {
         protected virtual void OnDisable() { }
         protected virtual void OnRectDimensionsChanged() { }
         
+        /// <summary>
+        /// Called when modifier is updated.
+        /// </summary>
         protected virtual void OnModifierUpdated() { }
-        protected virtual void OnLayoutRefresh() { }
+
+        /// <summary>
+        /// Called when host doesn't have a driver and needs a layout recalculation.
+        /// </summary>
+        protected virtual void OnRecalculateLayoutSelf() { }
+
+        /// <summary>
+        /// Called when layout application is finished.
+        /// </summary>
         protected virtual void OnLayoutApply() { }
 
         #endregion

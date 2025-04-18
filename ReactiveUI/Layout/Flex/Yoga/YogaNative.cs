@@ -5,14 +5,12 @@ namespace Reactive.Yoga {
     internal static class YogaNative {
         static YogaNative() {
             YogaConfig.Default.SetPointScaleFactor(0f);
+            YogaConfig.Default.SetDefaultLogger();
         }
 
         private const string YogaDllName = "yoga";
         
         #region YGConfig
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void YGLoggerDelegate(IntPtr config, IntPtr node, LogLevel logLevel, string format, IntPtr args);
 
         [DllImport(YogaDllName)]
         public static extern IntPtr YGConfigGetDefault();
@@ -20,8 +18,8 @@ namespace Reactive.Yoga {
         [DllImport(YogaDllName)]
         public static extern void YGConfigSetPointScaleFactor(IntPtr ptr, float factor);
         
-        [DllImport(YogaDllName)]
-        public static extern void YGConfigSetLogger(IntPtr ptr, YGLoggerDelegate factor);
+        [DllImport(YogaDllName, EntryPoint = "YGBindingsConfigSetLogger")]
+        public static extern void YGConfigSetLogger(IntPtr ptr, YogaLoggerDelegate? logger);
 
         #endregion
 
@@ -42,16 +40,25 @@ namespace Reactive.Yoga {
         [DllImport(YogaDllName)]
         public static extern void YGNodeRemoveAllChildren(IntPtr node);
 
+        [DllImport(YogaDllName)]
+        public static extern IntPtr YGNodeGetParent(IntPtr node);
+        
+        [DllImport(YogaDllName)]
+        public static extern int YGNodeGetChildCount(IntPtr node);
+        
+        [DllImport(YogaDllName)]
+        public static extern IntPtr YGNodeGetChild(IntPtr node, int index);
+
         #endregion
 
         #region YGNodeLayout
-        
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void YGMeasureFunc(IntPtr node, float width, MeasureMode widthMode, float height, MeasureMode heightMode);
 
         [DllImport(YogaDllName)]
-        public static extern bool YGNodeSetMeasureFunc(IntPtr node, YGMeasureFunc? measureFunc);
+        public static extern void YGNodeSetMeasureFunc(IntPtr node, YGMeasureFunc? measureFunc);
         
+        [DllImport(YogaDllName)]
+        public static extern bool YGNodeHasMeasureFunc(IntPtr node);
+
         [DllImport(YogaDllName)]
         public static extern bool YGNodeGetHasNewLayout(IntPtr node);
         

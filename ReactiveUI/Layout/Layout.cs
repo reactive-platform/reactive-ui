@@ -25,10 +25,11 @@ namespace Reactive {
                     InsertContextMember(_layoutController);
                     _layoutController.LayoutControllerUpdatedEvent += ScheduleLayoutRecalculation;
 
-                    var i = 0;
                     foreach (var child in Children) {
-                        _layoutController.InsertChild(child, i);
-                        i++;
+                        var index = _layoutController.ChildCount;
+                        // Components without modifiers are not added to the hierarchy, so instead of
+                        // just incrementing the index each cycle, we rely on the actual child count
+                        _layoutController.InsertChild(child, index);
                     }
                 }
             }
@@ -38,7 +39,20 @@ namespace Reactive {
         private bool _beingRecalculated;
         private bool _recalculationScheduled;
 
-        private void RecalculateLayoutInternal(bool root) {
+        // Guard for requests from other components
+        private float _lastRecalculationTime;
+
+        // Guard for requests from itself
+        private bool _recalculatedThisFrame;
+
+        private void RecalculateLayoutInternal() {
+            var time = Time.time;
+            // Used to prevent multiple recalculations
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (_lastRecalculationTime == time) {
+                return;
+            }
+
             if (_layoutController == null || Children.Count == 0) {
                 return;
             }
@@ -46,6 +60,8 @@ namespace Reactive {
             _layoutController.PrepareForRecalculation();
             _layoutController.Recalculate(this);
             _layoutController.ApplyChildren();
+
+            _lastRecalculationTime = Time.time;
         }
 
         public void RecalculateLayout() {
@@ -60,7 +76,7 @@ namespace Reactive {
                 return;
             }
 
-            RecalculateLayoutInternal(true);
+            RecalculateLayoutInternal();
             _beingRecalculated = false;
         }
 
@@ -79,22 +95,6 @@ namespace Reactive {
 
         private HashSet<ILayoutItem> _children = new();
 
-        public void AppendChild(ILayoutItem item) {
-            if (!_children.Add(item)) {
-                return;
-            }
-
-            AppendChildInternal(item);
-        }
-
-        public void TruncateChild(ILayoutItem item) {
-            if (!_children.Remove(item)) {
-                return;
-            }
-
-            TruncateChildInternal(item);
-        }
-
         private void AppendChildInternal(ILayoutItem item) {
             AppendPhysicalChild(item);
 
@@ -103,10 +103,15 @@ namespace Reactive {
 
             if (_layoutController != null) {
                 var index = _layoutController!.ChildCount - 1;
+
+                if (index < 0) {
+                    index = 0;
+                }
+
                 _layoutController.InsertChild(item, index);
             }
-            ScheduleLayoutRecalculation();
 
+            ScheduleLayoutRecalculation();
             OnChildrenUpdated();
         }
 
@@ -175,13 +180,6 @@ namespace Reactive {
 
         #region Construct
 
-        private class LayoutItemComparer : IEqualityComparer<ILayoutItem> {
-            public bool Equals(ILayoutItem x, ILayoutItem y) => x.Equals(y);
-            public int GetHashCode(ILayoutItem obj) => obj.GetHashCode();
-        }
-
-        private static readonly LayoutItemComparer layoutItemComparer = new();
-
         protected override void OnInstantiate() {
             Children = new ObservableCollectionAdapter<ILayoutItem>(
                 _children,
@@ -196,8 +194,8 @@ namespace Reactive {
         #region Overrides
 
         protected sealed override void OnModifierUpdated() {
-            if (LayoutDriver == null) {
-                RecalculateLayoutInternal(true);
+            if (LayoutDriver == null && !_beingRecalculated) {
+                ScheduleLayoutRecalculation();
             }
         }
 
@@ -208,16 +206,22 @@ namespace Reactive {
             }
         }
 
-        protected override void OnLayoutRefresh() {
-            // called when wants to be recalculated
-            if (_beingRecalculated) return;
-            ScheduleLayoutRecalculation();
+        protected override void OnRecalculateLayoutSelf() {
+            RecalculateLayout();
+            // LateUpdate is called right after this method, so we prevent
+            // the layout from starting a second layout recalculation 
+            _recalculationScheduled = false;
         }
 
         protected override void OnLayoutApply() {
-            // called when layout driver updated object's dimensions
-            if (LayoutDriver == null) return;
-            RecalculateLayout();
+            // If was applied outside the layout system
+            if (LayoutDriver == null) {
+                return;
+            }
+
+            if (_children.Count > 0) {
+                _layoutController?.ApplyChildren();
+            }
         }
 
         #endregion

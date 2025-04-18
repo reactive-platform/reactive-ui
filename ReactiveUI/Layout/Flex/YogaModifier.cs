@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using JetBrains.Annotations;
 using Reactive.Yoga;
+using Debug = UnityEngine.Debug;
 
 namespace Reactive {
     [PublicAPI]
@@ -185,7 +187,7 @@ namespace Reactive {
                 _size = YogaVector.Undefined;
                 _margin = YogaFrame.Undefined;
                 _aspectRatio = YogaValue.Undefined;
-                
+
                 RefreshAllProperties();
                 _node = null;
             }
@@ -206,13 +208,29 @@ namespace Reactive {
 
         private bool HasValidNode => _node?.IsInitialized ?? false;
 
+        private ILeafLayoutItem? _item;
+        private bool _hasMeasureFunc;
         private YogaNode? _node;
 
-        public override void ExposeLayoutItem(ILayoutItem item) {
-            if (item is ILeafLayoutItem leaf) {
-                // TODO: add leaf handling
-                throw new NotImplementedException();
+        public override void ExposeLayoutItem(ILayoutItem? item) {
+            if (item == null || _hasMeasureFunc) {
+                YogaNode.SetMeasureFunc(null);
+                _item = null;
+                _hasMeasureFunc = false;
+            } else if (item is ILeafLayoutItem leaf && !_hasMeasureFunc) {
+                YogaNode.SetMeasureFunc(MeasureFuncWrapper);
+                _item = leaf;
+                _hasMeasureFunc = true;
             }
+        }
+        
+        private YogaSize MeasureFuncWrapper(IntPtr node, float width, MeasureMode widthMode, float height, MeasureMode heightMode) {
+            var size = _item!.Measure(width, widthMode, height, heightMode);
+
+            return new() {
+                width = size.x,
+                height = size.y
+            };
         }
 
         public override void CopyFromSimilar(YogaModifier similar) {

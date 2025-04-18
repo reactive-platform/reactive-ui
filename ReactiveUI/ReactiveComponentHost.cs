@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 
@@ -27,12 +28,20 @@ namespace Reactive {
                     if (_modifier != null) {
                         ReleaseContextMember(_modifier);
                         _modifier.ModifierUpdatedEvent -= HandleModifierUpdated;
+                        _modifier.ExposeLayoutItem(null);
                     }
+
                     _modifier = value;
+
                     if (_modifier != null) {
                         _modifier.ModifierUpdatedEvent += HandleModifierUpdated;
                         InsertContextMember(_modifier);
+
+                        // Normally the main component is the component that was created the last
+                        var primaryComponent = _components.LastOrDefault();
+                        _modifier.ExposeLayoutItem(primaryComponent);
                     }
+
                     HandleModifierUpdated();
                 }
             }
@@ -52,12 +61,14 @@ namespace Reactive {
             private ILayoutDriver? _layoutDriver;
             private ILayoutModifier? _modifier;
             private bool _beingRecalculated;
+            private StackTrace? _recTrace;
 
             public RectTransform BeginApply() {
                 if (_beingRecalculated) {
                     throw new InvalidOperationException("Cannot begin layout application as it's already started");
                 }
 
+                _recTrace = new StackTrace();
                 _beingRecalculated = true;
                 return _rectTransform;
             }
@@ -67,8 +78,17 @@ namespace Reactive {
                 _components.ForEach(static x => x.OnLayoutApply());
             }
 
+            // TODO: Introduce dict with item hashes. Add GetItemHash to ILayoutItem
             public bool Equals(ILayoutItem other) {
-                return ReferenceEquals(other, this) || _components.Any(x => x == other);
+                return ReferenceEquals(other, this) || _components.Any((ILayoutItem x) => x == other);
+            }
+
+            public override bool Equals(object? other) {
+                return other is ILayoutItem item && Equals(item);
+            }
+
+            public override int GetHashCode() {
+                return base.GetHashCode();
             }
 
             #endregion
@@ -77,13 +97,8 @@ namespace Reactive {
 
             private bool _recalculationScheduled;
 
-            public void RefreshLayout() {
-                if (_beingRecalculated) {
-                    return;
-                }
-
-                HandleModifierUpdated();
-                _components.ForEach(static x => x.OnLayoutRefresh());
+            public void ScheduleLayoutRecalculation() {
+                _recalculationScheduled = true;
             }
 
             private void HandleModifierUpdated() {
@@ -128,6 +143,7 @@ namespace Reactive {
 
             private readonly Dictionary<object, EffectBindingBase> _effects = new();
 
+            // TODO: Remove all this crap and use pure delegates
             public void BindEffect<T>(INotifyValueChanged<T> value, IEffect<T> effect) {
                 EffectBinding<T> binding;
                 if (!_effects.TryGetValue(value, out var bin)) {
@@ -244,7 +260,14 @@ namespace Reactive {
 
             private void LateUpdate() {
                 if (_recalculationScheduled) {
-                    RefreshLayout();
+                    if (LayoutDriver != null) {
+                        // If a layout driver is presented, start recalculation from this point
+                        LayoutDriver.RecalculateLayout();
+                    } else {
+                        // If not, tell own components to start recalculation (if there is a Layout or a custom layout controller) 
+                        _components.ForEach(static x => x.OnRecalculateLayoutSelf());
+                    }
+
                     _recalculationScheduled = false;
                 }
                 _components.ForEach(static x => x.OnLateUpdate());
@@ -258,12 +281,12 @@ namespace Reactive {
             }
 
             private void OnEnable() {
-                RefreshLayout();
+                ScheduleLayoutRecalculation();
                 _components.ForEach(static x => x.OnEnable());
             }
 
             private void OnDisable() {
-                RefreshLayout();
+                ScheduleLayoutRecalculation();
                 _components.ForEach(static x => x.OnDisable());
             }
 
@@ -273,7 +296,9 @@ namespace Reactive {
                 // it means that layout controller will be able to modify rect properties
                 // which is not allowed to be performed on the OnRectTransformDimensionsChange stack.
                 // that's why we schedule recalculation to the end of this frame
-                _recalculationScheduled = true;
+                if (!_beingRecalculated) {
+                    _recalculationScheduled = true;
+                }
                 _components.ForEach(static x => x.OnRectDimensionsChanged());
             }
 

@@ -17,7 +17,7 @@ namespace Reactive {
             ModifierUpdatedEvent?.Invoke();
         }
 
-        public virtual void ExposeLayoutItem(ILayoutItem item) { }
+        public virtual void ExposeLayoutItem(ILayoutItem? item) { }
         
         public virtual void CopyFromSimilar(T similar) { }
 
