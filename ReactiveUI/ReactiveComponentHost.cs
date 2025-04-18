@@ -26,9 +26,9 @@ namespace Reactive {
                 get => _modifier;
                 set {
                     if (_modifier != null) {
-                        ReleaseContextMember(_modifier);
-                        _modifier.ModifierUpdatedEvent -= HandleModifierUpdated;
                         _modifier.ExposeLayoutItem(null);
+                        _modifier.ModifierUpdatedEvent -= HandleModifierUpdated;
+                        ReleaseContextMember(_modifier);
                     }
 
                     _modifier = value;

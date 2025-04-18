@@ -14,9 +14,9 @@ namespace Reactive {
             get => _layoutController;
             set {
                 if (_layoutController != null) {
-                    ReleaseContextMember(_layoutController);
-                    _layoutController.LayoutControllerUpdatedEvent -= ScheduleLayoutRecalculation;
                     _layoutController.RemoveAllChildren();
+                    _layoutController.LayoutControllerUpdatedEvent -= ScheduleLayoutRecalculation;
+                    ReleaseContextMember(_layoutController);
                 }
 
                 _layoutController = value;
