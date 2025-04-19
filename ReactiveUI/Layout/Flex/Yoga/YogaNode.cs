@@ -357,7 +357,7 @@ namespace Reactive.Yoga {
         public bool HasMeasureFunc() {
             return YogaNative.YGNodeHasMeasureFunc(NodePtr);
         }
-        
+
         public float LayoutGetLeft() {
             return YogaNative.YGNodeLayoutGetLeft(NodePtr);
         }
@@ -375,8 +375,14 @@ namespace Reactive.Yoga {
         }
 
         public void ApplyTo(RectTransform rectTransform) {
-            rectTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Top, LayoutGetTop(), LayoutGetHeight());
-            rectTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, LayoutGetLeft(), LayoutGetWidth());
+            if (GetParent() != null) {
+                rectTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Top, LayoutGetTop(), LayoutGetHeight());
+                rectTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Left, LayoutGetLeft(), LayoutGetWidth());
+            } else {
+                // Root nodes don't need to apply position 
+                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, LayoutGetWidth());
+                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, LayoutGetHeight());
+            }
         }
 
         public void CalculateLayout(float availableWidth, float availableHeight, Direction ownerDirection) {
