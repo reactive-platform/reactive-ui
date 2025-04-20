@@ -111,6 +111,16 @@ namespace Reactive {
             remove => Host.ModifierUpdatedEvent -= value;
         }
 
+        public event Action<ILayoutItem>? StateUpdatedEvent;
+
+        public int GetLayoutItemHashCode() {
+            return Host.GetLayoutItemHashCode();
+        }
+
+        public bool EqualsToLayoutItem(ILayoutItem item) {
+            return Host.EqualsToLayoutItem(item);
+        }
+
         public RectTransform BeginApply() {
             return Host.BeginApply();
         }
@@ -118,21 +128,9 @@ namespace Reactive {
         public void EndApply() {
             Host.EndApply();
         }
-
-        bool IEquatable<ILayoutItem>.Equals(ILayoutItem other) {
-            return Host.Equals(other);
-        }
-
-        protected void RefreshLayout() {
+        
+        protected void ScheduleLayoutRecalculation() {
             Host.ScheduleLayoutRecalculation();
-        }
-
-        public override bool Equals(object? obj) {
-            return Host.Equals(obj);
-        }
-
-        public override int GetHashCode() {
-            return Host.GetHashCode();
         }
 
         #endregion

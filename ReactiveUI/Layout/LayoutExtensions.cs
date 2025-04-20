@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using Reactive.Yoga;
 using UnityEngine;
@@ -308,6 +309,23 @@ namespace Reactive {
         public static T With<T>(this T modifier, ILayoutModifier apModifier) where T : ILayoutModifier {
             modifier.CopyFrom(apModifier);
             return modifier;
+        }
+
+        /// <summary>
+        /// Finds index of an item in the <see cref="ILayoutItem"/> list. You must use this instead of the
+        /// default method, otherwise the behaviour is undefined.
+        /// </summary>
+        /// <param name="items">A list to search in.</param>
+        /// <param name="item">An item to search for.</param>
+        /// <returns>An index of the item, or -1 if not presented.</returns>
+        public static int FindLayoutItemIndex(this IList<ILayoutItem> items, ILayoutItem item) {
+            for (var i = 0; i < items.Count; i++) {
+                if (items[i].EqualsToLayoutItem(item)) {
+                    return i;
+                }
+            }
+
+            return -1;
         }
     }
 }

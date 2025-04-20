@@ -4,11 +4,10 @@ using UnityEngine;
 
 namespace Reactive {
     /// <summary>
-    /// Represents an object that can be controlled by a layout. This abstraction assumes that alongside with <see cref="IEquatable{T}"/> you
-    /// will override base methods <see cref="object.Equals(object)"/> and <see cref="object.GetHashCode()"/>, otherwise the behaviour is undefined.
+    /// Represents an object that can be controlled by a layout.
     /// </summary>
     [PublicAPI]
-    public interface ILayoutItem : IEquatable<ILayoutItem> {
+    public interface ILayoutItem {
         ILayoutDriver? LayoutDriver { get; set; }
         ILayoutModifier? LayoutModifier { get; set; }
         
@@ -16,6 +15,19 @@ namespace Reactive {
 
         event Action<ILayoutItem>? ModifierUpdatedEvent;
 
+        /// <summary>
+        /// Calculates and returns the item hash code.
+        /// </summary>
+        /// <returns>A hash code.</returns>
+        int GetLayoutItemHashCode();
+
+        /// <summary>
+        /// Compares the current instance with another one.
+        /// </summary>
+        /// <param name="item">An instance to compare with.</param>
+        /// <returns>True if items belong to the same host, otherwise False.</returns>
+        bool EqualsToLayoutItem(ILayoutItem item);
+        
         /// <summary>
         /// Starts layout application. This way is used instead of a delegate in order to reduce unnecessary allocations.
         /// </summary>

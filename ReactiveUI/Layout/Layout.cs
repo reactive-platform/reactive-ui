@@ -39,7 +39,6 @@ namespace Reactive {
 
         private ILayoutController? _layoutController;
         private bool _beingRecalculated;
-        private bool _recalculationScheduled;
 
         // Guard for requests from other components
         private float _lastRecalculationTime;
@@ -79,10 +78,6 @@ namespace Reactive {
             _beingRecalculated = false;
         }
 
-        private void ScheduleLayoutRecalculation() {
-            _recalculationScheduled = true;
-        }
-
         #endregion
 
         #region Children
@@ -92,7 +87,7 @@ namespace Reactive {
         /// </summary>
         public ICollection<ILayoutItem> Children { get; private set; } = null!;
 
-        private HashSet<ILayoutItem> _children = new();
+        private LayoutSet _children = new();
         private List<ILayoutItem> _childrenOrdered = new();
 
         private void AppendChildInternal(ILayoutItem item) {
@@ -147,7 +142,7 @@ namespace Reactive {
                 }
             } else {
                 if (!hasChild) {
-                    var index = _childrenOrdered.IndexOf(item);
+                    var index = _childrenOrdered.FindLayoutItemIndex(item);
                     // It is crucial to maintain the same order as it can break the whole layout
                     _layoutController.InsertChild(item, index);
                     hasModifications = true;
@@ -211,18 +206,8 @@ namespace Reactive {
             }
         }
 
-        protected sealed override void OnLateUpdate() {
-            if (_recalculationScheduled) {
-                RecalculateLayout();
-                _recalculationScheduled = false;
-            }
-        }
-
         protected override void OnRecalculateLayoutSelf() {
             RecalculateLayout();
-            // LateUpdate is called right after this method, so we prevent
-            // the layout from starting a second layout recalculation 
-            _recalculationScheduled = false;
         }
 
         protected override void OnLayoutApply() {

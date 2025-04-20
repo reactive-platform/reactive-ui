@@ -202,7 +202,7 @@ namespace Reactive.Yoga {
 
         public int ChildCount => _nodes.Count;
 
-        private readonly Dictionary<ILayoutItem, YogaNode> _nodes = new();
+        private readonly LayoutDictionary<YogaNode> _nodes = new();
 
         public void InsertChild(ILayoutItem comp, int index) {
             if (comp.LayoutModifier is not YogaModifier modifier) {

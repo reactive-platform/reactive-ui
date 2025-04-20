@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 
@@ -57,10 +56,19 @@ namespace Reactive {
             public bool WithinLayoutIfDisabled { get; set; }
 
             public event Action<ILayoutItem>? ModifierUpdatedEvent;
+            public event Action<ILayoutItem>? StateUpdatedEvent;
 
             private ILayoutDriver? _layoutDriver;
             private ILayoutModifier? _modifier;
             private bool _beingRecalculated;
+
+            public int GetLayoutItemHashCode() {
+                return base.GetHashCode();
+            }
+
+            public bool EqualsToLayoutItem(ILayoutItem item) {
+                return item.GetLayoutItemHashCode() == GetLayoutItemHashCode();
+            }
 
             public RectTransform BeginApply() {
                 if (_beingRecalculated) {
@@ -74,19 +82,6 @@ namespace Reactive {
             public void EndApply() {
                 _beingRecalculated = false;
                 _components.ForEach(static x => x.OnLayoutApply());
-            }
-
-            // TODO: Introduce dict with item hashes. Add GetItemHash to ILayoutItem
-            public bool Equals(ILayoutItem other) {
-                return ReferenceEquals(other, this) || _components.Any((ILayoutItem x) => x == other);
-            }
-
-            public override bool Equals(object? other) {
-                return other is ILayoutItem item && Equals(item);
-            }
-
-            public override int GetHashCode() {
-                return base.GetHashCode();
             }
 
             #endregion
