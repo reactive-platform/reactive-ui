@@ -61,14 +61,12 @@ namespace Reactive {
             private ILayoutDriver? _layoutDriver;
             private ILayoutModifier? _modifier;
             private bool _beingRecalculated;
-            private StackTrace? _recTrace;
 
             public RectTransform BeginApply() {
                 if (_beingRecalculated) {
                     throw new InvalidOperationException("Cannot begin layout application as it's already started");
                 }
 
-                _recTrace = new StackTrace();
                 _beingRecalculated = true;
                 return _rectTransform;
             }
