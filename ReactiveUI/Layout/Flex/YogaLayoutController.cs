@@ -172,7 +172,6 @@ namespace Reactive.Yoga {
             if (YogaNode.GetHasNewLayout()) {
                 // Root nodes don't need to apply position
                 YogaNode.ApplySizeTo(transform);
-                YogaNode.SetHasNewLayout(false);
             }
 
             item.EndApply();
