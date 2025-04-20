@@ -177,8 +177,8 @@ namespace Reactive.Yoga {
             YogaNode.SetHasNewLayout(false);
 
             if (_hasNewLayout) {
-                //TODO: add ApplySizeTo method and remove checks from ApplyTo
-                YogaNode.ApplyTo(transform);
+                // Root nodes don't need to apply position
+                YogaNode.ApplySizeTo(transform);
             }
 
             item.EndApply();
