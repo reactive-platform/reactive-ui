@@ -208,24 +208,45 @@ namespace Reactive {
 
         private bool HasValidNode => _node?.IsInitialized ?? false;
 
-        private ILeafLayoutItem? _item;
-        private bool _hasMeasureFunc;
+        private ILeafLayoutItem? _leafItem;
+        private ILayoutItem? _item;
         private YogaNode? _node;
 
         public override void ExposeLayoutItem(ILayoutItem? item) {
-            if (item == null || _hasMeasureFunc) {
-                YogaNode.SetMeasureFunc(null);
-                _item = null;
-                _hasMeasureFunc = false;
-            } else if (item is ILeafLayoutItem leaf && !_hasMeasureFunc) {
-                YogaNode.SetMeasureFunc(MeasureFuncWrapper);
-                _item = leaf;
-                _hasMeasureFunc = true;
+            if (_item != null) {
+                _item.StateUpdatedEvent -= HandleLayoutItemStateUpdated;
+
+                if (_leafItem != null) {
+                    _leafItem.LeafLayoutUpdatedEvent -= HandleLeafLayoutUpdated;
+
+                    YogaNode.SetMeasureFunc(null);
+                }
+            }
+
+            _item = item;
+            _leafItem = item as ILeafLayoutItem;
+
+            if (_item != null) {
+                _item.StateUpdatedEvent += HandleLayoutItemStateUpdated;
+                
+                if (_leafItem != null) {
+                    _leafItem.LeafLayoutUpdatedEvent += HandleLeafLayoutUpdated;
+
+                    YogaNode.SetMeasureFunc(MeasureFuncWrapper);
+                }
             }
         }
-        
+
+        private void HandleLayoutItemStateUpdated(ILayoutItem item) {
+            YogaNode.StyleSetDisplay(item.WithinLayout ? Display.Flex : Display.None);
+        }
+
+        private void HandleLeafLayoutUpdated(ILeafLayoutItem item) {
+            YogaNode.MarkDirty();
+        }
+
         private YogaSize MeasureFuncWrapper(IntPtr node, float width, MeasureMode widthMode, float height, MeasureMode heightMode) {
-            var size = _item!.Measure(width, widthMode, height, heightMode);
+            var size = _leafItem!.Measure(width, widthMode, height, heightMode);
 
             return new() {
                 width = size.x,

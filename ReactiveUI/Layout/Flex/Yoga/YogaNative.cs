@@ -64,6 +64,9 @@ namespace Reactive.Yoga {
         
         [DllImport(YogaDllName)]
         public static extern void YGNodeSetHasNewLayout(IntPtr node, bool value);
+        
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeMarkDirty(IntPtr node);
 
         [DllImport(YogaDllName)]
         public static extern void YGNodeCalculateLayout(IntPtr node, float availableWidth, float availableHeight, Direction ownerDirection);

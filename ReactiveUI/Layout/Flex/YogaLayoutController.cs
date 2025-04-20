@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace Reactive.Yoga {
     public class YogaLayoutController : ILayoutController {
@@ -163,37 +162,20 @@ namespace Reactive.Yoga {
         }
 
         private YogaNode? _contextNode;
-        private bool _isRootNode;
-        private bool _hasNewLayout;
 
         public void Recalculate(ILayoutItem item) {
             var transform = item.BeginApply();
             var rect = transform.rect;
 
             YogaNode.CalculateLayout(rect.width, rect.height, Direction);
-
-            _isRootNode = true;
-            _hasNewLayout = YogaNode.GetHasNewLayout();
-            YogaNode.SetHasNewLayout(false);
-
-            if (_hasNewLayout) {
+            
+            if (YogaNode.GetHasNewLayout()) {
                 // Root nodes don't need to apply position
                 YogaNode.ApplySizeTo(transform);
+                YogaNode.SetHasNewLayout(false);
             }
 
             item.EndApply();
-        }
-
-        public void PrepareForRecalculation() {
-            ReloadChildrenVisibility();
-            _isRootNode = false;
-            _hasNewLayout = false;
-        }
-
-        private void ReloadChildrenVisibility() {
-            foreach (var (child, node) in _nodes) {
-                node.StyleSetDisplay(child.WithinLayout ? Display.Flex : Display.None);
-            }
         }
 
         #endregion
@@ -238,14 +220,11 @@ namespace Reactive.Yoga {
         }
 
         public void ApplyChildren() {
-            if (!_isRootNode) {
-                _hasNewLayout = YogaNode.GetHasNewLayout();
-                YogaNode.SetHasNewLayout(false);
-            }
-
-            if (!_hasNewLayout) {
+            if (!YogaNode.GetHasNewLayout()) {
                 return;
             }
+
+            YogaNode.SetHasNewLayout(false);
 
             foreach (var (child, node) in _nodes) {
                 var rect = child.BeginApply();

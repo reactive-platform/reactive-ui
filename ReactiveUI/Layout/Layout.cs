@@ -54,8 +54,7 @@ namespace Reactive {
             if (_layoutController == null || Children.Count == 0) {
                 return;
             }
-
-            _layoutController.PrepareForRecalculation();
+            
             _layoutController.Recalculate(this);
             _layoutController.ApplyChildren();
 
@@ -67,7 +66,6 @@ namespace Reactive {
 
             // Items without modifiers are not supposed to be controlled
             if (LayoutModifier != null && LayoutDriver?.LayoutController != null) {
-                _layoutController?.PrepareForRecalculation();
                 LayoutDriver.RecalculateLayout();
 
                 _beingRecalculated = false;

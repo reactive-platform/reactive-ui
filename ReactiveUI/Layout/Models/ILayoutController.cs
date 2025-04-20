@@ -47,10 +47,5 @@ namespace Reactive {
         /// </summary>
         /// <param name="item">The controller as an item.</param>
         void Recalculate(ILayoutItem item);
-
-        /// <summary>
-        /// Prepares controller for recalculation. Must be called for each node, not just the root one.
-        /// </summary>
-        void PrepareForRecalculation();
     }
 }

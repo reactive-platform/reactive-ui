@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using Reactive.Yoga;
 using UnityEngine;
 
@@ -10,6 +11,11 @@ namespace Reactive;
 /// </summary>
 [PublicAPI]
 public interface ILeafLayoutItem : ILayoutItem {
+    /// <summary>
+    /// Invoked when the leaf item is updated and requires layout recalculation.
+    /// </summary>
+    event Action<ILeafLayoutItem>? LeafLayoutUpdatedEvent;
+    
     /// <summary>
     /// Returns the computed dimensions of the node, following the constraints of widthMode and heightMode.
     /// </summary>

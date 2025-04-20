@@ -14,6 +14,7 @@ namespace Reactive {
         bool WithinLayout { get; set; }
 
         event Action<ILayoutItem>? ModifierUpdatedEvent;
+        event Action<ILayoutItem>? StateUpdatedEvent;
 
         /// <summary>
         /// Calculates and returns the item hash code.

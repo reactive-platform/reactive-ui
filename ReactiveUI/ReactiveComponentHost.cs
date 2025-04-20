@@ -50,6 +50,7 @@ namespace Reactive {
                 set {
                     if (WithinLayoutIfDisabled) return;
                     Enabled = value;
+                    StateUpdatedEvent?.Invoke(this);
                 }
             }
 

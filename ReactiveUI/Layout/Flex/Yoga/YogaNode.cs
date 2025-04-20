@@ -396,6 +396,10 @@ namespace Reactive.Yoga {
             YogaNative.YGNodeSetHasNewLayout(NodePtr, hasNewLayout);
         }
 
+        public void MarkDirty() {
+            YogaNative.YGNodeMarkDirty(NodePtr);
+        }
+
         #endregion
 
         #region Style
