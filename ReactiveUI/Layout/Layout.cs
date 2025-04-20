@@ -25,11 +25,13 @@ namespace Reactive {
                     InsertContextMember(_layoutController);
                     _layoutController.LayoutControllerUpdatedEvent += ScheduleLayoutRecalculation;
 
-                    foreach (var child in Children) {
-                        var index = _layoutController.ChildCount;
-                        // Components without modifiers are not added to the hierarchy, so instead of
-                        // just incrementing the index each cycle, we rely on the actual child count
-                        _layoutController.InsertChild(child, index);
+                    var index = 0;
+                    foreach (var child in _childrenOrdered) {
+                        // Components without modifiers are not added to the hierarchy
+                        if (child.LayoutModifier != null) {
+                            _layoutController.InsertChild(child, index);
+                            index++;
+                        }
                     }
                 }
             }
@@ -41,9 +43,6 @@ namespace Reactive {
 
         // Guard for requests from other components
         private float _lastRecalculationTime;
-
-        // Guard for requests from itself
-        private bool _recalculatedThisFrame;
 
         private void RecalculateLayoutInternal() {
             var time = Time.time;
@@ -94,19 +93,17 @@ namespace Reactive {
         public ICollection<ILayoutItem> Children { get; private set; } = null!;
 
         private HashSet<ILayoutItem> _children = new();
+        private List<ILayoutItem> _childrenOrdered = new();
 
         private void AppendChildInternal(ILayoutItem item) {
             AppendPhysicalChild(item);
 
             item.LayoutDriver = this;
             item.ModifierUpdatedEvent += HandleChildModifierUpdated;
+            _childrenOrdered.Add(item);
 
             if (_layoutController != null) {
-                var index = _layoutController!.ChildCount - 1;
-
-                if (index < 0) {
-                    index = 0;
-                }
+                var index = _layoutController!.ChildCount;
 
                 _layoutController.InsertChild(item, index);
             }
@@ -120,6 +117,7 @@ namespace Reactive {
 
             item.LayoutDriver = null;
             item.ModifierUpdatedEvent -= HandleChildModifierUpdated;
+            _childrenOrdered.Remove(item);
 
             _layoutController?.RemoveChild(item);
             ScheduleLayoutRecalculation();
@@ -134,13 +132,27 @@ namespace Reactive {
         }
 
         private void HandleChildModifierUpdated(ILayoutItem item) {
-            if (_beingRecalculated) {
+            if (_beingRecalculated || _layoutController == null) {
                 return;
             }
 
-            var hasModifications = item.LayoutModifier == null ?
-                _children.Remove(item) :
-                _children.Add(item);
+            var hasChild = _layoutController.HasChild(item);
+            var hasModifications = false;
+
+            if (item.LayoutModifier == null) {
+                if (hasChild) {
+                    // Here we remove the child from the layout controller exclusively to add it again later
+                    _layoutController.RemoveChild(item);
+                    hasModifications = true;
+                }
+            } else {
+                if (!hasChild) {
+                    var index = _childrenOrdered.IndexOf(item);
+                    // It is crucial to maintain the same order as it can break the whole layout
+                    _layoutController.InsertChild(item, index);
+                    hasModifications = true;
+                }
+            }
 
             if (hasModifications) {
                 ScheduleLayoutRecalculation();

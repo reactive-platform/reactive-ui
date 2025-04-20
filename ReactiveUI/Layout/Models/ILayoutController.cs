@@ -28,9 +28,16 @@ namespace Reactive {
         /// Removes all children from the controller.
         /// </summary>
         void RemoveAllChildren();
+
+        /// <summary>
+        /// Checks if the controller has the specified child added to its hierarchy.
+        /// </summary>
+        /// <param name="comp">A component to search for.</param>
+        /// <returns>True if the component is in hierarchy, otherwise False.</returns>
+        bool HasChild(ILayoutItem comp);
         
         /// <summary>
-        /// Called every time layout update is needed. No matter is controller the root or not.
+        /// Applies calculated layout to first-level children. Own size is not applied.
         /// </summary>
         void ApplyChildren();
         

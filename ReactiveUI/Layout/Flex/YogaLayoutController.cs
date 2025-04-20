@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Reactive.Yoga {
-    public class YogaLayoutController : ReactiveLayoutController {
+    public class YogaLayoutController : ILayoutController {
         #region Properties
 
         public Overflow Overflow {
@@ -86,6 +86,8 @@ namespace Reactive.Yoga {
             }
         }
 
+        public event Action? LayoutControllerUpdatedEvent;
+
         private Overflow _overflow = Overflow.Visible;
         private Direction _direction = Direction.Inherit;
         private FlexDirection _flexDirection = FlexDirection.Row;
@@ -95,6 +97,10 @@ namespace Reactive.Yoga {
         private Wrap _flexWrap = Wrap.Wrap;
         private YogaFrame _padding = YogaFrame.Zero;
         private YogaVector _gap = YogaVector.Undefined;
+
+        private void NotifyControllerUpdated() {
+            LayoutControllerUpdatedEvent?.Invoke();
+        }
 
         private void RefreshGap() {
             YogaNode.StyleSetGap(Gutter.Row, _gap.y);
@@ -124,11 +130,11 @@ namespace Reactive.Yoga {
 
         #region Context
 
-        public sealed override Type ContextType { get; } = typeof(YogaContext);
+        public Type ContextType { get; } = typeof(YogaContext);
 
-        public sealed override object CreateContext() => new YogaContext();
+        public object CreateContext() => new YogaContext();
 
-        public sealed override void ProvideContext(object? context) {
+        public void ProvideContext(object? context) {
             if (context == null) {
                 if (_contextNode.GetIsInitialized()) {
                     _contextNode!.RemoveAllChildren();
@@ -160,7 +166,7 @@ namespace Reactive.Yoga {
         private bool _isRootNode;
         private bool _hasNewLayout;
 
-        public sealed override void Recalculate(ILayoutItem item) {
+        public void Recalculate(ILayoutItem item) {
             var transform = item.BeginApply();
             var rect = transform.rect;
 
@@ -171,13 +177,14 @@ namespace Reactive.Yoga {
             YogaNode.SetHasNewLayout(false);
 
             if (_hasNewLayout) {
+                //TODO: add ApplySizeTo method and remove checks from ApplyTo
                 YogaNode.ApplyTo(transform);
             }
 
             item.EndApply();
         }
 
-        public override void PrepareForRecalculation() {
+        public void PrepareForRecalculation() {
             ReloadChildrenVisibility();
             _isRootNode = false;
             _hasNewLayout = false;
@@ -193,11 +200,11 @@ namespace Reactive.Yoga {
 
         #region Children
 
-        public override int ChildCount => _nodes.Count;
+        public int ChildCount => _nodes.Count;
 
         private readonly Dictionary<ILayoutItem, YogaNode> _nodes = new();
 
-        public override void InsertChild(ILayoutItem comp, int index) {
+        public void InsertChild(ILayoutItem comp, int index) {
             if (comp.LayoutModifier is not YogaModifier modifier) {
                 return;
             }
@@ -211,7 +218,7 @@ namespace Reactive.Yoga {
             _nodes.Add(comp, modifier.YogaNode);
         }
 
-        public override void RemoveChild(ILayoutItem comp) {
+        public void RemoveChild(ILayoutItem comp) {
             if (!_nodes.TryGetValue(comp, out var node)) {
                 return;
             }
@@ -221,12 +228,16 @@ namespace Reactive.Yoga {
             _nodes.Remove(comp);
         }
 
-        public override void RemoveAllChildren() {
+        public void RemoveAllChildren() {
             YogaNode.RemoveAllChildren();
             _nodes.Clear();
         }
 
-        public override void ApplyChildren() {
+        public bool HasChild(ILayoutItem comp) {
+            return _nodes.ContainsKey(comp);
+        }
+
+        public void ApplyChildren() {
             if (!_isRootNode) {
                 _hasNewLayout = YogaNode.GetHasNewLayout();
                 YogaNode.SetHasNewLayout(false);
