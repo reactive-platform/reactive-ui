@@ -95,7 +95,7 @@ namespace Reactive {
             }
 
             private void RecalculateLayoutImmediate() {
-                if (LayoutDriver != null) {
+                if (LayoutModifier != null && LayoutDriver?.LayoutController != null) {
                     // If a layout driver is presented, start recalculation from this point
                     LayoutDriver.RecalculateLayout();
                 } else {

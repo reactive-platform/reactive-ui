@@ -134,26 +134,21 @@ namespace Reactive {
             }
 
             var hasChild = _layoutController.HasChild(item);
-            var hasModifications = false;
 
             if (item.LayoutModifier == null) {
                 if (hasChild) {
                     // Here we remove the child from the layout controller exclusively to add it again later
                     _layoutController.RemoveChild(item);
-                    hasModifications = true;
                 }
             } else {
                 if (!hasChild) {
                     var index = _childrenOrdered.FindLayoutItemIndex(item);
                     // It is crucial to maintain the same order as it can break the whole layout
                     _layoutController.InsertChild(item, index);
-                    hasModifications = true;
                 }
             }
 
-            if (hasModifications) {
-                ScheduleLayoutRecalculation();
-            }
+            ScheduleLayoutRecalculation();
         }
 
         protected virtual void OnChildrenUpdated() { }
