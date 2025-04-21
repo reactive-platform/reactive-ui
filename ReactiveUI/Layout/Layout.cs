@@ -76,6 +76,10 @@ namespace Reactive {
             _beingRecalculated = false;
         }
 
+        public new void ScheduleLayoutRecalculation() {
+            base.ScheduleLayoutRecalculation();
+        }
+
         #endregion
 
         #region Children

@@ -111,7 +111,10 @@ namespace Reactive {
             remove => Host.ModifierUpdatedEvent -= value;
         }
 
-        public event Action<ILayoutItem>? StateUpdatedEvent;
+        public event Action<ILayoutItem>? StateUpdatedEvent {
+            add => Host.StateUpdatedEvent += value;
+            remove => Host.StateUpdatedEvent -= value;
+        }
 
         public int GetLayoutItemHashCode() {
             return Host.GetLayoutItemHashCode();
@@ -128,7 +131,7 @@ namespace Reactive {
         public void EndApply() {
             Host.EndApply();
         }
-        
+
         protected void ScheduleLayoutRecalculation() {
             Host.ScheduleLayoutRecalculation();
         }
@@ -309,7 +312,7 @@ namespace Reactive {
         protected virtual void OnEnable() { }
         protected virtual void OnDisable() { }
         protected virtual void OnRectDimensionsChanged() { }
-        
+
         /// <summary>
         /// Called when modifier is updated.
         /// </summary>

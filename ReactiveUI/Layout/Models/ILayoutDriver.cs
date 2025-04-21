@@ -14,6 +14,14 @@ namespace Reactive {
         ICollection<ILayoutItem> Children { get; }
         ILayoutController? LayoutController { get; set; }
         
+        /// <summary>
+        /// Performs immediate layout recalculation.
+        /// </summary>
         void RecalculateLayout();
+        
+        /// <summary>
+        /// Schedules layout recalculation to the end of this frame.
+        /// </summary>
+        void ScheduleLayoutRecalculation();
     }
 }

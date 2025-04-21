@@ -50,7 +50,6 @@ namespace Reactive {
                 set {
                     if (WithinLayoutIfDisabled) return;
                     Enabled = value;
-                    StateUpdatedEvent?.Invoke(this);
                 }
             }
 
@@ -93,6 +92,28 @@ namespace Reactive {
 
             public void ScheduleLayoutRecalculation() {
                 _recalculationScheduled = true;
+            }
+
+            private void RecalculateLayoutImmediate() {
+                if (LayoutDriver != null) {
+                    // If a layout driver is presented, start recalculation from this point
+                    LayoutDriver.RecalculateLayout();
+                } else {
+                    // If not, tell own components to start recalculation (if there is a Layout or a custom layout controller) 
+                    _components.ForEach(static x => x.OnRecalculateLayoutSelf());
+                }
+            }
+
+            private void ScheduleLayoutRecalculationAfterStateChange(bool newState) {
+                if (newState) {
+                    ScheduleLayoutRecalculation();
+                } else if (LayoutDriver != null) {
+                    // The current object is disabled and LateUpdate won't be called, so we try to 
+                    // move the recalculation responsibility to the driver if possible. 
+                    // If this object doesn't have a driver, recalculation is omitted as it will
+                    // happen anyway when the object will get enabled back.
+                    LayoutDriver.ScheduleLayoutRecalculation();
+                }
             }
 
             private void HandleModifierUpdated() {
@@ -225,7 +246,11 @@ namespace Reactive {
 
             public void AddComponent(ReactiveComponent comp) {
                 _components.Add(comp);
-                if (IsStarted) comp.OnStart();
+                _modifier?.ExposeLayoutItem(comp);
+
+                if (IsStarted) {
+                    comp.OnStart();
+                }
             }
 
             public void RemoveComponent(ReactiveComponent comp) {
@@ -254,13 +279,7 @@ namespace Reactive {
 
             private void LateUpdate() {
                 if (_recalculationScheduled) {
-                    if (LayoutDriver != null) {
-                        // If a layout driver is presented, start recalculation from this point
-                        LayoutDriver.RecalculateLayout();
-                    } else {
-                        // If not, tell own components to start recalculation (if there is a Layout or a custom layout controller) 
-                        _components.ForEach(static x => x.OnRecalculateLayoutSelf());
-                    }
+                    RecalculateLayoutImmediate();
 
                     _recalculationScheduled = false;
                 }
@@ -275,12 +294,16 @@ namespace Reactive {
             }
 
             private void OnEnable() {
-                ScheduleLayoutRecalculation();
+                StateUpdatedEvent?.Invoke(this);
+                ScheduleLayoutRecalculationAfterStateChange(true);
+
                 _components.ForEach(static x => x.OnEnable());
             }
 
             private void OnDisable() {
-                ScheduleLayoutRecalculation();
+                StateUpdatedEvent?.Invoke(this);
+                ScheduleLayoutRecalculationAfterStateChange(false);
+
                 _components.ForEach(static x => x.OnDisable());
             }
 
