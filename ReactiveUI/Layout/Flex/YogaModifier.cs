@@ -228,11 +228,13 @@ namespace Reactive {
 
             if (_item != null) {
                 _item.StateUpdatedEvent += HandleLayoutItemStateUpdated;
+                HandleLayoutItemStateUpdated(_item);
                 
                 if (_leafItem != null) {
                     _leafItem.LeafLayoutUpdatedEvent += HandleLeafLayoutUpdated;
 
                     YogaNode.SetMeasureFunc(MeasureFuncWrapper);
+                    HandleLeafLayoutUpdated(_leafItem);
                 }
             }
         }
