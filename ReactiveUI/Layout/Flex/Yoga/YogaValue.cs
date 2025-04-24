@@ -9,9 +9,12 @@ namespace Reactive.Yoga {
             this.unit = unit;
         }
 
-        public static readonly YogaValue Zero = new(0, Unit.Point);
         public static readonly YogaValue Undefined = new(float.NaN, Unit.Undefined);
+        public static readonly YogaValue Zero = new(0, Unit.Point);
         public static readonly YogaValue Auto = new(float.NaN, Unit.Auto);
+        public static readonly YogaValue MaxContent = new(float.NaN, Unit.MaxContent);
+        public static readonly YogaValue FitContent = new(float.NaN, Unit.FitContent);
+        public static readonly YogaValue Stretch = new(float.NaN, Unit.Stretch);
 
         public float value;
         public Unit unit;

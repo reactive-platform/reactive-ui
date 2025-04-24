@@ -122,6 +122,8 @@ namespace Reactive {
             }
         }
 
+        public bool HadOverflow => YogaNode.HadOverflow();
+
         private float _flexGrow;
         private float _flexShrink = 1;
         private Align _alignSelf = Align.Auto;
@@ -229,7 +231,7 @@ namespace Reactive {
             if (_item != null) {
                 _item.StateUpdatedEvent += HandleLayoutItemStateUpdated;
                 HandleLayoutItemStateUpdated(_item);
-                
+
                 if (_leafItem != null) {
                     _leafItem.LeafLayoutUpdatedEvent += HandleLeafLayoutUpdated;
 

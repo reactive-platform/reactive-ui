@@ -84,38 +84,54 @@ namespace Reactive.Yoga {
         public void StyleSetPosition(Edge edge, YogaValue value) {
             switch (value.unit) {
                 case Unit.Undefined:
-                    StyleSetPosition(edge, float.NaN);
+                    YogaNative.YGNodeStyleSetPosition(NodePtr, edge, float.NaN);
                     break;
 
                 case Unit.Point:
-                    StyleSetPosition(edge, value.value);
+                    YogaNative.YGNodeStyleSetPosition(NodePtr, edge, value.value); 
                     break;
 
                 case Unit.Percent:
-                    StyleSetPositionPercent(edge, value.value);
+                    YogaNative.YGNodeStyleSetPositionPercent(NodePtr, edge, value.value);
                     break;
 
                 case Unit.Auto:
-                    throw new ArgumentOutOfRangeException(nameof(value), "Auto is not supported for position");
+                    YogaNative.YGNodeStyleSetPositionAuto(NodePtr, edge);
+                    break;
+                
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"{value.unit} is not supported for position");
             }
         }
 
         public void StyleSetWidth(YogaValue value) {
             switch (value.unit) {
                 case Unit.Undefined:
-                    StyleSetWidth(float.NaN);
+                    YogaNative.YGNodeStyleSetWidth(NodePtr, float.NaN);
                     break;
 
                 case Unit.Point:
-                    StyleSetWidth(value.value);
+                    YogaNative.YGNodeStyleSetWidth(NodePtr, value.value);
                     break;
 
                 case Unit.Percent:
-                    StyleSetWidthPercent(value.value);
+                    YogaNative.YGNodeStyleSetWidthPercent(NodePtr, value.value);
                     break;
 
                 case Unit.Auto:
-                    StyleSetWidthAuto();
+                    YogaNative.YGNodeStyleSetWidthAuto(NodePtr);
+                    break;
+                    
+                case Unit.MaxContent:
+                    YogaNative.YGNodeStyleSetWidthMaxContent(NodePtr);
+                    break;
+                    
+                case Unit.FitContent:
+                    YogaNative.YGNodeStyleSetWidthFitContent(NodePtr);
+                    break;
+                    
+                case Unit.Stretch:
+                    YogaNative.YGNodeStyleSetWidthStretch(NodePtr);
                     break;
             }
         }
@@ -123,19 +139,31 @@ namespace Reactive.Yoga {
         public void StyleSetHeight(YogaValue value) {
             switch (value.unit) {
                 case Unit.Undefined:
-                    StyleSetHeight(float.NaN);
+                    YogaNative.YGNodeStyleSetHeight(NodePtr, float.NaN);
                     break;
 
                 case Unit.Point:
-                    StyleSetHeight(value.value);
+                    YogaNative.YGNodeStyleSetHeight(NodePtr, value.value);
                     break;
 
                 case Unit.Percent:
-                    StyleSetHeightPercent(value.value);
+                    YogaNative.YGNodeStyleSetHeightPercent(NodePtr, value.value);
                     break;
 
                 case Unit.Auto:
-                    StyleSetHeightAuto();
+                    YogaNative.YGNodeStyleSetHeightAuto(NodePtr);
+                    break;
+                    
+                case Unit.MaxContent:
+                    YogaNative.YGNodeStyleSetHeightMaxContent(NodePtr);
+                    break;
+                    
+                case Unit.FitContent:
+                    YogaNative.YGNodeStyleSetHeightFitContent(NodePtr);
+                    break;
+                    
+                case Unit.Stretch:
+                    YogaNative.YGNodeStyleSetHeightStretch(NodePtr);
                     break;
             }
         }
@@ -143,95 +171,155 @@ namespace Reactive.Yoga {
         public void StyleSetMinWidth(YogaValue value) {
             switch (value.unit) {
                 case Unit.Undefined:
-                    StyleSetMinWidth(float.NaN);
+                    YogaNative.YGNodeStyleSetMinWidth(NodePtr, float.NaN);
                     break;
 
                 case Unit.Point:
-                    StyleSetMinWidth(value.value);
+                    YogaNative.YGNodeStyleSetMinWidth(NodePtr, value.value);
                     break;
 
                 case Unit.Percent:
-                    StyleSetMinWidthPercent(value.value);
+                    YogaNative.YGNodeStyleSetMinWidthPercent(NodePtr, value.value);
+                    break;
+                    
+                case Unit.MaxContent:
+                    YogaNative.YGNodeStyleSetMinWidthMaxContent(NodePtr);
+                    break;
+                    
+                case Unit.FitContent:
+                    YogaNative.YGNodeStyleSetMinWidthFitContent(NodePtr);
+                    break;
+                    
+                case Unit.Stretch:
+                    YogaNative.YGNodeStyleSetMinWidthStretch(NodePtr);
                     break;
 
-                case Unit.Auto:
-                    throw new ArgumentOutOfRangeException(nameof(value), "Auto is not supported for min width");
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"{value.unit} is not supported for min width");
             }
         }
 
         public void StyleSetMaxWidth(YogaValue value) {
             switch (value.unit) {
                 case Unit.Undefined:
-                    StyleSetMaxWidth(float.NaN);
+                    YogaNative.YGNodeStyleSetMaxWidth(NodePtr, float.NaN);
                     break;
 
                 case Unit.Point:
-                    StyleSetMaxWidth(value.value);
+                    YogaNative.YGNodeStyleSetMaxWidth(NodePtr, value.value);
                     break;
 
                 case Unit.Percent:
-                    StyleSetMaxWidthPercent(value.value);
+                    YogaNative.YGNodeStyleSetMaxWidthPercent(NodePtr, value.value);
+                    break;
+                    
+                case Unit.MaxContent:
+                    YogaNative.YGNodeStyleSetMaxWidthMaxContent(NodePtr);
+                    break;
+                    
+                case Unit.FitContent:
+                    YogaNative.YGNodeStyleSetMaxWidthFitContent(NodePtr);
+                    break;
+                    
+                case Unit.Stretch:
+                    YogaNative.YGNodeStyleSetMaxWidthStretch(NodePtr);
                     break;
 
-                case Unit.Auto:
-                    throw new ArgumentOutOfRangeException(nameof(value), "Auto is not supported for max width");
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"{value.unit} is not supported for max width");
             }
         }
 
         public void StyleSetMinHeight(YogaValue value) {
             switch (value.unit) {
                 case Unit.Undefined:
-                    StyleSetMinHeight(float.NaN);
+                    YogaNative.YGNodeStyleSetMinHeight(NodePtr, float.NaN);
                     break;
 
                 case Unit.Point:
-                    StyleSetMinHeight(value.value);
+                    YogaNative.YGNodeStyleSetMinHeight(NodePtr, value.value);
                     break;
 
                 case Unit.Percent:
-                    StyleSetMinHeightPercent(value.value);
+                    YogaNative.YGNodeStyleSetMinHeightPercent(NodePtr, value.value);
+                    break;
+                    
+                case Unit.MaxContent:
+                    YogaNative.YGNodeStyleSetMinHeightMaxContent(NodePtr);
+                    break;
+                    
+                case Unit.FitContent:
+                    YogaNative.YGNodeStyleSetMinHeightFitContent(NodePtr);
+                    break;
+                    
+                case Unit.Stretch:
+                    YogaNative.YGNodeStyleSetMinHeightStretch(NodePtr);
                     break;
 
-                case Unit.Auto:
-                    throw new ArgumentOutOfRangeException(nameof(value), "Auto is not supported for min height");
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"{value.unit} is not supported for min height");
             }
         }
 
         public void StyleSetMaxHeight(YogaValue value) {
             switch (value.unit) {
                 case Unit.Undefined:
-                    StyleSetMaxHeight(float.NaN);
+                    YogaNative.YGNodeStyleSetMaxHeight(NodePtr, float.NaN);
                     break;
 
                 case Unit.Point:
-                    StyleSetMaxHeight(value.value);
+                    YogaNative.YGNodeStyleSetMaxHeight(NodePtr, value.value);
                     break;
 
                 case Unit.Percent:
-                    StyleSetMaxHeightPercent(value.value);
+                    YogaNative.YGNodeStyleSetMaxHeightPercent(NodePtr, value.value);
+                    break;
+                    
+                case Unit.MaxContent:
+                    YogaNative.YGNodeStyleSetMaxHeightMaxContent(NodePtr);
+                    break;
+                    
+                case Unit.FitContent:
+                    YogaNative.YGNodeStyleSetMaxHeightFitContent(NodePtr);
+                    break;
+                    
+                case Unit.Stretch:
+                    YogaNative.YGNodeStyleSetMaxHeightStretch(NodePtr);
                     break;
 
-                case Unit.Auto:
-                    throw new ArgumentOutOfRangeException(nameof(value), "Auto is not supported for max height");
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"{value.unit} is not supported for max height");
             }
         }
 
         public void StyleSetFlexBasis(YogaValue value) {
             switch (value.unit) {
                 case Unit.Undefined:
-                    StyleSetFlexBasis(float.NaN);
+                    YogaNative.YGNodeStyleSetFlexBasis(NodePtr, float.NaN);
                     break;
 
                 case Unit.Point:
-                    StyleSetFlexBasis(value.value);
+                    YogaNative.YGNodeStyleSetFlexBasis(NodePtr, value.value);
                     break;
 
                 case Unit.Percent:
-                    StyleSetFlexBasisPercent(value.value);
+                    YogaNative.YGNodeStyleSetFlexBasisPercent(NodePtr, value.value);
                     break;
 
                 case Unit.Auto:
-                    StyleSetFlexBasisAuto();
+                    YogaNative.YGNodeStyleSetFlexBasisAuto(NodePtr);
+                    break;
+                    
+                case Unit.MaxContent:
+                    YogaNative.YGNodeStyleSetFlexBasisMaxContent(NodePtr);
+                    break;
+                    
+                case Unit.FitContent:
+                    YogaNative.YGNodeStyleSetFlexBasisFitContent(NodePtr);
+                    break;
+                    
+                case Unit.Stretch:
+                    YogaNative.YGNodeStyleSetFlexBasisStretch(NodePtr);
                     break;
             }
         }
@@ -239,58 +327,61 @@ namespace Reactive.Yoga {
         public void StyleSetMargin(Edge edge, YogaValue value) {
             switch (value.unit) {
                 case Unit.Undefined:
-                    StyleSetMargin(edge, float.NaN);
+                    YogaNative.YGNodeStyleSetMargin(NodePtr, edge, float.NaN);
                     break;
 
                 case Unit.Point:
-                    StyleSetMargin(edge, value.value);
+                    YogaNative.YGNodeStyleSetMargin(NodePtr, edge, value.value);
                     break;
 
                 case Unit.Percent:
-                    StyleSetMarginPercent(edge, value.value);
+                    YogaNative.YGNodeStyleSetMarginPercent(NodePtr, edge, value.value);
                     break;
 
                 case Unit.Auto:
-                    StyleSetMarginAuto(edge);
+                    YogaNative.YGNodeStyleSetMarginAuto(NodePtr, edge);
                     break;
+                    
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"{value.unit} is not supported for padding");
             }
         }
 
         public void StyleSetPadding(Edge edge, YogaValue value) {
             switch (value.unit) {
                 case Unit.Undefined:
-                    StyleSetPadding(edge, float.NaN);
+                    YogaNative.YGNodeStyleSetPadding(NodePtr, edge, float.NaN);
                     break;
 
                 case Unit.Point:
-                    StyleSetPadding(edge, value.value);
+                    YogaNative.YGNodeStyleSetPadding(NodePtr, edge, value.value);
                     break;
 
                 case Unit.Percent:
-                    StyleSetPaddingPercent(edge, value.value);
+                    YogaNative.YGNodeStyleSetPaddingPercent(NodePtr, edge, value.value);
                     break;
 
-                case Unit.Auto:
-                    throw new ArgumentOutOfRangeException(nameof(value), "Auto is not supported for padding");
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"{value.unit} is not supported for padding");
             }
         }
 
         public void StyleSetGap(Gutter gutter, YogaValue value) {
             switch (value.unit) {
                 case Unit.Undefined:
-                    StyleSetGap(gutter, float.NaN);
+                    YogaNative.YGNodeStyleSetGap(NodePtr, gutter, float.NaN);
                     break;
 
                 case Unit.Point:
-                    StyleSetGap(gutter, value.value);
+                    YogaNative.YGNodeStyleSetGap(NodePtr, gutter, value.value);
                     break;
 
                 case Unit.Percent:
-                    StyleSetGapPercent(gutter, value.value);
+                    YogaNative.YGNodeStyleSetGapPercent(NodePtr, gutter, value.value);
                     break;
 
-                case Unit.Auto:
-                    throw new ArgumentOutOfRangeException(nameof(value), "Auto is not supported for gap");
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"{value.unit} is not supported for gap");
             }
         }
 
@@ -358,6 +449,10 @@ namespace Reactive.Yoga {
             return YogaNative.YGNodeHasMeasureFunc(NodePtr);
         }
 
+        public bool HadOverflow() {
+            return YogaNative.YGNodeHadOverflow(NodePtr);
+        }
+
         public float LayoutGetLeft() {
             return YogaNative.YGNodeLayoutGetLeft(NodePtr);
         }
@@ -413,6 +508,10 @@ namespace Reactive.Yoga {
 
         #region Style
 
+        public void CopyStyleTo(YogaNode node) {
+            YogaNative.YGNodeCopyStyle(node.NodePtr, NodePtr);
+        }
+        
         public YogaValue StyleGetHeight() {
             return YogaNative.YGNodeStyleGetHeight(NodePtr);
         }
@@ -463,110 +562,6 @@ namespace Reactive.Yoga {
 
         public void StyleSetFlexShrink(float flexShrink) {
             YogaNative.YGNodeStyleSetFlexShrink(NodePtr, flexShrink);
-        }
-
-        public void StyleSetFlexBasis(float flexBasis) {
-            YogaNative.YGNodeStyleSetFlexBasis(NodePtr, flexBasis);
-        }
-
-        public void StyleSetFlexBasisPercent(float flexBasis) {
-            YogaNative.YGNodeStyleSetFlexBasisPercent(NodePtr, flexBasis);
-        }
-
-        public void StyleSetFlexBasisAuto() {
-            YogaNative.YGNodeStyleSetFlexBasisAuto(NodePtr);
-        }
-
-        public void StyleSetPosition(Edge edge, float position) {
-            YogaNative.YGNodeStyleSetPosition(NodePtr, edge, position);
-        }
-
-        public void StyleSetPositionPercent(Edge edge, float position) {
-            YogaNative.YGNodeStyleSetPositionPercent(NodePtr, edge, position);
-        }
-
-        public void StyleSetMargin(Edge edge, float margin) {
-            YogaNative.YGNodeStyleSetMargin(NodePtr, edge, margin);
-        }
-
-        public void StyleSetMarginPercent(Edge edge, float margin) {
-            YogaNative.YGNodeStyleSetMarginPercent(NodePtr, edge, margin);
-        }
-
-        public void StyleSetMarginAuto(Edge edge) {
-            YogaNative.YGNodeStyleSetMarginAuto(NodePtr, edge);
-        }
-
-        public void StyleSetPadding(Edge edge, float padding) {
-            YogaNative.YGNodeStyleSetPadding(NodePtr, edge, padding);
-        }
-
-        public void StyleSetPaddingPercent(Edge edge, float padding) {
-            YogaNative.YGNodeStyleSetPaddingPercent(NodePtr, edge, padding);
-        }
-
-        public void StyleSetWidth(float width) {
-            YogaNative.YGNodeStyleSetWidth(NodePtr, width);
-        }
-
-        public void StyleSetWidthPercent(float width) {
-            YogaNative.YGNodeStyleSetWidthPercent(NodePtr, width);
-        }
-
-        public void StyleSetWidthAuto() {
-            YogaNative.YGNodeStyleSetWidthAuto(NodePtr);
-        }
-
-        public void StyleSetHeight(float height) {
-            YogaNative.YGNodeStyleSetHeight(NodePtr, height);
-        }
-
-        public void StyleSetHeightPercent(float height) {
-            YogaNative.YGNodeStyleSetHeightPercent(NodePtr, height);
-        }
-
-        public void StyleSetHeightAuto() {
-            YogaNative.YGNodeStyleSetHeightAuto(NodePtr);
-        }
-
-        public void StyleSetMinWidth(float minWidth) {
-            YogaNative.YGNodeStyleSetMinWidth(NodePtr, minWidth);
-        }
-
-        public void StyleSetMinWidthPercent(float minWidth) {
-            YogaNative.YGNodeStyleSetMinWidthPercent(NodePtr, minWidth);
-        }
-
-        public void StyleSetMinHeight(float minHeight) {
-            YogaNative.YGNodeStyleSetMinHeight(NodePtr, minHeight);
-        }
-
-        public void StyleSetMinHeightPercent(float minHeight) {
-            YogaNative.YGNodeStyleSetMinHeightPercent(NodePtr, minHeight);
-        }
-
-        public void StyleSetMaxWidth(float maxWidth) {
-            YogaNative.YGNodeStyleSetMaxWidth(NodePtr, maxWidth);
-        }
-
-        public void StyleSetMaxWidthPercent(float maxWidth) {
-            YogaNative.YGNodeStyleSetMaxWidthPercent(NodePtr, maxWidth);
-        }
-
-        public void StyleSetMaxHeight(float maxHeight) {
-            YogaNative.YGNodeStyleSetMaxHeight(NodePtr, maxHeight);
-        }
-
-        public void StyleSetMaxHeightPercent(float maxHeight) {
-            YogaNative.YGNodeStyleSetMaxHeightPercent(NodePtr, maxHeight);
-        }
-
-        public void StyleSetGap(Gutter gutter, float gap) {
-            YogaNative.YGNodeStyleSetGap(NodePtr, gutter, gap);
-        }
-
-        public void StyleSetGapPercent(Gutter gutter, float gap) {
-            YogaNative.YGNodeStyleSetGapPercent(NodePtr, gutter, gap);
         }
 
         public void StyleSetAspectRatio(float aspectRatio) {

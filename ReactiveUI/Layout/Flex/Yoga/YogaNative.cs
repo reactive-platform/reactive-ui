@@ -9,7 +9,7 @@ namespace Reactive.Yoga {
         }
 
         private const string YogaDllName = "yoga";
-        
+
         #region YGConfig
 
         [DllImport(YogaDllName)]
@@ -17,7 +17,7 @@ namespace Reactive.Yoga {
 
         [DllImport(YogaDllName)]
         public static extern void YGConfigSetPointScaleFactor(IntPtr ptr, float factor);
-        
+
         [DllImport(YogaDllName, EntryPoint = "YGBindingsConfigSetLogger")]
         public static extern void YGConfigSetLogger(IntPtr ptr, YogaLoggerDelegate? logger);
 
@@ -36,16 +36,16 @@ namespace Reactive.Yoga {
 
         [DllImport(YogaDllName)]
         public static extern void YGNodeRemoveChild(IntPtr node, IntPtr child);
-        
+
         [DllImport(YogaDllName)]
         public static extern void YGNodeRemoveAllChildren(IntPtr node);
 
         [DllImport(YogaDllName)]
         public static extern IntPtr YGNodeGetParent(IntPtr node);
-        
+
         [DllImport(YogaDllName)]
         public static extern int YGNodeGetChildCount(IntPtr node);
-        
+
         [DllImport(YogaDllName)]
         public static extern IntPtr YGNodeGetChild(IntPtr node, int index);
 
@@ -55,142 +55,208 @@ namespace Reactive.Yoga {
 
         [DllImport(YogaDllName)]
         public static extern void YGNodeSetMeasureFunc(IntPtr node, YGMeasureFunc? measureFunc);
-        
+
         [DllImport(YogaDllName)]
         public static extern bool YGNodeHasMeasureFunc(IntPtr node);
 
         [DllImport(YogaDllName)]
         public static extern bool YGNodeGetHasNewLayout(IntPtr node);
-        
+
         [DllImport(YogaDllName)]
         public static extern void YGNodeSetHasNewLayout(IntPtr node, bool value);
-        
+
+        [DllImport(YogaDllName)]
+        public static extern bool YGNodeHadOverflow(IntPtr node);
+
         [DllImport(YogaDllName)]
         public static extern void YGNodeMarkDirty(IntPtr node);
 
         [DllImport(YogaDllName)]
         public static extern void YGNodeCalculateLayout(IntPtr node, float availableWidth, float availableHeight, Direction ownerDirection);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeLayoutGetLeft")]
+        [DllImport(YogaDllName)]
         public static extern float YGNodeLayoutGetLeft(IntPtr node);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeLayoutGetTop")]
+        [DllImport(YogaDllName)]
         public static extern float YGNodeLayoutGetTop(IntPtr node);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeLayoutGetWidth")]
+        [DllImport(YogaDllName)]
         public static extern float YGNodeLayoutGetWidth(IntPtr node);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeLayoutGetHeight")]
+        [DllImport(YogaDllName)]
         public static extern float YGNodeLayoutGetHeight(IntPtr node);
 
         #endregion
 
-        #region YGNodeStyle
+        #region FlexBasis
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetOverflow")]
-        public static extern void YGNodeStyleSetOverflow(IntPtr node, Overflow overflow);
-
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetDirection")]
-        public static extern void YGNodeStyleSetDirection(IntPtr node, Direction direction);
-
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetFlexDirection")]
-        public static extern void YGNodeStyleSetFlexDirection(IntPtr node, FlexDirection flexDirection);
-
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetJustifyContent")]
-        public static extern void YGNodeStyleSetJustifyContent(IntPtr node, Justify justifyContent);
-
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetAlignContent")]
-        public static extern void YGNodeStyleSetAlignContent(IntPtr node, Align alignContent);
-
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetAlignItems")]
-        public static extern void YGNodeStyleSetAlignItems(IntPtr node, Align alignItems);
-
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetAlignSelf")]
-        public static extern void YGNodeStyleSetAlignSelf(IntPtr node, Align alignSelf);
-
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetPositionType")]
-        public static extern void YGNodeStyleSetPositionType(IntPtr node, PositionType positionType);
-
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetFlexWrap")]
-        public static extern void YGNodeStyleSetFlexWrap(IntPtr node, Wrap flexWrap);
-
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetFlexGrow")]
-        public static extern void YGNodeStyleSetFlexGrow(IntPtr node, float flexGrow);
-
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetFlexShrink")]
-        public static extern void YGNodeStyleSetFlexShrink(IntPtr node, float flexShrink);
-
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetFlexBasis")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetFlexBasis(IntPtr node, float flexBasis);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetFlexBasisPercent")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetFlexBasisPercent(IntPtr node, float flexBasis);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetFlexBasisAuto")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetFlexBasisAuto(IntPtr node);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetPosition")]
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetFlexBasisMaxContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetFlexBasisFitContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetFlexBasisStretch(IntPtr node);
+
+        #endregion
+
+        #region Position
+
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetPosition(IntPtr node, Edge edge, float position);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetPositionPercent")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetPositionPercent(IntPtr node, Edge edge, float position);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetMargin")]
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetPositionAuto(IntPtr node, Edge edge);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetPositionType(IntPtr node, PositionType positionType);
+
+        #endregion
+
+        #region Margin
+
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetMargin(IntPtr node, Edge edge, float margin);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetMarginPercent")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetMarginPercent(IntPtr node, Edge edge, float margin);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetMarginAuto")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetMarginAuto(IntPtr node, Edge edge);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetPadding")]
+        #endregion
+
+        #region Padding
+
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetPadding(IntPtr node, Edge edge, float padding);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetPaddingPercent")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetPaddingPercent(IntPtr node, Edge edge, float padding);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleGetWidth")]
+        #endregion
+
+        #region Width
+
+        [DllImport(YogaDllName)]
         public static extern YogaValue YGNodeStyleGetWidth(IntPtr node);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetWidth")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetWidth(IntPtr node, float width);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetWidthPercent")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetWidthPercent(IntPtr node, float width);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetWidthAuto")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetWidthAuto(IntPtr node);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleGetHeight")]
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetWidthMaxContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetWidthFitContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetWidthStretch(IntPtr node);
+
+        #endregion
+
+        #region Height
+
+        [DllImport(YogaDllName)]
         public static extern YogaValue YGNodeStyleGetHeight(IntPtr node);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetHeight")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetHeight(IntPtr node, float height);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetHeightPercent")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetHeightPercent(IntPtr node, float height);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetHeightAuto")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetHeightAuto(IntPtr node);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetMinWidth")]
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetHeightMaxContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetHeightFitContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetHeightStretch(IntPtr node);
+
+        #endregion
+
+        #region MinWidth
+
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetMinWidth(IntPtr node, float minWidth);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetMinWidthPercent")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetMinWidthPercent(IntPtr node, float minWidth);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetMinHeight")]
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetMinWidthMaxContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetMinWidthFitContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetMinWidthStretch(IntPtr node);
+
+        #endregion
+
+        #region MinHeight
+
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetMinHeight(IntPtr node, float minHeight);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetMinHeightPercent")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetMinHeightPercent(IntPtr node, float minHeight);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetMaxWidth")]
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetMinHeightMaxContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetMinHeightFitContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetMinHeightStretch(IntPtr node);
+
+        #endregion
+
+        #region MaxWidth
+
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetMaxWidth(IntPtr node, float maxWidth);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetMaxWidthPercent")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetMaxWidthPercent(IntPtr node, float maxWidth);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetMaxWidthMaxContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetMaxWidthFitContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetMaxWidthStretch(IntPtr node);
+
+        #endregion
+
+        #region MaxHeight
 
         [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetMaxHeight")]
         public static extern void YGNodeStyleSetMaxHeight(IntPtr node, float maxHeight);
@@ -198,20 +264,73 @@ namespace Reactive.Yoga {
         [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetMaxHeightPercent")]
         public static extern void YGNodeStyleSetMaxHeightPercent(IntPtr node, float maxHeight);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetGap")]
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetMaxHeightMaxContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetMaxHeightFitContent(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetMaxHeightStretch(IntPtr node);
+
+        #endregion
+
+        #region Gap
+
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetGap(IntPtr node, Gutter gutter, float gap);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetGapPercent")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetGapPercent(IntPtr node, Gutter gutter, float gap);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetAspectRatio")]
+        #endregion
+
+        #region Other Style Properties
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetOverflow(IntPtr node, Overflow overflow);
+
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetAspectRatio(IntPtr node, float aspectRatio);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleSetDisplay")]
+        [DllImport(YogaDllName)]
         public static extern void YGNodeStyleSetDisplay(IntPtr node, Display display);
 
-        [DllImport(YogaDllName, EntryPoint = "YGNodeStyleGetDisplay")]
+        [DllImport(YogaDllName)]
         public static extern Display YGNodeStyleGetDisplay(IntPtr node);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeCopyStyle(IntPtr destination, IntPtr source);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetDirection(IntPtr node, Direction direction);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetFlexDirection(IntPtr node, FlexDirection flexDirection);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetJustifyContent(IntPtr node, Justify justifyContent);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetAlignContent(IntPtr node, Align alignContent);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetAlignItems(IntPtr node, Align alignItems);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetAlignSelf(IntPtr node, Align alignSelf);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetFlexWrap(IntPtr node, Wrap flexWrap);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetFlex(IntPtr node, float flex);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetFlexGrow(IntPtr node, float flexGrow);
+
+        [DllImport(YogaDllName)]
+        public static extern void YGNodeStyleSetFlexShrink(IntPtr node, float flexShrink);
 
         #endregion
     }
