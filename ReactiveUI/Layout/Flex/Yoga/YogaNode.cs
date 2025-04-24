@@ -88,7 +88,7 @@ namespace Reactive.Yoga {
                     break;
 
                 case Unit.Point:
-                    YogaNative.YGNodeStyleSetPosition(NodePtr, edge, value.value); 
+                    YogaNative.YGNodeStyleSetPosition(NodePtr, edge, value.value);
                     break;
 
                 case Unit.Percent:
@@ -98,7 +98,7 @@ namespace Reactive.Yoga {
                 case Unit.Auto:
                     YogaNative.YGNodeStyleSetPositionAuto(NodePtr, edge);
                     break;
-                
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), $"{value.unit} is not supported for position");
             }
@@ -121,15 +121,15 @@ namespace Reactive.Yoga {
                 case Unit.Auto:
                     YogaNative.YGNodeStyleSetWidthAuto(NodePtr);
                     break;
-                    
+
                 case Unit.MaxContent:
                     YogaNative.YGNodeStyleSetWidthMaxContent(NodePtr);
                     break;
-                    
+
                 case Unit.FitContent:
                     YogaNative.YGNodeStyleSetWidthFitContent(NodePtr);
                     break;
-                    
+
                 case Unit.Stretch:
                     YogaNative.YGNodeStyleSetWidthStretch(NodePtr);
                     break;
@@ -153,15 +153,15 @@ namespace Reactive.Yoga {
                 case Unit.Auto:
                     YogaNative.YGNodeStyleSetHeightAuto(NodePtr);
                     break;
-                    
+
                 case Unit.MaxContent:
                     YogaNative.YGNodeStyleSetHeightMaxContent(NodePtr);
                     break;
-                    
+
                 case Unit.FitContent:
                     YogaNative.YGNodeStyleSetHeightFitContent(NodePtr);
                     break;
-                    
+
                 case Unit.Stretch:
                     YogaNative.YGNodeStyleSetHeightStretch(NodePtr);
                     break;
@@ -181,15 +181,15 @@ namespace Reactive.Yoga {
                 case Unit.Percent:
                     YogaNative.YGNodeStyleSetMinWidthPercent(NodePtr, value.value);
                     break;
-                    
+
                 case Unit.MaxContent:
                     YogaNative.YGNodeStyleSetMinWidthMaxContent(NodePtr);
                     break;
-                    
+
                 case Unit.FitContent:
                     YogaNative.YGNodeStyleSetMinWidthFitContent(NodePtr);
                     break;
-                    
+
                 case Unit.Stretch:
                     YogaNative.YGNodeStyleSetMinWidthStretch(NodePtr);
                     break;
@@ -212,15 +212,15 @@ namespace Reactive.Yoga {
                 case Unit.Percent:
                     YogaNative.YGNodeStyleSetMaxWidthPercent(NodePtr, value.value);
                     break;
-                    
+
                 case Unit.MaxContent:
                     YogaNative.YGNodeStyleSetMaxWidthMaxContent(NodePtr);
                     break;
-                    
+
                 case Unit.FitContent:
                     YogaNative.YGNodeStyleSetMaxWidthFitContent(NodePtr);
                     break;
-                    
+
                 case Unit.Stretch:
                     YogaNative.YGNodeStyleSetMaxWidthStretch(NodePtr);
                     break;
@@ -243,15 +243,15 @@ namespace Reactive.Yoga {
                 case Unit.Percent:
                     YogaNative.YGNodeStyleSetMinHeightPercent(NodePtr, value.value);
                     break;
-                    
+
                 case Unit.MaxContent:
                     YogaNative.YGNodeStyleSetMinHeightMaxContent(NodePtr);
                     break;
-                    
+
                 case Unit.FitContent:
                     YogaNative.YGNodeStyleSetMinHeightFitContent(NodePtr);
                     break;
-                    
+
                 case Unit.Stretch:
                     YogaNative.YGNodeStyleSetMinHeightStretch(NodePtr);
                     break;
@@ -274,15 +274,15 @@ namespace Reactive.Yoga {
                 case Unit.Percent:
                     YogaNative.YGNodeStyleSetMaxHeightPercent(NodePtr, value.value);
                     break;
-                    
+
                 case Unit.MaxContent:
                     YogaNative.YGNodeStyleSetMaxHeightMaxContent(NodePtr);
                     break;
-                    
+
                 case Unit.FitContent:
                     YogaNative.YGNodeStyleSetMaxHeightFitContent(NodePtr);
                     break;
-                    
+
                 case Unit.Stretch:
                     YogaNative.YGNodeStyleSetMaxHeightStretch(NodePtr);
                     break;
@@ -309,15 +309,15 @@ namespace Reactive.Yoga {
                 case Unit.Auto:
                     YogaNative.YGNodeStyleSetFlexBasisAuto(NodePtr);
                     break;
-                    
+
                 case Unit.MaxContent:
                     YogaNative.YGNodeStyleSetFlexBasisMaxContent(NodePtr);
                     break;
-                    
+
                 case Unit.FitContent:
                     YogaNative.YGNodeStyleSetFlexBasisFitContent(NodePtr);
                     break;
-                    
+
                 case Unit.Stretch:
                     YogaNative.YGNodeStyleSetFlexBasisStretch(NodePtr);
                     break;
@@ -341,7 +341,7 @@ namespace Reactive.Yoga {
                 case Unit.Auto:
                     YogaNative.YGNodeStyleSetMarginAuto(NodePtr, edge);
                     break;
-                    
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), $"{value.unit} is not supported for padding");
             }
@@ -450,7 +450,7 @@ namespace Reactive.Yoga {
         }
 
         public bool HadOverflow() {
-            return YogaNative.YGNodeHadOverflow(NodePtr);
+            return YogaNative.YGNodeGetHadOverflow(NodePtr);
         }
 
         public float LayoutGetLeft() {
@@ -481,14 +481,14 @@ namespace Reactive.Yoga {
 
         public void CalculateLayout(float availableWidth, float availableHeight, Direction ownerDirection) {
             // NaN values allow the node to determine it's size without constraints
-            if (StyleGetWidth() == YogaValue.Undefined) {
-                availableWidth = float.NaN;
-            }
-            
-            if (StyleGetHeight() == YogaValue.Undefined) {
-                availableHeight = float.NaN;
-            }
-            
+            //if (StyleGetWidth() == YogaValue.Undefined) {
+            //    availableWidth = float.NaN;
+            //}
+
+            //if (StyleGetHeight() == YogaValue.Undefined) {
+            //    availableHeight = float.NaN;
+            //}
+
             YogaNative.YGNodeCalculateLayout(NodePtr, availableWidth, availableHeight, ownerDirection);
         }
 
@@ -506,18 +506,18 @@ namespace Reactive.Yoga {
 
         #endregion
 
-        #region Style
+        #region Style Setters
 
         public void CopyStyleTo(YogaNode node) {
             YogaNative.YGNodeCopyStyle(node.NodePtr, NodePtr);
         }
-        
-        public YogaValue StyleGetHeight() {
-            return YogaNative.YGNodeStyleGetHeight(NodePtr);
+
+        public void StyleSetFlex(float flex) {
+            YogaNative.YGNodeStyleSetFlex(NodePtr, flex);
         }
 
-        public YogaValue StyleGetWidth() {
-            return YogaNative.YGNodeStyleGetWidth(NodePtr);
+        public void StyleSetAspectRatio(float aspectRatio) {
+            YogaNative.YGNodeStyleSetAspectRatio(NodePtr, aspectRatio);
         }
 
         public void StyleSetOverflow(Overflow overflow) {
@@ -564,16 +564,112 @@ namespace Reactive.Yoga {
             YogaNative.YGNodeStyleSetFlexShrink(NodePtr, flexShrink);
         }
 
-        public void StyleSetAspectRatio(float aspectRatio) {
-            YogaNative.YGNodeStyleSetAspectRatio(NodePtr, aspectRatio);
-        }
-
         public void StyleSetDisplay(Display display) {
             YogaNative.YGNodeStyleSetDisplay(NodePtr, display);
         }
 
+        #endregion
+
+        #region Style Getters
+
+        public float StyleGetFlex() {
+            return YogaNative.YGNodeStyleGetFlex(NodePtr);
+        }
+
+        public YogaValue StyleGetHeight() {
+            return YogaNative.YGNodeStyleGetHeight(NodePtr);
+        }
+
+        public YogaValue StyleGetWidth() {
+            return YogaNative.YGNodeStyleGetWidth(NodePtr);
+        }
+
+        public YogaValue StyleGetMinWidth() {
+            return YogaNative.YGNodeStyleGetMinWidth(NodePtr);
+        }
+
+        public YogaValue StyleGetMinHeight() {
+            return YogaNative.YGNodeStyleGetMinHeight(NodePtr);
+        }
+
+        public YogaValue StyleGetMaxWidth() {
+            return YogaNative.YGNodeStyleGetMaxWidth(NodePtr);
+        }
+
+        public YogaValue StyleGetMaxHeight() {
+            return YogaNative.YGNodeStyleGetMaxHeight(NodePtr);
+        }
+
+        public float StyleGetAspectRatio() {
+            return YogaNative.YGNodeStyleGetAspectRatio(NodePtr);
+        }
+
         public Display StyleGetDisplay() {
             return YogaNative.YGNodeStyleGetDisplay(NodePtr);
+        }
+
+        public YogaValue StyleGetPosition(Edge edge) {
+            return YogaNative.YGNodeStyleGetPosition(NodePtr, edge);
+        }
+
+        public YogaValue StyleGetMargin(Edge edge) {
+            return YogaNative.YGNodeStyleGetMargin(NodePtr, edge);
+        }
+
+        public YogaValue StyleGetPadding(Edge edge) {
+            return YogaNative.YGNodeStyleGetPadding(NodePtr, edge);
+        }
+
+        public float StyleGetGap(Gutter gutter) {
+            return YogaNative.YGNodeStyleGetGap(NodePtr, gutter);
+        }
+
+        public PositionType StyleGetPositionType() {
+            return YogaNative.YGNodeStyleGetPositionType(NodePtr);
+        }
+
+        public float StyleGetFlexGrow() {
+            return YogaNative.YGNodeStyleGetFlexGrow(NodePtr);
+        }
+
+        public float StyleGetFlexShrink() {
+            return YogaNative.YGNodeStyleGetFlexShrink(NodePtr);
+        }
+
+        public YogaValue StyleGetFlexBasis() {
+            return YogaNative.YGNodeStyleGetFlexBasis(NodePtr);
+        }
+
+        public Overflow StyleGetOverflow() {
+            return YogaNative.YGNodeStyleGetOverflow(NodePtr);
+        }
+
+        public Direction StyleGetDirection() {
+            return YogaNative.YGNodeStyleGetDirection(NodePtr);
+        }
+
+        public FlexDirection StyleGetFlexDirection() {
+            return YogaNative.YGNodeStyleGetFlexDirection(NodePtr);
+        }
+
+        public Justify StyleGetJustifyContent() {
+            return YogaNative.YGNodeStyleGetJustifyContent(NodePtr);
+        }
+
+        public Align StyleGetAlignContent() {
+            return YogaNative.YGNodeStyleGetAlignContent(NodePtr);
+        }
+
+        public Align StyleGetAlignItems() {
+            return YogaNative.YGNodeStyleGetAlignItems(NodePtr);
+        }
+
+        public Align StyleGetAlignSelf() {
+            return YogaNative.YGNodeStyleGetAlignSelf(NodePtr);
+        }
+
+        public Wrap StyleGetFlexWrap() {
+            return YogaNative.YGNodeStyleGetFlexWrap(NodePtr);
         }
 
         #endregion

@@ -1,116 +1,186 @@
 using System;
+using JetBrains.Annotations;
 
 namespace Reactive.Yoga {
+    [PublicAPI]
     public class YogaLayoutController : ILayoutController {
         #region Properties
 
         public Overflow Overflow {
-            get => _overflow;
+            get => HasValidNode ? YogaNode.StyleGetOverflow() : _overflow;
             set {
                 _overflow = value;
-                YogaNode.StyleSetOverflow(_overflow);
-                NotifyControllerUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetOverflow(_overflow);
+                    NotifyControllerUpdated();
+                }
             }
         }
 
         public Direction Direction {
-            get => _direction;
+            get => HasValidNode ? YogaNode.StyleGetDirection() : _direction;
             set {
                 _direction = value;
-                YogaNode.StyleSetDirection(_direction);
-                NotifyControllerUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetDirection(_direction);
+                    NotifyControllerUpdated();
+                }
             }
         }
 
         public FlexDirection FlexDirection {
-            get => _flexDirection;
+            get => HasValidNode ? YogaNode.StyleGetFlexDirection() : _flexDirection;
             set {
                 _flexDirection = value;
-                YogaNode.StyleSetFlexDirection(_flexDirection);
-                NotifyControllerUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetFlexDirection(_flexDirection);
+                    NotifyControllerUpdated();
+                }
             }
         }
 
         public Wrap FlexWrap {
-            get => _flexWrap;
+            get => HasValidNode ? YogaNode.StyleGetFlexWrap() : _flexWrap;
             set {
                 _flexWrap = value;
-                YogaNode.StyleSetFlexWrap(_flexWrap);
-                NotifyControllerUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetFlexWrap(_flexWrap);
+                    NotifyControllerUpdated();
+                }
             }
         }
 
         public Justify JustifyContent {
-            get => _justifyContent;
+            get => HasValidNode ? YogaNode.StyleGetJustifyContent() : _justifyContent;
             set {
                 _justifyContent = value;
-                YogaNode.StyleSetJustifyContent(_justifyContent);
-                NotifyControllerUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetJustifyContent(_justifyContent);
+                    NotifyControllerUpdated();
+                }
             }
         }
 
         public Align AlignItems {
-            get => _alignItems;
+            get => HasValidNode ? YogaNode.StyleGetAlignItems() : _alignItems;
             set {
                 _alignItems = value;
-                YogaNode.StyleSetAlignItems(_alignItems);
-                NotifyControllerUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetAlignItems(_alignItems);
+                    NotifyControllerUpdated();
+                }
             }
         }
 
         public Align AlignContent {
-            get => _alignContent;
+            get => HasValidNode ? YogaNode.StyleGetAlignContent() : _alignContent;
             set {
                 _alignContent = value;
-                YogaNode.StyleSetAlignContent(_alignContent);
-                NotifyControllerUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetAlignContent(_alignContent);
+                    NotifyControllerUpdated();
+                }
             }
         }
 
         public YogaFrame Padding {
-            get => _padding;
+            get {
+                if (HasValidNode) {
+                    return new() {
+                        top = YogaNode.StyleGetPadding(Edge.Top),
+                        bottom = YogaNode.StyleGetPadding(Edge.Bottom),
+                        left = YogaNode.StyleGetPadding(Edge.Left),
+                        right = YogaNode.StyleGetPadding(Edge.Right)
+                    };
+                }
+
+                return _padding;
+            }
             set {
                 _padding = value;
-                RefreshPadding();
-                NotifyControllerUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    RefreshPadding();
+                    NotifyControllerUpdated();
+                }
             }
         }
 
         public YogaVector Gap {
-            get => _gap;
+            get {
+                if (HasValidNode) {
+                    return new() {
+                        x = YogaNode.StyleGetGap(Gutter.Column),
+                        y = YogaNode.StyleGetGap(Gutter.Row)
+                    };
+                }
+
+                return _gap;
+            }
             set {
                 _gap = value;
-                RefreshGap();
-                NotifyControllerUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    RefreshGap();
+                    NotifyControllerUpdated();
+                }
             }
         }
+        
+        public bool HadOverflow => HasValidNode && YogaNode.HadOverflow();
 
         public event Action? LayoutControllerUpdatedEvent;
 
-        private Overflow _overflow = Overflow.Visible;
-        private Direction _direction = Direction.Inherit;
-        private FlexDirection _flexDirection = FlexDirection.Row;
-        private Justify _justifyContent = Justify.FlexStart;
-        private Align _alignItems = Align.FlexStart;
-        private Align _alignContent = Align.Auto;
-        private Wrap _flexWrap = Wrap.Wrap;
-        private YogaFrame _padding = YogaFrame.Zero;
-        private YogaVector _gap = YogaVector.Undefined;
+        private Overflow _overflow;
+        private Direction _direction;
+        private FlexDirection _flexDirection;
+        private Wrap _flexWrap;
+        private Justify _justifyContent;
+        private Align _alignItems;
+        private Align _alignContent;
+        private YogaFrame _padding;
+        private YogaVector _gap;
+        private bool _changedCacheBeforeInit;
 
         private void NotifyControllerUpdated() {
             LayoutControllerUpdatedEvent?.Invoke();
         }
 
-        private void RefreshGap() {
-            YogaNode.StyleSetGap(Gutter.Row, _gap.y);
-            YogaNode.StyleSetGap(Gutter.Column, _gap.x);
+        private void RefreshPadding() {
+            if (_padding.top == _padding.bottom) {
+                YogaNode.StyleSetPadding(Edge.Vertical, _padding.top);
+            } else {
+                YogaNode.StyleSetPadding(Edge.Top, _padding.top);
+                YogaNode.StyleSetPadding(Edge.Bottom, _padding.bottom);
+            }
+
+            if (_padding.left == _padding.right) {
+                YogaNode.StyleSetPadding(Edge.Horizontal, _padding.left);
+            } else {
+                YogaNode.StyleSetPadding(Edge.Left, _padding.left);
+                YogaNode.StyleSetPadding(Edge.Right, _padding.right);
+            }
         }
 
-        private void RefreshPadding() {
-            YogaNode.StyleSetPadding(Edge.Top, _padding.top);
-            YogaNode.StyleSetPadding(Edge.Bottom, _padding.bottom);
-            YogaNode.StyleSetPadding(Edge.Left, _padding.left);
-            YogaNode.StyleSetPadding(Edge.Right, _padding.right);
+        private void RefreshGap() {
+            YogaNode.StyleSetGap(Gutter.Column, _gap.x);
+            YogaNode.StyleSetGap(Gutter.Row, _gap.y);
         }
 
         private void RefreshAllProperties() {
@@ -131,33 +201,40 @@ namespace Reactive.Yoga {
 
         public Type ContextType { get; } = typeof(YogaContext);
 
+        private bool _everInitialized;
+
         public object CreateContext() => new YogaContext();
 
         public void ProvideContext(object? context) {
             if (context == null) {
-                if (_contextNode.GetIsInitialized()) {
-                    _contextNode!.RemoveAllChildren();
-                }
-                _contextNode = default;
+                _contextNode = null;
                 return;
             }
 
-            var c = (YogaContext)context;
-            _contextNode = c.YogaNode;
-            RefreshAllProperties();
+            if (_everInitialized) {
+                throw new InvalidOperationException("YogaLayoutController can be used only once.");
+            }
+
+            _contextNode = ((YogaContext)context).YogaNode;
+            _everInitialized = true;
+
+            if (_changedCacheBeforeInit) {
+                RefreshAllProperties();
+            }
         }
 
         #endregion
 
         #region Calculations
 
+        private bool HasValidNode => _contextNode?.IsInitialized ?? false;
+
         private YogaNode YogaNode {
             get {
-                if (_contextNode is not { IsInitialized: true }) {
+                if (!HasValidNode) {
                     throw new Exception("Node was not initialized");
                 }
-
-                return _contextNode;
+                return _contextNode!;
             }
         }
 
@@ -168,7 +245,7 @@ namespace Reactive.Yoga {
             var rect = transform.rect;
 
             YogaNode.CalculateLayout(rect.width, rect.height, Direction);
-            
+
             if (YogaNode.GetHasNewLayout()) {
                 // Root nodes don't need to apply position
                 YogaNode.ApplySizeTo(transform);

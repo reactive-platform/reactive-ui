@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using JetBrains.Annotations;
 using Reactive.Yoga;
-using Debug = UnityEngine.Debug;
 
 namespace Reactive {
     [PublicAPI]
@@ -10,144 +8,257 @@ namespace Reactive {
         #region Properties
 
         public PositionType PositionType {
-            get => _positionType;
+            get => HasValidNode ? YogaNode.StyleGetPositionType() : _positionType;
             set {
                 _positionType = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetPositionType(value);
-                NotifyModifierUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetPositionType(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public Align AlignSelf {
-            get => _alignSelf;
+            get => HasValidNode ? YogaNode.StyleGetAlignSelf() : _alignSelf;
             set {
                 _alignSelf = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetAlignSelf(value);
-                NotifyModifierUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetAlignSelf(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public YogaValue FlexBasis {
-            get => _flexBasis;
+            get => HasValidNode ? YogaNode.StyleGetFlexBasis() : _flexBasis;
             set {
                 _flexBasis = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetFlexBasis(value);
-                NotifyModifierUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetFlexBasis(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public float FlexGrow {
-            get => _flexGrow;
+            get => HasValidNode ? YogaNode.StyleGetFlexGrow() : _flexGrow;
             set {
                 _flexGrow = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetFlexGrow(value);
-                NotifyModifierUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetFlexGrow(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public float FlexShrink {
-            get => _flexShrink;
+            get => HasValidNode ? YogaNode.StyleGetFlexShrink() : _flexShrink;
             set {
                 _flexShrink = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetFlexShrink(value);
-                NotifyModifierUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetFlexShrink(value);
+                    NotifyModifierUpdated();
+                }
+            }
+        }
+
+        public float Flex {
+            get => HasValidNode ? YogaNode.StyleGetFlex() : _flex;
+            set {
+                _flex = value;
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetFlex(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public YogaFrame Position {
-            get => _position;
+            get {
+                if (HasValidNode) {
+                    return new() {
+                        top = YogaNode.StyleGetPosition(Edge.Top),
+                        bottom = YogaNode.StyleGetPosition(Edge.Bottom),
+                        left = YogaNode.StyleGetPosition(Edge.Left),
+                        right = YogaNode.StyleGetPosition(Edge.Right)
+                    };
+                }
+                return _position;
+            }
             set {
                 _position = value;
-                if (!HasValidNode) return;
-                RefreshPosition();
-                NotifyModifierUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    RefreshPosition(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public YogaVector Size {
-            get => _size;
+            get {
+                if (HasValidNode) {
+                    return new() {
+                        x = YogaNode.StyleGetWidth(),
+                        y = YogaNode.StyleGetHeight()
+                    };
+                }
+                return _size;
+            }
             set {
                 _size = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetWidth(_size.x);
-                YogaNode.StyleSetHeight(_size.y);
-                NotifyModifierUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetWidth(value.x);
+                    YogaNode.StyleSetHeight(value.y);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public YogaVector MinSize {
-            get => _minSize;
+            get {
+                if (HasValidNode) {
+                    return new() {
+                        x = YogaNode.StyleGetMinWidth(),
+                        y = YogaNode.StyleGetMinHeight()
+                    };
+                }
+                return _minSize;
+            }
             set {
                 _minSize = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetMinWidth(value.x);
-                YogaNode.StyleSetMinHeight(value.y);
-                NotifyModifierUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetMinWidth(value.x);
+                    YogaNode.StyleSetMinHeight(value.y);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public YogaVector MaxSize {
-            get => _maxSize;
+            get {
+                if (HasValidNode) {
+                    return new() {
+                        x = YogaNode.StyleGetMaxWidth(),
+                        y = YogaNode.StyleGetMaxHeight()
+                    };
+                }
+                return _maxSize;
+            }
             set {
                 _maxSize = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetMaxWidth(value.x);
-                YogaNode.StyleSetMaxHeight(value.y);
-                NotifyModifierUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetMaxWidth(value.x);
+                    YogaNode.StyleSetMaxHeight(value.y);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
-        public YogaValue AspectRatio {
-            get => _aspectRatio;
+        public float AspectRatio {
+            get => HasValidNode ? YogaNode.StyleGetAspectRatio() : _aspectRatio;
             set {
                 _aspectRatio = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetAspectRatio(value.value);
-                NotifyModifierUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetAspectRatio(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public YogaFrame Margin {
-            get => _margin;
+            get {
+                if (HasValidNode) {
+                    return new() {
+                        top = YogaNode.StyleGetMargin(Edge.Top),
+                        bottom = YogaNode.StyleGetMargin(Edge.Bottom),
+                        left = YogaNode.StyleGetMargin(Edge.Left),
+                        right = YogaNode.StyleGetMargin(Edge.Right)
+                    };
+                }
+                return _margin;
+            }
             set {
                 _margin = value;
-                if (!HasValidNode) return;
-                RefreshMargin();
-                NotifyModifierUpdated();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    RefreshMargin(value);
+                    NotifyModifierUpdated();
+                }
+            }
+        }
+        
+        public bool HadOverflow => HasValidNode && YogaNode.HadOverflow();
+        
+        // Take into account that yoga can modify values on the backend, so when debugging,
+        // do NOT rely on these variables, rely on properties instead.
+        // These variables hold cached values for late initialization and are not intended for anything else.
+        private PositionType _positionType;
+        private Align _alignSelf;
+        private float _aspectRatio;
+        private float _flex;
+        private float _flexGrow;
+        private float _flexShrink;
+        private YogaValue _flexBasis;
+        private YogaFrame _position;
+        private YogaVector _size;
+        private YogaVector _minSize;
+        private YogaVector _maxSize;
+        private YogaFrame _margin;
+        private bool _changedCacheBeforeInit;
+
+        private void RefreshMargin(YogaFrame value) {
+            if (value.top == value.bottom) {
+                YogaNode.StyleSetMargin(Edge.Vertical, value.top);
+            } else {
+                YogaNode.StyleSetMargin(Edge.Top, value.top);
+                YogaNode.StyleSetMargin(Edge.Bottom, value.bottom);
+            }
+
+            if (value.left == value.right) {
+                YogaNode.StyleSetMargin(Edge.Horizontal, value.left);
+            } else {
+                YogaNode.StyleSetMargin(Edge.Left, value.left);
+                YogaNode.StyleSetMargin(Edge.Right, value.right);
             }
         }
 
-        public bool HadOverflow => YogaNode.HadOverflow();
+        private void RefreshPosition(YogaFrame value) {
+            if (value.top == value.bottom) {
+                YogaNode.StyleSetPosition(Edge.Vertical, value.top);
+            } else {
+                YogaNode.StyleSetPosition(Edge.Top, value.top);
+                YogaNode.StyleSetPosition(Edge.Bottom, value.bottom);
+            }
 
-        private float _flexGrow;
-        private float _flexShrink = 1;
-        private Align _alignSelf = Align.Auto;
-        private PositionType _positionType = PositionType.Relative;
-        private YogaFrame _position = YogaFrame.Undefined;
-        private YogaValue _flexBasis = YogaValue.Undefined;
-        private YogaVector _size = YogaVector.Undefined;
-        private YogaVector _minSize = YogaVector.Undefined;
-        private YogaVector _maxSize = YogaVector.Undefined;
-        private YogaValue _aspectRatio = YogaValue.Undefined;
-        private YogaFrame _margin = YogaFrame.Zero;
-
-        private void RefreshMargin() {
-            YogaNode.StyleSetMargin(Edge.Top, _margin.top);
-            YogaNode.StyleSetMargin(Edge.Bottom, _margin.bottom);
-            YogaNode.StyleSetMargin(Edge.Left, _margin.left);
-            YogaNode.StyleSetMargin(Edge.Right, _margin.right);
-        }
-
-        private void RefreshPosition() {
-            YogaNode.StyleSetPosition(Edge.Top, _position.top);
-            YogaNode.StyleSetPosition(Edge.Bottom, _position.bottom);
-            YogaNode.StyleSetPosition(Edge.Left, _position.left);
-            YogaNode.StyleSetPosition(Edge.Right, _position.right);
+            if (value.left == value.right) {
+                YogaNode.StyleSetPosition(Edge.Horizontal, value.left);
+            } else {
+                YogaNode.StyleSetPosition(Edge.Left, value.left);
+                YogaNode.StyleSetPosition(Edge.Right, value.right);
+            }
         }
 
         private void RefreshAllProperties() {
@@ -156,15 +267,21 @@ namespace Reactive {
             YogaNode.StyleSetFlexBasis(_flexBasis);
             YogaNode.StyleSetFlexGrow(_flexGrow);
             YogaNode.StyleSetFlexShrink(_flexShrink);
-            YogaNode.StyleSetMinWidth(_minSize.x);
-            YogaNode.StyleSetMinHeight(_minSize.y);
-            YogaNode.StyleSetMaxWidth(_maxSize.x);
-            YogaNode.StyleSetMaxHeight(_maxSize.y);
-            YogaNode.StyleSetAspectRatio(_aspectRatio.value);
+
+            RefreshPosition(_position);
+
             YogaNode.StyleSetWidth(_size.x);
             YogaNode.StyleSetHeight(_size.y);
-            RefreshMargin();
-            RefreshPosition();
+
+            YogaNode.StyleSetMinWidth(_minSize.x);
+            YogaNode.StyleSetMinHeight(_minSize.y);
+
+            YogaNode.StyleSetMaxWidth(_maxSize.x);
+            YogaNode.StyleSetMaxHeight(_maxSize.y);
+
+            YogaNode.StyleSetAspectRatio(_aspectRatio);
+
+            RefreshMargin(_margin);
         }
 
         #endregion
@@ -173,25 +290,26 @@ namespace Reactive {
 
         public override Type ContextType { get; } = typeof(YogaContext);
 
+        private bool _everInitialized;
+
         public override object CreateContext() => new YogaContext();
 
         public override void ProvideContext(object? context) {
-            if (context != null) {
-                _node = ((YogaContext)context).YogaNode;
-                RefreshAllProperties();
+            if (context == null) {
+                _node = null;
                 return;
             }
 
-            if (HasValidNode) {
-                // Clearing properties to prevent size lock on this node
-                _minSize = YogaVector.Undefined;
-                _maxSize = YogaVector.Undefined;
-                _size = YogaVector.Undefined;
-                _margin = YogaFrame.Undefined;
-                _aspectRatio = YogaValue.Undefined;
+            if (_everInitialized) {
+                throw new InvalidOperationException("YogaModifier can be used only once. If you need a modifier with similar values, use Copy instead.");
+            }
 
+            _node = ((YogaContext)context).YogaNode;
+            _everInitialized = true;
+
+            // No need to update if nothing was changed
+            if (_changedCacheBeforeInit) {
                 RefreshAllProperties();
-                _node = null;
             }
         }
 
@@ -201,10 +319,10 @@ namespace Reactive {
 
         internal YogaNode YogaNode {
             get {
-                if (!(_node?.IsInitialized ?? false)) {
+                if (!HasValidNode) {
                     throw new Exception("Node was not initialized");
                 }
-                return _node;
+                return _node!;
             }
         }
 
@@ -259,20 +377,28 @@ namespace Reactive {
         }
 
         public override void CopyFromSimilar(YogaModifier similar) {
-            SuppressRefresh = true;
-            PositionType = similar.PositionType;
-            AlignSelf = similar.AlignSelf;
-            FlexBasis = similar.FlexBasis;
-            FlexGrow = similar.FlexGrow;
-            FlexShrink = similar.FlexShrink;
-            Position = similar.Position;
-            Size = similar.Size;
-            MinSize = similar.MinSize;
-            MaxSize = similar.MinSize;
-            AspectRatio = similar.AspectRatio;
-            Margin = similar.Margin;
-            SuppressRefresh = false;
-            NotifyModifierUpdated();
+            if (HasValidNode && similar.HasValidNode) {
+                similar.YogaNode.CopyStyleTo(YogaNode);
+                NotifyModifierUpdated();
+            }
+        }
+
+        public override ILayoutModifier CreateCopy() {
+            var copy = new YogaModifier {
+                _positionType = _positionType,
+                _alignSelf = _alignSelf,
+                _flexBasis = _flexBasis,
+                _flexGrow = _flexGrow,
+                _flexShrink = _flexShrink,
+                _position = _position,
+                _size = _size,
+                _minSize = _minSize,
+                _maxSize = _maxSize,
+                _aspectRatio = _aspectRatio,
+                _margin = _margin
+            };
+
+            return copy;
         }
 
         #endregion
