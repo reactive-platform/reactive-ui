@@ -8,7 +8,7 @@ namespace Reactive {
         #region Properties
 
         public PositionType PositionType {
-            get => HasValidNode ? YogaNode.StyleGetPositionType() : _positionType;
+            get => HasValidNode ? YogaNode.StyleGetPositionType() : _positionType.GetValueOrDefault();
             set {
                 _positionType = value;
                 _changedCacheBeforeInit = true;
@@ -21,7 +21,7 @@ namespace Reactive {
         }
 
         public Align AlignSelf {
-            get => HasValidNode ? YogaNode.StyleGetAlignSelf() : _alignSelf;
+            get => HasValidNode ? YogaNode.StyleGetAlignSelf() : _alignSelf.GetValueOrDefault();
             set {
                 _alignSelf = value;
                 _changedCacheBeforeInit = true;
@@ -34,7 +34,7 @@ namespace Reactive {
         }
 
         public YogaValue FlexBasis {
-            get => HasValidNode ? YogaNode.StyleGetFlexBasis() : _flexBasis;
+            get => HasValidNode ? YogaNode.StyleGetFlexBasis() : _flexBasis.GetValueOrDefault();
             set {
                 _flexBasis = value;
                 _changedCacheBeforeInit = true;
@@ -47,7 +47,7 @@ namespace Reactive {
         }
 
         public float FlexGrow {
-            get => HasValidNode ? YogaNode.StyleGetFlexGrow() : _flexGrow;
+            get => HasValidNode ? YogaNode.StyleGetFlexGrow() : _flexGrow.GetValueOrDefault();
             set {
                 _flexGrow = value;
                 _changedCacheBeforeInit = true;
@@ -60,7 +60,7 @@ namespace Reactive {
         }
 
         public float FlexShrink {
-            get => HasValidNode ? YogaNode.StyleGetFlexShrink() : _flexShrink;
+            get => HasValidNode ? YogaNode.StyleGetFlexShrink() : _flexShrink.GetValueOrDefault();
             set {
                 _flexShrink = value;
                 _changedCacheBeforeInit = true;
@@ -73,7 +73,7 @@ namespace Reactive {
         }
 
         public float Flex {
-            get => HasValidNode ? YogaNode.StyleGetFlex() : _flex;
+            get => HasValidNode ? YogaNode.StyleGetFlex() : _flex.GetValueOrDefault();
             set {
                 _flex = value;
                 _changedCacheBeforeInit = true;
@@ -95,7 +95,7 @@ namespace Reactive {
                         right = YogaNode.StyleGetPosition(Edge.Right)
                     };
                 }
-                return _position;
+                return _position.GetValueOrDefault();
             }
             set {
                 _position = value;
@@ -116,7 +116,7 @@ namespace Reactive {
                         y = YogaNode.StyleGetHeight()
                     };
                 }
-                return _size;
+                return _size.GetValueOrDefault();
             }
             set {
                 _size = value;
@@ -138,7 +138,7 @@ namespace Reactive {
                         y = YogaNode.StyleGetMinHeight()
                     };
                 }
-                return _minSize;
+                return _minSize.GetValueOrDefault();
             }
             set {
                 _minSize = value;
@@ -160,7 +160,7 @@ namespace Reactive {
                         y = YogaNode.StyleGetMaxHeight()
                     };
                 }
-                return _maxSize;
+                return _maxSize.GetValueOrDefault();
             }
             set {
                 _maxSize = value;
@@ -175,7 +175,7 @@ namespace Reactive {
         }
 
         public float AspectRatio {
-            get => HasValidNode ? YogaNode.StyleGetAspectRatio() : _aspectRatio;
+            get => HasValidNode ? YogaNode.StyleGetAspectRatio() : _aspectRatio.GetValueOrDefault();
             set {
                 _aspectRatio = value;
                 _changedCacheBeforeInit = true;
@@ -197,7 +197,7 @@ namespace Reactive {
                         right = YogaNode.StyleGetMargin(Edge.Right)
                     };
                 }
-                return _margin;
+                return _margin.GetValueOrDefault();
             }
             set {
                 _margin = value;
@@ -215,18 +215,18 @@ namespace Reactive {
         // Take into account that yoga can modify values on the backend, so when debugging,
         // do NOT rely on these variables, rely on properties instead.
         // These variables hold cached values for late initialization and are not intended for anything else.
-        private PositionType _positionType;
-        private Align _alignSelf;
-        private float _aspectRatio;
-        private float _flex;
-        private float _flexGrow;
-        private float _flexShrink;
-        private YogaValue _flexBasis;
-        private YogaFrame _position;
-        private YogaVector _size;
-        private YogaVector _minSize;
-        private YogaVector _maxSize;
-        private YogaFrame _margin;
+        private PositionType? _positionType;
+        private Align? _alignSelf;
+        private float? _aspectRatio;
+        private float? _flex;
+        private float? _flexGrow;
+        private float? _flexShrink;
+        private YogaValue? _flexBasis;
+        private YogaFrame? _position;
+        private YogaVector? _size;
+        private YogaVector? _minSize;
+        private YogaVector? _maxSize;
+        private YogaFrame? _margin;
         private bool _changedCacheBeforeInit;
 
         private void RefreshMargin(YogaFrame value) {
@@ -262,26 +262,51 @@ namespace Reactive {
         }
 
         private void RefreshAllProperties() {
-            YogaNode.StyleSetPositionType(_positionType);
-            YogaNode.StyleSetAlignSelf(_alignSelf);
-            YogaNode.StyleSetFlexBasis(_flexBasis);
-            YogaNode.StyleSetFlexGrow(_flexGrow);
-            YogaNode.StyleSetFlexShrink(_flexShrink);
-
-            RefreshPosition(_position);
-
-            YogaNode.StyleSetWidth(_size.x);
-            YogaNode.StyleSetHeight(_size.y);
-
-            YogaNode.StyleSetMinWidth(_minSize.x);
-            YogaNode.StyleSetMinHeight(_minSize.y);
-
-            YogaNode.StyleSetMaxWidth(_maxSize.x);
-            YogaNode.StyleSetMaxHeight(_maxSize.y);
-
-            YogaNode.StyleSetAspectRatio(_aspectRatio);
-
-            RefreshMargin(_margin);
+            if (_positionType.HasValue) {
+                YogaNode.StyleSetPositionType(_positionType.Value);
+            }
+            if (_alignSelf.HasValue) {
+                YogaNode.StyleSetAlignSelf(_alignSelf.Value);
+            }
+            if (_flexBasis.HasValue) {
+                YogaNode.StyleSetFlexBasis(_flexBasis.Value);
+            }
+            if (_flexGrow.HasValue) {
+                YogaNode.StyleSetFlexGrow(_flexGrow.Value);
+            }
+            if (_flexShrink.HasValue) {
+                YogaNode.StyleSetFlexShrink(_flexShrink.Value);
+            }
+            if (_flex.HasValue) {
+                YogaNode.StyleSetFlex(_flex.Value);
+            }
+            
+            if (_position.HasValue) {
+                RefreshPosition(_position.Value);
+            }
+            
+            if (_size.HasValue) {
+                YogaNode.StyleSetWidth(_size.Value.x);
+                YogaNode.StyleSetHeight(_size.Value.y);
+            }
+            
+            if (_minSize.HasValue) {
+                YogaNode.StyleSetMinWidth(_minSize.Value.x);
+                YogaNode.StyleSetMinHeight(_minSize.Value.y);
+            }
+            
+            if (_maxSize.HasValue) {
+                YogaNode.StyleSetMaxWidth(_maxSize.Value.x);
+                YogaNode.StyleSetMaxHeight(_maxSize.Value.y);
+            }
+            
+            if (_aspectRatio.HasValue) {
+                YogaNode.StyleSetAspectRatio(_aspectRatio.Value);
+            }
+            
+            if (_margin.HasValue) {
+                RefreshMargin(_margin.Value);
+            }
         }
 
         #endregion
@@ -290,8 +315,6 @@ namespace Reactive {
 
         public override Type ContextType { get; } = typeof(YogaContext);
 
-        private bool _everInitialized;
-
         public override object CreateContext() => new YogaContext();
 
         public override void ProvideContext(object? context) {
@@ -299,13 +322,8 @@ namespace Reactive {
                 _node = null;
                 return;
             }
-
-            if (_everInitialized) {
-                throw new InvalidOperationException("YogaModifier can be used only once. If you need a modifier with similar values, use Copy instead.");
-            }
-
+            
             _node = ((YogaContext)context).YogaNode;
-            _everInitialized = true;
 
             // No need to update if nothing was changed
             if (_changedCacheBeforeInit) {

@@ -450,7 +450,7 @@ namespace Reactive.Yoga {
         }
 
         public bool HadOverflow() {
-            return YogaNative.YGNodeGetHadOverflow(NodePtr);
+            return YogaNative.YGNodeLayoutGetHadOverflow(NodePtr);
         }
 
         public float LayoutGetLeft() {

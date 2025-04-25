@@ -66,7 +66,7 @@ namespace Reactive.Yoga {
         public static extern void YGNodeSetHasNewLayout(IntPtr node, bool value);
 
         [DllImport(YogaDllName)]
-        public static extern bool YGNodeGetHadOverflow(IntPtr node);
+        public static extern bool YGNodeLayoutGetHadOverflow(IntPtr node);
 
         [DllImport(YogaDllName)]
         public static extern void YGNodeMarkDirty(IntPtr node);
