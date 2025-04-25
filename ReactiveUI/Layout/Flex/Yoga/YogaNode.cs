@@ -480,15 +480,6 @@ namespace Reactive.Yoga {
         }
 
         public void CalculateLayout(float availableWidth, float availableHeight, Direction ownerDirection) {
-            // NaN values allow the node to determine it's size without constraints
-            //if (StyleGetWidth() == YogaValue.Undefined) {
-            //    availableWidth = float.NaN;
-            //}
-
-            //if (StyleGetHeight() == YogaValue.Undefined) {
-            //    availableHeight = float.NaN;
-            //}
-
             YogaNative.YGNodeCalculateLayout(NodePtr, availableWidth, availableHeight, ownerDirection);
         }
 

@@ -166,7 +166,7 @@ namespace Reactive {
             YogaFrame? padding = null,
             YogaVector? gap = null
         ) where T : ILayoutDriver {
-            return AsYogaFlexGroup<T, YogaLayoutController>(
+            return AsFlexGroup(
                 component,
                 out _,
                 direction,
@@ -183,58 +183,57 @@ namespace Reactive {
         public static T AsFlexGroup<T>(
             this T component,
             out YogaLayoutController layoutController,
-            FlexDirection direction = FlexDirection.Row,
-            Justify justifyContent = Justify.SpaceAround,
-            Align alignItems = Align.Stretch,
-            Align alignContent = Align.Auto,
-            Wrap wrap = Wrap.NoWrap,
-            Overflow overflow = Overflow.Visible,
+            FlexDirection? direction = null,
+            Justify? justifyContent = null,
+            Align? alignItems = null,
+            Align? alignContent = null,
+            Wrap? wrap = null,
+            Overflow? overflow = null,
             YogaFrame? padding = null,
-            YogaVector? gap = null
+            YogaVector? gap = null,
+            bool constrainHorizontal = true,
+            bool constrainVertical = true
         ) where T : ILayoutDriver {
-            return AsYogaFlexGroup(
-                component,
-                out layoutController,
-                direction,
-                justifyContent,
-                alignItems,
-                alignContent,
-                wrap,
-                overflow,
-                padding,
-                gap
-            );
-        }
-
-        #endregion
-
-        #region Flex Group Tools
-
-        private static T AsYogaFlexGroup<T, TController>(
-            this T component,
-            out TController layoutController,
-            FlexDirection direction = FlexDirection.Row,
-            Justify justifyContent = Justify.SpaceAround,
-            Align alignItems = Align.Stretch,
-            Align alignContent = Align.Auto,
-            Wrap wrap = Wrap.NoWrap,
-            Overflow overflow = Overflow.Visible,
-            YogaFrame? padding = null,
-            YogaVector? gap = null
-        ) where T : ILayoutDriver where TController : YogaLayoutController, new() {
-            if (component.LayoutController is not TController controller) {
+            if (component.LayoutController is not YogaLayoutController controller) {
                 controller = new();
+                component.LayoutController = controller;
             }
             
-            component.LayoutController = controller;
-            controller.FlexDirection = direction;
-            controller.JustifyContent = justifyContent;
-            controller.AlignContent = alignContent;
-            controller.AlignItems = alignItems;
-            controller.FlexWrap = wrap;
-            controller.Overflow = overflow;
-            controller.Padding = padding ?? controller.Padding;
-            controller.Gap = gap ?? controller.Gap;
+            if (direction.HasValue) {
+                controller.FlexDirection = direction.Value;
+            }
+            
+            if (justifyContent.HasValue) {
+                controller.JustifyContent = justifyContent.Value;
+            }
+            
+            if (alignContent.HasValue) {
+                controller.AlignContent = alignContent.Value;
+            }
+            
+            if (alignItems.HasValue) {
+                controller.AlignItems = alignItems.Value;
+            }
+            
+            if (wrap.HasValue) {
+                controller.FlexWrap = wrap.Value;
+            }
+            
+            if (overflow.HasValue) {
+                controller.Overflow = overflow.Value;
+            }
+            
+            if (padding.HasValue) {
+                controller.Padding = padding.Value;
+            }
+            
+            if (gap.HasValue) {
+                controller.Gap = gap.Value;
+            }
+
+            // Those aren't native properties so we don't care
+            controller.ConstrainVertical = constrainVertical;
+            controller.ConstrainHorizontal = constrainHorizontal;
 
             layoutController = controller;
             return component;

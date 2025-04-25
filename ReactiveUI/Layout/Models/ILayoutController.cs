@@ -1,5 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
+using UnityEngine;
 
 namespace Reactive {
     /// <summary>
@@ -46,6 +47,6 @@ namespace Reactive {
         /// Must be called for the root node only, otherwise the behaviour is undefined. 
         /// </summary>
         /// <param name="item">The controller as an item.</param>
-        void Recalculate(ILayoutItem item);
+        void Recalculate(ILayoutItem item, Vector2 constraints);
     }
 }

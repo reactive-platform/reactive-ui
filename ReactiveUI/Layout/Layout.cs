@@ -54,8 +54,15 @@ namespace Reactive {
             if (_layoutController == null || Children.Count == 0) {
                 return;
             }
+
+            Vector2 constraints;
+            if (ContentTransform.parent is RectTransform parent) {
+                constraints = parent.rect.size;
+            } else {
+                constraints = new Vector2(float.NaN, float.NaN);
+            }
             
-            _layoutController.Recalculate(this);
+            _layoutController.Recalculate(this, constraints);
             _layoutController.ApplyChildren();
 
             _lastRecalculationTime = Time.time;

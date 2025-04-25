@@ -1,5 +1,6 @@
 using System;
 using JetBrains.Annotations;
+using UnityEngine;
 
 namespace Reactive.Yoga {
     [PublicAPI]
@@ -143,19 +144,45 @@ namespace Reactive.Yoga {
             }
         }
 
+        public bool ConstrainVertical {
+            get => _constrainVertical;
+            set {
+                _constrainVertical = value;
+
+                if (HasValidNode) {
+                    NotifyControllerUpdated();
+                }
+            }
+        }
+
+        public bool ConstrainHorizontal {
+            get => _constrainHorizontal;
+            set {
+                _constrainHorizontal = value;
+
+                if (HasValidNode) {
+                    NotifyControllerUpdated();
+                }
+            }
+        }
+
         public bool HadOverflow => HasValidNode && YogaNode.HadOverflow();
 
         public event Action? LayoutControllerUpdatedEvent;
 
         private Overflow? _overflow;
         private Direction? _direction;
-        private FlexDirection? _flexDirection;
+        // To match web defaults
+        private FlexDirection? _flexDirection = FlexDirection.Row;
         private Wrap? _flexWrap;
         private Justify? _justifyContent;
         private Align? _alignItems;
         private Align? _alignContent;
         private YogaFrame? _padding;
         private YogaVector? _gap;
+        private bool _constrainVertical = true;
+        private bool _constrainHorizontal = true;
+
         private bool _changedCacheBeforeInit;
 
         private void NotifyControllerUpdated() {
@@ -212,7 +239,7 @@ namespace Reactive.Yoga {
                 RefreshPadding(_padding.Value);
             }
         }
-        
+
         #endregion
 
         #region Context
@@ -251,18 +278,23 @@ namespace Reactive.Yoga {
 
         private YogaNode? _node;
 
-        public void Recalculate(ILayoutItem item) {
-            var transform = item.BeginApply();
-            var rect = transform.rect;
-
-            YogaNode.CalculateLayout(rect.width, rect.height, Direction);
+        public void Recalculate(ILayoutItem item, Vector2 constraints) {
+            if (!ConstrainHorizontal) {
+                constraints.x = float.NaN;
+            }
+            if (!ConstrainVertical) {
+                constraints.y = float.NaN;
+            }
+            
+            YogaNode.CalculateLayout(constraints.x, constraints.y, Direction);
 
             if (YogaNode.GetHasNewLayout()) {
+                var transform = item.BeginApply();
                 // Root nodes don't need to apply position
                 YogaNode.ApplySizeTo(transform);
+                
+                item.EndApply();
             }
-
-            item.EndApply();
         }
 
         #endregion
