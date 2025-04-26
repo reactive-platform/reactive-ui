@@ -164,7 +164,9 @@ namespace Reactive {
             Wrap wrap = Wrap.NoWrap,
             Overflow overflow = Overflow.Visible,
             YogaFrame? padding = null,
-            YogaVector? gap = null
+            YogaVector? gap = null,
+            bool constrainHorizontal = true,
+            bool constrainVertical = true
         ) where T : ILayoutDriver {
             return AsFlexGroup(
                 component,
@@ -176,7 +178,9 @@ namespace Reactive {
                 wrap,
                 overflow,
                 padding,
-                gap
+                gap,
+                constrainHorizontal,
+                constrainVertical
             );
         }
 
