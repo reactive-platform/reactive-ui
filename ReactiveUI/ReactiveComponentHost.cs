@@ -46,10 +46,10 @@ namespace Reactive {
             }
 
             public bool WithinLayout {
-                get => Enabled || WithinLayoutIfDisabled;
+                get => gameObject.activeSelf || WithinLayoutIfDisabled;
                 set {
                     if (WithinLayoutIfDisabled) return;
-                    Enabled = value;
+                    gameObject.SetActive(value);
                 }
             }
 
@@ -262,6 +262,7 @@ namespace Reactive {
             #region Events
 
             private RectTransform _rectTransform = null!;
+            private bool _wasActuallyDisabled;
 
             private void Awake() {
                 _rectTransform = GetComponent<RectTransform>();
@@ -294,17 +295,27 @@ namespace Reactive {
             }
 
             private void OnEnable() {
+                if (!_wasActuallyDisabled) {
+                    return;
+                }
+
                 StateUpdatedEvent?.Invoke(this);
                 ScheduleLayoutRecalculationAfterStateChange(true);
 
                 _components.ForEach(static x => x.OnEnable());
+                _wasActuallyDisabled = false;
             }
 
             private void OnDisable() {
+                if (gameObject.activeSelf) {
+                    return;
+                }
+
                 StateUpdatedEvent?.Invoke(this);
                 ScheduleLayoutRecalculationAfterStateChange(false);
 
                 _components.ForEach(static x => x.OnDisable());
+                _wasActuallyDisabled = true;
             }
 
             private void OnRectTransformDimensionsChange() {
