@@ -244,8 +244,10 @@ namespace Reactive {
         public GameObject Use(Transform? parent = null) {
             ValidateExternalInteraction();
             if (!IsInitialized) ConstructAndInit();
+            
+            LayoutDriver = null;
             ContentTransform.SetParent(parent, false);
-            if (parent == null) LayoutDriver = null;
+            
             return Content;
         }
 
