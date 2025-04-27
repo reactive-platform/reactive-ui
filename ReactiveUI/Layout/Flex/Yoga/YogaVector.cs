@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Reactive.Yoga {
     [PublicAPI]
-    public struct YogaVector {
+    public struct YogaVector : IEquatable<YogaVector> {
         public static readonly YogaVector Auto = new() {
             x = YogaValue.Auto,
             y = YogaValue.Auto
@@ -51,6 +51,20 @@ namespace Reactive.Yoga {
         
         public static bool operator !=(YogaVector left, YogaVector right) {
             return left.x != right.x || left.y != right.y;
+        }
+        
+        public bool Equals(YogaVector other) {
+            return x == other.x && y.Equals(other.y);
+        }
+
+        public override bool Equals(object? obj) {
+            return obj is YogaVector other && Equals(other);
+        }
+        
+        public override int GetHashCode() {
+            unchecked {
+                return (x.GetHashCode() * 397) ^ y.GetHashCode();
+            }
         }
     }
 }

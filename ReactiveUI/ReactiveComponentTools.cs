@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Reactive;
 
-public partial class ReactiveComponentBase {
+public partial class ReactiveComponent {
     #region Remember
 
     protected static ObservableValue<TValue> Remember<TValue>(TValue initialValue) {

@@ -1,27 +1,52 @@
 ﻿using System;
-using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Reactive {
+    /// <summary>
+    /// Represents a standalone layout controller.
+    /// </summary>
+    [PublicAPI]
     public interface ILayoutController : IContextMember {
+        int ChildCount { get; }
+        
         event Action? LayoutControllerUpdatedEvent;
-        
-        void ReloadChildren(IEnumerable<ILayoutItem> children);
-        void ReloadDimensions(Rect controllerRect);
-        
+
         /// <summary>
-        /// Called every time layout update is queued. 
+        /// Adds a child to the controller.
         /// </summary>
-        void Recalculate(bool root);
+        /// <param name="comp">A component to add.</param>
+        /// <param name="index">An index to insert at.</param>
+        void InsertChild(ILayoutItem comp, int index);
+
+        /// <summary>
+        /// Removes a child from the controller.
+        /// </summary>
+        /// <param name="comp">A component to remove.</param>
+        void RemoveChild(ILayoutItem comp);
+
+        /// <summary>
+        /// Removes all children from the controller.
+        /// </summary>
+        void RemoveAllChildren();
+
+        /// <summary>
+        /// Checks if the controller has the specified child added to its hierarchy.
+        /// </summary>
+        /// <param name="comp">A component to search for.</param>
+        /// <returns>True if the component is in hierarchy, otherwise False.</returns>
+        bool HasChild(ILayoutItem comp);
         
         /// <summary>
-        /// Called every time layout update is needed. No matter is controller the root or not.
+        /// Applies calculated layout to first-level children. Own size is not applied.
         /// </summary>
         void ApplyChildren();
         
         /// <summary>
-        /// Called in case controller is the root of the layout hierarchy, so it can control itself.
+        /// Recalculates the layout starting from this node and applies its own size immediately after recalculation.
+        /// Must be called for the root node only, otherwise the behaviour is undefined. 
         /// </summary>
-        void ApplySelf(ILayoutItem item);
+        /// <param name="item">The controller as an item.</param>
+        void Recalculate(ILayoutItem item, Vector2 constraints);
     }
 }

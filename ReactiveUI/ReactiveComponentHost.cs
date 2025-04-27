@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace Reactive {
-    public abstract partial class ReactiveComponentBase {
+    public partial class ReactiveComponent {
         [RequireComponent(typeof(RectTransform))]
         private class ReactiveHost : MonoBehaviour, ILayoutItem, IEffectBinder, IReactiveModuleBinder {
             #region LayoutItem
@@ -16,8 +16,8 @@ namespace Reactive {
                     // do not change! truncation before assignment can cause deadlock!
                     var oldDriver = _layoutDriver;
                     _layoutDriver = value;
-                    oldDriver?.TruncateChild(this);
-                    _layoutDriver?.AppendChild(this);
+                    oldDriver?.Children.Remove(this);
+                    _layoutDriver?.Children.Add(this);
                 }
             }
 
@@ -25,44 +25,62 @@ namespace Reactive {
                 get => _modifier;
                 set {
                     if (_modifier != null) {
-                        ReleaseContextMember(_modifier);
+                        _modifier.ExposeLayoutItem(null);
                         _modifier.ModifierUpdatedEvent -= HandleModifierUpdated;
+                        ReleaseContextMember(_modifier);
                     }
+
                     _modifier = value;
+
                     if (_modifier != null) {
                         _modifier.ModifierUpdatedEvent += HandleModifierUpdated;
                         InsertContextMember(_modifier);
+
+                        // Normally the main component is the component that was created the last
+                        var primaryComponent = _components.LastOrDefault();
+                        _modifier.ExposeLayoutItem(primaryComponent);
                     }
+
                     HandleModifierUpdated();
                 }
             }
 
-            public float? DesiredHeight => _components.LastOrDefault()?.DesiredHeight;
-            public float? DesiredWidth => _components.LastOrDefault()?.DesiredWidth;
-
             public bool WithinLayout {
-                get => Enabled || WithinLayoutIfDisabled;
+                get => gameObject.activeSelf || WithinLayoutIfDisabled;
                 set {
                     if (WithinLayoutIfDisabled) return;
-                    Enabled = value;
+                    gameObject.SetActive(value);
                 }
             }
 
             public bool WithinLayoutIfDisabled { get; set; }
 
             public event Action<ILayoutItem>? ModifierUpdatedEvent;
+            public event Action<ILayoutItem>? StateUpdatedEvent;
 
             private ILayoutDriver? _layoutDriver;
             private ILayoutModifier? _modifier;
+            private bool _beingApplied;
 
-            bool IEquatable<ILayoutItem>.Equals(ILayoutItem other) {
-                return ReferenceEquals(other, this) || _components.Any(x => x == other);
+            public int GetLayoutItemHashCode() {
+                return base.GetHashCode();
             }
 
-            public void ApplyTransforms(Action<RectTransform> applicator) {
-                _beingRecalculated = true;
-                applicator(_rectTransform);
-                _beingRecalculated = false;
+            public bool EqualsToLayoutItem(ILayoutItem item) {
+                return item.GetLayoutItemHashCode() == GetLayoutItemHashCode();
+            }
+
+            public RectTransform BeginApply() {
+                if (_beingApplied) {
+                    throw new InvalidOperationException("Cannot begin layout application as it's already started");
+                }
+
+                _beingApplied = true;
+                return _rectTransform;
+            }
+
+            public void EndApply() {
+                _beingApplied = false;
                 _components.ForEach(static x => x.OnLayoutApply());
             }
 
@@ -73,16 +91,43 @@ namespace Reactive {
             private bool _recalculationScheduled;
             private bool _beingRecalculated;
 
-            public void RefreshLayout() {
-                if (_beingRecalculated) return;
-                HandleModifierUpdated();
-                _components.ForEach(static x => x.OnLayoutRefresh());
+            public void ScheduleLayoutRecalculation() {
+                _recalculationScheduled = true;
+            }
+
+            public void RecalculateLayoutImmediate() {
+                if (_beingRecalculated) {
+                    throw new InvalidOperationException("Calling RecalculateLayoutImmediate in a layout cycle is not allowed");
+                }
+                
+                _beingRecalculated = true;
+                
+                if (LayoutModifier != null && LayoutDriver?.LayoutController != null) {
+                    // If a layout driver is presented, start recalculation from this point
+                    LayoutDriver.RecalculateLayoutImmediate();
+                } else {
+                    // If not, tell own components to start recalculation (if there is a Layout or a custom layout controller) 
+                    _components.ForEach(static x => x.OnRecalculateLayoutSelf());
+                }
+
+                _beingRecalculated = false;
+            }
+
+            private void ScheduleLayoutRecalculationAfterStateChange(bool newState) {
+                if (newState) {
+                    ScheduleLayoutRecalculation();
+                } else if (LayoutDriver != null) {
+                    // The current object is disabled and LateUpdate won't be called, so we try to 
+                    // move the recalculation responsibility to the driver if possible. 
+                    // If this object doesn't have a driver, recalculation is omitted as it will
+                    // happen anyway when the object will get enabled back.
+                    LayoutDriver.ScheduleLayoutRecalculation();
+                }
             }
 
             private void HandleModifierUpdated() {
-                _modifier?.ReloadLayoutItem(this);
                 ModifierUpdatedEvent?.Invoke(this);
-                _components.ForEach(static x => x.OnModifierUpdatedInternal());
+                _components.ForEach(static x => x.OnModifierUpdated());
             }
 
             #endregion
@@ -122,6 +167,7 @@ namespace Reactive {
 
             private readonly Dictionary<object, EffectBindingBase> _effects = new();
 
+            // TODO: Remove all this crap and use pure delegates
             public void BindEffect<T>(INotifyValueChanged<T> value, IEffect<T> effect) {
                 EffectBinding<T> binding;
                 if (!_effects.TryGetValue(value, out var bin)) {
@@ -205,14 +251,18 @@ namespace Reactive {
             public bool IsStarted { get; private set; }
             public bool IsDestroyed { get; private set; }
 
-            private readonly List<ReactiveComponentBase> _components = new();
+            private readonly List<ReactiveComponent> _components = new();
 
-            public void AddComponent(ReactiveComponentBase comp) {
+            public void AddComponent(ReactiveComponent comp) {
                 _components.Add(comp);
-                if (IsStarted) comp.OnStart();
+                _modifier?.ExposeLayoutItem(comp);
+
+                if (IsStarted) {
+                    comp.OnStart();
+                }
             }
 
-            public void RemoveComponent(ReactiveComponentBase comp) {
+            public void RemoveComponent(ReactiveComponent comp) {
                 _components.Remove(comp);
             }
 
@@ -221,6 +271,7 @@ namespace Reactive {
             #region Events
 
             private RectTransform _rectTransform = null!;
+            private bool _wasActuallyDisabled;
 
             private void Awake() {
                 _rectTransform = GetComponent<RectTransform>();
@@ -238,10 +289,11 @@ namespace Reactive {
 
             private void LateUpdate() {
                 if (_recalculationScheduled) {
-                    RefreshLayout();
+                    RecalculateLayoutImmediate();
+
                     _recalculationScheduled = false;
                 }
-                _components.ForEach(static x => x.OnLateUpdateInternal());
+                _components.ForEach(static x => x.OnLateUpdate());
             }
 
             private void OnDestroy() {
@@ -252,13 +304,27 @@ namespace Reactive {
             }
 
             private void OnEnable() {
-                RefreshLayout();
+                if (!_wasActuallyDisabled) {
+                    return;
+                }
+
+                StateUpdatedEvent?.Invoke(this);
+                ScheduleLayoutRecalculationAfterStateChange(true);
+
                 _components.ForEach(static x => x.OnEnable());
+                _wasActuallyDisabled = false;
             }
 
             private void OnDisable() {
-                RefreshLayout();
+                if (gameObject.activeSelf) {
+                    return;
+                }
+
+                StateUpdatedEvent?.Invoke(this);
+                ScheduleLayoutRecalculationAfterStateChange(false);
+
                 _components.ForEach(static x => x.OnDisable());
+                _wasActuallyDisabled = true;
             }
 
             private void OnRectTransformDimensionsChange() {
@@ -267,7 +333,9 @@ namespace Reactive {
                 // it means that layout controller will be able to modify rect properties
                 // which is not allowed to be performed on the OnRectTransformDimensionsChange stack.
                 // that's why we schedule recalculation to the end of this frame
-                _recalculationScheduled = true;
+                if (!_beingApplied) {
+                    _recalculationScheduled = true;
+                }
                 _components.ForEach(static x => x.OnRectDimensionsChanged());
             }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using Reactive.Yoga;
 using UnityEngine;
@@ -11,14 +12,15 @@ namespace Reactive {
         public static T AsFlexItem<T>(
             this T component,
             out YogaModifier modifier,
-            float grow = 0f,
-            float shrink = 1f,
+            float? flex = null,
+            float? flexGrow = null,
+            float? flexShrink = null,
             YogaValue? basis = null,
             YogaVector? size = null,
             YogaVector? minSize = null,
             YogaVector? maxSize = null,
             YogaFrame? margin = null,
-            YogaValue? aspectRatio = null,
+            float? aspectRatio = null,
             YogaFrame? position = null,
             PositionType? positionType = null,
             Align alignSelf = Align.Auto
@@ -28,8 +30,9 @@ namespace Reactive {
                 component.LayoutModifier,
                 static (comp, mod) => comp.LayoutModifier = mod,
                 out modifier,
-                grow,
-                shrink,
+                flex,
+                flexGrow,
+                flexShrink,
                 basis,
                 size,
                 minSize,
@@ -44,14 +47,15 @@ namespace Reactive {
 
         public static T AsFlexItem<T>(
             this T component,
-            float grow = 0f,
-            float shrink = 1f,
+            float? flex = null,
+            float? flexGrow = null,
+            float? flexShrink = null,
             YogaValue? basis = null,
             YogaVector? size = null,
             YogaVector? minSize = null,
             YogaVector? maxSize = null,
             YogaFrame? margin = null,
-            YogaValue? aspectRatio = null,
+            float? aspectRatio = null,
             YogaFrame? position = null,
             PositionType? positionType = null,
             Align alignSelf = Align.Auto
@@ -59,8 +63,9 @@ namespace Reactive {
             return AsFlexItem(
                 component,
                 out _,
-                grow,
-                shrink,
+                flex,
+                flexGrow,
+                flexShrink,
                 basis,
                 size,
                 minSize,
@@ -78,14 +83,15 @@ namespace Reactive {
             ILayoutModifier? layoutModifier,
             Action<T, ILayoutModifier> setModifierCallback,
             out YogaModifier yogaModifier,
-            float grow = 0f,
-            float shrink = 1f,
+            float? flex = null,
+            float? flexGrow = null,
+            float? flexShrink = null,
             YogaValue? basis = null,
             YogaVector? size = null,
             YogaVector? minSize = null,
             YogaVector? maxSize = null,
             YogaFrame? margin = null,
-            YogaValue? aspectRatio = null,
+            float? aspectRatio = null,
             YogaFrame? position = null,
             PositionType? positionType = null,
             Align alignSelf = Align.Auto
@@ -94,21 +100,52 @@ namespace Reactive {
                 modifier = new YogaModifier();
                 setModifierCallback(component, modifier);
             }
+            
             if (position != null) {
                 modifier.PositionType = PositionType.Absolute;
                 modifier.Position = position.Value;
             }
+            
             if (positionType != null) {
                 modifier.PositionType = positionType.Value;
             }
-            modifier.Size = size ?? modifier.Size;
-            modifier.FlexShrink = shrink;
-            modifier.FlexGrow = grow;
-            modifier.FlexBasis = basis ?? modifier.FlexBasis;
-            modifier.MinSize = minSize ?? modifier.MinSize;
-            modifier.MaxSize = maxSize ?? modifier.MaxSize;
-            modifier.Margin = margin ?? modifier.Margin;
-            modifier.AspectRatio = aspectRatio ?? modifier.AspectRatio;
+            
+            if (size != null) {
+                modifier.Size = size.Value;
+            }
+            
+            if (flex != null) {
+                modifier.Flex = flex.Value;
+            }
+            
+            if (flexShrink != null) {
+                modifier.FlexShrink = flexShrink.Value;
+            }
+            
+            if (flexGrow != null) {
+                modifier.FlexGrow = flexGrow.Value;
+            }
+            
+            if (basis != null) {
+                modifier.FlexBasis = basis.Value;
+            }
+            
+            if (minSize != null) {
+                modifier.MinSize = minSize.Value;
+            }
+            
+            if (maxSize != null) {
+                modifier.MaxSize = maxSize.Value;
+            }
+            
+            if (margin != null) {
+                modifier.Margin = margin.Value;
+            }
+            
+            if (aspectRatio != null) {
+                modifier.AspectRatio = aspectRatio.Value;
+            }
+            
             modifier.AlignSelf = alignSelf;
             yogaModifier = modifier;
             return component;
@@ -128,9 +165,10 @@ namespace Reactive {
             Overflow overflow = Overflow.Visible,
             YogaFrame? padding = null,
             YogaVector? gap = null,
-            bool independentLayout = false
+            bool constrainHorizontal = true,
+            bool constrainVertical = true
         ) where T : ILayoutDriver {
-            return AsYogaFlexGroup<T, YogaLayoutController>(
+            return AsFlexGroup(
                 component,
                 out _,
                 direction,
@@ -141,127 +179,65 @@ namespace Reactive {
                 overflow,
                 padding,
                 gap,
-                independentLayout
+                constrainHorizontal,
+                constrainVertical
             );
         }
 
         public static T AsFlexGroup<T>(
             this T component,
             out YogaLayoutController layoutController,
-            FlexDirection direction = FlexDirection.Row,
-            Justify justifyContent = Justify.SpaceAround,
-            Align alignItems = Align.Stretch,
-            Align alignContent = Align.Auto,
-            Wrap wrap = Wrap.NoWrap,
-            Overflow overflow = Overflow.Visible,
+            FlexDirection? direction = null,
+            Justify? justifyContent = null,
+            Align? alignItems = null,
+            Align? alignContent = null,
+            Wrap? wrap = null,
+            Overflow? overflow = null,
             YogaFrame? padding = null,
             YogaVector? gap = null,
-            bool independentLayout = false
+            bool constrainHorizontal = true,
+            bool constrainVertical = true
         ) where T : ILayoutDriver {
-            return AsYogaFlexGroup(
-                component,
-                out layoutController,
-                direction,
-                justifyContent,
-                alignItems,
-                alignContent,
-                wrap,
-                overflow,
-                padding,
-                gap,
-                independentLayout
-            );
-        }
-
-        #endregion
-
-        #region Flex Root Group
-
-        public static T AsRootFlexGroup<T>(
-            this T component,
-            FlexDirection direction = FlexDirection.Row,
-            Justify justifyContent = Justify.SpaceAround,
-            Align alignItems = Align.Stretch,
-            Align alignContent = Align.Auto,
-            Wrap wrap = Wrap.NoWrap,
-            Overflow overflow = Overflow.Visible,
-            YogaFrame? padding = null,
-            YogaVector? gap = null,
-            bool independentLayout = false
-        ) where T : ILayoutDriver {
-            return AsYogaFlexGroup<T, YogaSelfLayoutController>(
-                component,
-                out _,
-                direction,
-                justifyContent,
-                alignItems,
-                alignContent,
-                wrap,
-                overflow,
-                padding,
-                gap,
-                independentLayout
-            );
-        }
-
-        public static T AsRootFlexGroup<T>(
-            this T component,
-            out YogaSelfLayoutController layoutController,
-            FlexDirection direction = FlexDirection.Row,
-            Justify justifyContent = Justify.SpaceAround,
-            Align alignItems = Align.Stretch,
-            Align alignContent = Align.Auto,
-            Wrap wrap = Wrap.NoWrap,
-            Overflow overflow = Overflow.Visible,
-            YogaFrame? padding = null,
-            YogaVector? gap = null,
-            bool independentLayout = false
-        ) where T : ILayoutDriver {
-            return AsYogaFlexGroup(
-                component,
-                out layoutController,
-                direction,
-                justifyContent,
-                alignItems,
-                alignContent,
-                wrap,
-                overflow,
-                padding,
-                gap,
-                independentLayout
-            );
-        }
-
-        #endregion
-
-        #region Flex Group Tools
-
-        private static T AsYogaFlexGroup<T, TController>(
-            this T component,
-            out TController layoutController,
-            FlexDirection direction = FlexDirection.Row,
-            Justify justifyContent = Justify.SpaceAround,
-            Align alignItems = Align.Stretch,
-            Align alignContent = Align.Auto,
-            Wrap wrap = Wrap.NoWrap,
-            Overflow overflow = Overflow.Visible,
-            YogaFrame? padding = null,
-            YogaVector? gap = null,
-            bool independentLayout = false
-        ) where T : ILayoutDriver where TController : YogaLayoutController, new() {
-            if (component.LayoutController is not TController controller) {
+            if (component.LayoutController is not YogaLayoutController controller) {
                 controller = new();
+                component.LayoutController = controller;
             }
-            component.LayoutController = controller;
-            controller.FlexDirection = direction;
-            controller.JustifyContent = justifyContent;
-            controller.AlignContent = alignContent;
-            controller.AlignItems = alignItems;
-            controller.FlexWrap = wrap;
-            controller.Overflow = overflow;
-            controller.Padding = padding ?? controller.Padding;
-            controller.Gap = gap ?? controller.Gap;
-            controller.UseIndependentLayout = independentLayout;
+            
+            if (direction.HasValue) {
+                controller.FlexDirection = direction.Value;
+            }
+            
+            if (justifyContent.HasValue) {
+                controller.JustifyContent = justifyContent.Value;
+            }
+            
+            if (alignContent.HasValue) {
+                controller.AlignContent = alignContent.Value;
+            }
+            
+            if (alignItems.HasValue) {
+                controller.AlignItems = alignItems.Value;
+            }
+            
+            if (wrap.HasValue) {
+                controller.FlexWrap = wrap.Value;
+            }
+            
+            if (overflow.HasValue) {
+                controller.Overflow = overflow.Value;
+            }
+            
+            if (padding.HasValue) {
+                controller.Padding = padding.Value;
+            }
+            
+            if (gap.HasValue) {
+                controller.Gap = gap.Value;
+            }
+
+            // Those aren't native properties so we don't care
+            controller.ConstrainVertical = constrainVertical;
+            controller.ConstrainHorizontal = constrainHorizontal;
 
             layoutController = controller;
             return component;
@@ -300,7 +276,8 @@ namespace Reactive {
         }
 
         public static ILayoutItem WithRectExpand(this ILayoutItem component) {
-            component.ApplyTransforms(x => x.WithRectExpand());
+            component.BeginApply().WithRectExpand();
+            component.EndApply();
             return component;
         }
 
@@ -317,6 +294,23 @@ namespace Reactive {
         public static T With<T>(this T modifier, ILayoutModifier apModifier) where T : ILayoutModifier {
             modifier.CopyFrom(apModifier);
             return modifier;
+        }
+
+        /// <summary>
+        /// Finds index of an item in the <see cref="ILayoutItem"/> list. You must use this instead of the
+        /// default method, otherwise the behaviour is undefined.
+        /// </summary>
+        /// <param name="items">A list to search in.</param>
+        /// <param name="item">An item to search for.</param>
+        /// <returns>An index of the item, or -1 if not presented.</returns>
+        public static int FindLayoutItemIndex(this IList<ILayoutItem> items, ILayoutItem item) {
+            for (var i = 0; i < items.Count; i++) {
+                if (items[i].EqualsToLayoutItem(item)) {
+                    return i;
+                }
+            }
+
+            return -1;
         }
     }
 }

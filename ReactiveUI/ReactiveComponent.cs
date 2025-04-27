@@ -10,32 +10,13 @@ using Object = UnityEngine.Object;
 
 namespace Reactive {
     [PublicAPI]
-    public abstract class ReactiveComponent : ReactiveComponentBase {
-        #region Overrides
-
-        protected sealed override void ConstructInternal() {
-            base.ConstructInternal();
-        }
-
-        protected sealed override void OnModifierUpdatedInternal() {
-            base.OnModifierUpdatedInternal();
-        }
-
-        protected sealed override void OnLateUpdateInternal() {
-            base.OnLateUpdateInternal();
-        }
-
-        #endregion
-    }
-
-    [PublicAPI]
-    public abstract partial class ReactiveComponentBase : IReactiveComponent, IObservableHost, IEffectBinder, IReactiveModuleBinder {
+    public partial class ReactiveComponent : IReactiveComponent, IObservableHost, IEffectBinder, IReactiveModuleBinder {
         #region Factory
 
         [UsedImplicitly]
-        private ReactiveComponentBase(bool _) { }
+        private ReactiveComponent(bool _) { }
 
-        protected ReactiveComponentBase() {
+        public ReactiveComponent() {
             ConstructAndInit();
         }
 
@@ -43,7 +24,7 @@ namespace Reactive {
         private static readonly object[] dummyParams = { false };
 
         public static T Lazy<T>() where T : ReactiveComponent, new() {
-            _lazyConstructor ??= typeof(ReactiveComponentBase).GetConstructor(
+            _lazyConstructor ??= typeof(ReactiveComponent).GetConstructor(
                 ReflectionUtils.DefaultFlags,
                 null,
                 new[] { typeof(bool) },
@@ -120,29 +101,52 @@ namespace Reactive {
             }
         }
 
-        float? ILayoutItem.DesiredHeight => Host.DesiredHeight;
-        float? ILayoutItem.DesiredWidth => Host.DesiredWidth;
-
         public bool WithinLayoutIfDisabled {
             get => _reactiveHost!.WithinLayoutIfDisabled;
             set => _reactiveHost!.WithinLayoutIfDisabled = value;
         }
-
-        protected virtual float? DesiredHeight => null;
-        protected virtual float? DesiredWidth => null;
 
         public event Action<ILayoutItem>? ModifierUpdatedEvent {
             add => Host.ModifierUpdatedEvent += value;
             remove => Host.ModifierUpdatedEvent -= value;
         }
 
-        bool IEquatable<ILayoutItem>.Equals(ILayoutItem other) => ((ILayoutItem)Host).Equals(other);
+        public event Action<ILayoutItem>? StateUpdatedEvent {
+            add => Host.StateUpdatedEvent += value;
+            remove => Host.StateUpdatedEvent -= value;
+        }
 
-        void ILayoutItem.ApplyTransforms(Action<RectTransform> applicator) => Host.ApplyTransforms(applicator);
+        public int GetLayoutItemHashCode() {
+            return Host.GetLayoutItemHashCode();
+        }
 
-        protected void RefreshLayout() => Host.RefreshLayout();
+        public bool EqualsToLayoutItem(ILayoutItem item) {
+            return Host.EqualsToLayoutItem(item);
+        }
 
-        protected virtual void OnModifierUpdatedInternal() { }
+        public RectTransform BeginApply() {
+            return Host.BeginApply();
+        }
+
+        public void EndApply() {
+            Host.EndApply();
+        }
+
+        void ILayoutRecalculationSource.RecalculateLayoutImmediate() {
+            Host.RecalculateLayoutImmediate();
+        }
+
+        void ILayoutRecalculationSource.ScheduleLayoutRecalculation() {
+            Host.ScheduleLayoutRecalculation();
+        }
+        
+        protected void RecalculateLayoutImmediate() {
+            Host.RecalculateLayoutImmediate();
+        }
+        
+        protected void ScheduleLayoutRecalculation() {
+            Host.ScheduleLayoutRecalculation();
+        }
 
         #endregion
 
@@ -247,24 +251,24 @@ namespace Reactive {
         private ReactiveHost? _reactiveHost;
 
         /// <summary>
-        /// Constructs and reparents the component if needed
+        /// Constructs and reparents the component if needed.
         /// </summary>
         public GameObject Use(Transform? parent = null) {
             ValidateExternalInteraction();
             if (!IsInitialized) ConstructAndInit();
+            
+            LayoutDriver = null;
             ContentTransform.SetParent(parent, false);
-            if (parent == null) LayoutDriver = null;
+            
             return Content;
         }
 
         private void ConstructAndInit() {
-            _observableHost = new(this);
-            ConstructInternal();
-            OnInitialize();
-        }
+            if (IsInitialized) {
+                throw new InvalidOperationException();
+            }
 
-        protected virtual void ConstructInternal() {
-            if (IsInitialized) throw new InvalidOperationException();
+            _observableHost = new(this);
             OnInstantiate();
 
             _content = Construct();
@@ -275,6 +279,8 @@ namespace Reactive {
             IsInitialized = true;
             _reactiveHost.AddComponent(this);
             TransferModules();
+
+            OnInitialize();
         }
 
         private void ValidateExternalInteraction() {
@@ -295,7 +301,7 @@ namespace Reactive {
         #region Destroy
 
         /// <summary>
-        /// Destroys the component
+        /// Destroys the component.
         /// </summary>
         public void Destroy() {
             Object.Destroy(Content);
@@ -311,10 +317,6 @@ namespace Reactive {
 
         #region Events
 
-        protected virtual void OnLateUpdateInternal() {
-            OnLateUpdate();
-        }
-
         protected virtual void OnInstantiate() { }
         protected virtual void OnInitialize() { }
         protected virtual void OnUpdate() { }
@@ -324,7 +326,20 @@ namespace Reactive {
         protected virtual void OnEnable() { }
         protected virtual void OnDisable() { }
         protected virtual void OnRectDimensionsChanged() { }
-        protected virtual void OnLayoutRefresh() { }
+
+        /// <summary>
+        /// Called when modifier is updated.
+        /// </summary>
+        protected virtual void OnModifierUpdated() { }
+
+        /// <summary>
+        /// Called when host doesn't have a driver and needs a layout recalculation.
+        /// </summary>
+        protected virtual void OnRecalculateLayoutSelf() { }
+
+        /// <summary>
+        /// Called when layout application is finished.
+        /// </summary>
         protected virtual void OnLayoutApply() { }
 
         #endregion

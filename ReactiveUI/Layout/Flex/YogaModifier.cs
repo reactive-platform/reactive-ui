@@ -1,176 +1,312 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Reactive.Yoga;
 
 namespace Reactive {
-    public class YogaModifier : ModifierBase<YogaModifier> {
+    [PublicAPI]
+    public class YogaModifier : LayoutModifierBase<YogaModifier> {
         #region Properties
 
         public PositionType PositionType {
-            get => _positionType;
+            get => HasValidNode ? YogaNode.StyleGetPositionType() : _positionType.GetValueOrDefault();
             set {
                 _positionType = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetPositionType(value);
-                Refresh();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetPositionType(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public Align AlignSelf {
-            get => _alignSelf;
+            get => HasValidNode ? YogaNode.StyleGetAlignSelf() : _alignSelf.GetValueOrDefault();
             set {
                 _alignSelf = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetAlignSelf(value);
-                Refresh();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetAlignSelf(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public YogaValue FlexBasis {
-            get => _flexBasis;
+            get => HasValidNode ? YogaNode.StyleGetFlexBasis() : _flexBasis.GetValueOrDefault();
             set {
                 _flexBasis = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetFlexBasis(value);
-                Refresh();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetFlexBasis(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public float FlexGrow {
-            get => _flexGrow;
+            get => HasValidNode ? YogaNode.StyleGetFlexGrow() : _flexGrow.GetValueOrDefault();
             set {
                 _flexGrow = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetFlexGrow(value);
-                Refresh();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetFlexGrow(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public float FlexShrink {
-            get => _flexShrink;
+            get => HasValidNode ? YogaNode.StyleGetFlexShrink() : _flexShrink.GetValueOrDefault();
             set {
                 _flexShrink = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetFlexShrink(value);
-                Refresh();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetFlexShrink(value);
+                    NotifyModifierUpdated();
+                }
+            }
+        }
+
+        public float Flex {
+            get => HasValidNode ? YogaNode.StyleGetFlex() : _flex.GetValueOrDefault();
+            set {
+                _flex = value;
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetFlex(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public YogaFrame Position {
-            get => _position;
+            get {
+                if (HasValidNode) {
+                    return new() {
+                        top = YogaNode.StyleGetPosition(Edge.Top),
+                        bottom = YogaNode.StyleGetPosition(Edge.Bottom),
+                        left = YogaNode.StyleGetPosition(Edge.Left),
+                        right = YogaNode.StyleGetPosition(Edge.Right)
+                    };
+                }
+                return _position.GetValueOrDefault();
+            }
             set {
                 _position = value;
-                if (!HasValidNode) return;
-                RefreshPosition();
-                Refresh();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    RefreshPosition(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public YogaVector Size {
-            get => _size;
+            get {
+                if (HasValidNode) {
+                    return new() {
+                        x = YogaNode.StyleGetWidth(),
+                        y = YogaNode.StyleGetHeight()
+                    };
+                }
+                return _size.GetValueOrDefault();
+            }
             set {
                 _size = value;
-                if (!HasValidNode) return;
-                RefreshSize();
-                Refresh();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetWidth(value.x);
+                    YogaNode.StyleSetHeight(value.y);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public YogaVector MinSize {
-            get => _minSize;
+            get {
+                if (HasValidNode) {
+                    return new() {
+                        x = YogaNode.StyleGetMinWidth(),
+                        y = YogaNode.StyleGetMinHeight()
+                    };
+                }
+                return _minSize.GetValueOrDefault();
+            }
             set {
                 _minSize = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetMinWidth(value.x);
-                YogaNode.StyleSetMinHeight(value.y);
-                Refresh();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetMinWidth(value.x);
+                    YogaNode.StyleSetMinHeight(value.y);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public YogaVector MaxSize {
-            get => _maxSize;
+            get {
+                if (HasValidNode) {
+                    return new() {
+                        x = YogaNode.StyleGetMaxWidth(),
+                        y = YogaNode.StyleGetMaxHeight()
+                    };
+                }
+                return _maxSize.GetValueOrDefault();
+            }
             set {
                 _maxSize = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetMaxWidth(value.x);
-                YogaNode.StyleSetMaxHeight(value.y);
-                Refresh();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetMaxWidth(value.x);
+                    YogaNode.StyleSetMaxHeight(value.y);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
-        public YogaValue AspectRatio {
-            get => _aspectRatio;
+        public float AspectRatio {
+            get => HasValidNode ? YogaNode.StyleGetAspectRatio() : _aspectRatio.GetValueOrDefault();
             set {
                 _aspectRatio = value;
-                if (!HasValidNode) return;
-                YogaNode.StyleSetAspectRatio(value.value);
-                Refresh();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    YogaNode.StyleSetAspectRatio(value);
+                    NotifyModifierUpdated();
+                }
             }
         }
 
         public YogaFrame Margin {
-            get => _margin;
+            get {
+                if (HasValidNode) {
+                    return new() {
+                        top = YogaNode.StyleGetMargin(Edge.Top),
+                        bottom = YogaNode.StyleGetMargin(Edge.Bottom),
+                        left = YogaNode.StyleGetMargin(Edge.Left),
+                        right = YogaNode.StyleGetMargin(Edge.Right)
+                    };
+                }
+                return _margin.GetValueOrDefault();
+            }
             set {
                 _margin = value;
-                if (!HasValidNode) return;
-                RefreshMargin();
-                Refresh();
+                _changedCacheBeforeInit = true;
+
+                if (HasValidNode) {
+                    RefreshMargin(value);
+                    NotifyModifierUpdated();
+                }
+            }
+        }
+        
+        public bool HadOverflow => HasValidNode && YogaNode.HadOverflow();
+        
+        // Take into account that yoga can modify values on the backend, so when debugging,
+        // do NOT rely on these variables, rely on properties instead.
+        // These variables hold cached values for late initialization and are not intended for anything else.
+        private PositionType? _positionType;
+        private Align? _alignSelf;
+        private float? _aspectRatio;
+        private float? _flex;
+        private float? _flexGrow;
+        private float? _flexShrink;
+        private YogaValue? _flexBasis;
+        private YogaFrame? _position;
+        private YogaVector? _size;
+        private YogaVector? _minSize;
+        private YogaVector? _maxSize;
+        private YogaFrame? _margin;
+        private bool _changedCacheBeforeInit;
+
+        private void RefreshMargin(YogaFrame value) {
+            if (value.top == value.bottom) {
+                YogaNode.StyleSetMargin(Edge.Vertical, value.top);
+            } else {
+                YogaNode.StyleSetMargin(Edge.Top, value.top);
+                YogaNode.StyleSetMargin(Edge.Bottom, value.bottom);
+            }
+
+            if (value.left == value.right) {
+                YogaNode.StyleSetMargin(Edge.Horizontal, value.left);
+            } else {
+                YogaNode.StyleSetMargin(Edge.Left, value.left);
+                YogaNode.StyleSetMargin(Edge.Right, value.right);
             }
         }
 
-        private float _flexGrow;
-        private float _flexShrink = 1;
-        private Align _alignSelf = Align.Auto;
-        private PositionType _positionType = PositionType.Relative;
-        private YogaFrame _position = YogaFrame.Undefined;
-        private YogaValue _flexBasis = YogaValue.Undefined;
-        private YogaVector _size = YogaVector.Undefined;
-        private YogaVector _minSize = YogaVector.Undefined;
-        private YogaVector _maxSize = YogaVector.Undefined;
-        private YogaValue _aspectRatio = YogaValue.Undefined;
-        private YogaFrame _margin = YogaFrame.Zero;
-
-        private void RefreshMargin() {
-            YogaNode.StyleSetMargin(Edge.Top, _margin.top);
-            YogaNode.StyleSetMargin(Edge.Bottom, _margin.bottom);
-            YogaNode.StyleSetMargin(Edge.Left, _margin.left);
-            YogaNode.StyleSetMargin(Edge.Right, _margin.right);
-        }
-
-        private void RefreshPosition() {
-            YogaNode.StyleSetPosition(Edge.Top, _position.top);
-            YogaNode.StyleSetPosition(Edge.Bottom, _position.bottom);
-            YogaNode.StyleSetPosition(Edge.Left, _position.left);
-            YogaNode.StyleSetPosition(Edge.Right, _position.right);
-        }
-
-        private void RefreshSize() {
-            if (_size.x.unit is Unit.Auto && (LayoutItem?.DesiredWidth.HasValue ?? false)) {
-                YogaNode.StyleSetWidth(LayoutItem.DesiredWidth!.Value);
+        private void RefreshPosition(YogaFrame value) {
+            if (value.top == value.bottom) {
+                YogaNode.StyleSetPosition(Edge.Vertical, value.top);
             } else {
-                YogaNode.StyleSetWidth(_size.x);
+                YogaNode.StyleSetPosition(Edge.Top, value.top);
+                YogaNode.StyleSetPosition(Edge.Bottom, value.bottom);
             }
 
-            if (_size.y.unit is Unit.Auto && (LayoutItem?.DesiredHeight.HasValue ?? false)) {
-                YogaNode.StyleSetHeight(LayoutItem.DesiredHeight!.Value);
+            if (value.left == value.right) {
+                YogaNode.StyleSetPosition(Edge.Horizontal, value.left);
             } else {
-                YogaNode.StyleSetHeight(_size.y);
+                YogaNode.StyleSetPosition(Edge.Left, value.left);
+                YogaNode.StyleSetPosition(Edge.Right, value.right);
             }
         }
 
         private void RefreshAllProperties() {
-            YogaNode.StyleSetPositionType(_positionType);
-            YogaNode.StyleSetAlignSelf(_alignSelf);
-            YogaNode.StyleSetFlexBasis(_flexBasis);
-            YogaNode.StyleSetFlexGrow(_flexGrow);
-            YogaNode.StyleSetFlexShrink(_flexShrink);
-            YogaNode.StyleSetMinWidth(_minSize.x);
-            YogaNode.StyleSetMinHeight(_minSize.y);
-            YogaNode.StyleSetMaxWidth(_maxSize.x);
-            YogaNode.StyleSetMaxHeight(_maxSize.y);
-            YogaNode.StyleSetAspectRatio(_aspectRatio.value);
-            RefreshMargin();
-            RefreshPosition();
-            RefreshSize();
+            if (_positionType.HasValue) {
+                YogaNode.StyleSetPositionType(_positionType.Value);
+            }
+            if (_alignSelf.HasValue) {
+                YogaNode.StyleSetAlignSelf(_alignSelf.Value);
+            }
+            if (_flexBasis.HasValue) {
+                YogaNode.StyleSetFlexBasis(_flexBasis.Value);
+            }
+            if (_flexGrow.HasValue) {
+                YogaNode.StyleSetFlexGrow(_flexGrow.Value);
+            }
+            if (_flexShrink.HasValue) {
+                YogaNode.StyleSetFlexShrink(_flexShrink.Value);
+            }
+            if (_flex.HasValue) {
+                YogaNode.StyleSetFlex(_flex.Value);
+            }
+            
+            if (_position.HasValue) {
+                RefreshPosition(_position.Value);
+            }
+            
+            if (_size.HasValue) {
+                YogaNode.StyleSetWidth(_size.Value.x);
+                YogaNode.StyleSetHeight(_size.Value.y);
+            }
+            
+            if (_minSize.HasValue) {
+                YogaNode.StyleSetMinWidth(_minSize.Value.x);
+                YogaNode.StyleSetMinHeight(_minSize.Value.y);
+            }
+            
+            if (_maxSize.HasValue) {
+                YogaNode.StyleSetMaxWidth(_maxSize.Value.x);
+                YogaNode.StyleSetMaxHeight(_maxSize.Value.y);
+            }
+            
+            if (_aspectRatio.HasValue) {
+                YogaNode.StyleSetAspectRatio(_aspectRatio.Value);
+            }
+            
+            if (_margin.HasValue) {
+                RefreshMargin(_margin.Value);
+            }
         }
 
         #endregion
@@ -183,19 +319,16 @@ namespace Reactive {
 
         public override void ProvideContext(object? context) {
             if (context == null) {
-                if (!HasValidNode) return;
-                //clearing properties to prevent size lock on this node
-                _minSize = YogaVector.Undefined;
-                _maxSize = YogaVector.Undefined;
-                _size = YogaVector.Undefined;
-                _margin = YogaFrame.Undefined;
-                _aspectRatio = YogaValue.Undefined;
-                RefreshAllProperties();
-                _node = default;
+                _node = null;
                 return;
             }
+            
             _node = ((YogaContext)context).YogaNode;
-            RefreshAllProperties();
+
+            // No need to update if nothing was changed
+            if (_changedCacheBeforeInit) {
+                RefreshAllProperties();
+            }
         }
 
         #endregion
@@ -204,36 +337,86 @@ namespace Reactive {
 
         internal YogaNode YogaNode {
             get {
-                if (!(_node?.IsInitialized ?? false)) {
+                if (!HasValidNode) {
                     throw new Exception("Node was not initialized");
                 }
-                return _node;
+                return _node!;
             }
         }
 
         private bool HasValidNode => _node?.IsInitialized ?? false;
 
+        private ILeafLayoutItem? _leafItem;
+        private ILayoutItem? _item;
         private YogaNode? _node;
 
-        protected override void OnLayoutItemUpdate() {
-            RefreshSize();
+        public override void ExposeLayoutItem(ILayoutItem? item) {
+            if (_item != null) {
+                _item.StateUpdatedEvent -= HandleLayoutItemStateUpdated;
+
+                if (_leafItem != null) {
+                    _leafItem.LeafLayoutUpdatedEvent -= HandleLeafLayoutUpdated;
+
+                    YogaNode.SetMeasureFunc(null);
+                }
+            }
+
+            _item = item;
+            _leafItem = item as ILeafLayoutItem;
+
+            if (_item != null) {
+                _item.StateUpdatedEvent += HandleLayoutItemStateUpdated;
+                HandleLayoutItemStateUpdated(_item);
+
+                if (_leafItem != null) {
+                    _leafItem.LeafLayoutUpdatedEvent += HandleLeafLayoutUpdated;
+
+                    YogaNode.SetMeasureFunc(MeasureFuncWrapper);
+                    HandleLeafLayoutUpdated(_leafItem);
+                }
+            }
+        }
+
+        private void HandleLayoutItemStateUpdated(ILayoutItem item) {
+            YogaNode.StyleSetDisplay(item.WithinLayout ? Display.Flex : Display.None);
+        }
+
+        private void HandleLeafLayoutUpdated(ILeafLayoutItem item) {
+            YogaNode.MarkDirty();
+        }
+
+        private YogaSize MeasureFuncWrapper(IntPtr node, float width, MeasureMode widthMode, float height, MeasureMode heightMode) {
+            var size = _leafItem!.Measure(width, widthMode, height, heightMode);
+
+            return new() {
+                width = size.x,
+                height = size.y
+            };
         }
 
         public override void CopyFromSimilar(YogaModifier similar) {
-            SuppressRefresh = true;
-            PositionType = similar.PositionType;
-            AlignSelf = similar.AlignSelf;
-            FlexBasis = similar.FlexBasis;
-            FlexGrow = similar.FlexGrow;
-            FlexShrink = similar.FlexShrink;
-            Position = similar.Position;
-            Size = similar.Size;
-            MinSize = similar.MinSize;
-            MaxSize = similar.MinSize;
-            AspectRatio = similar.AspectRatio;
-            Margin = similar.Margin;
-            SuppressRefresh = false;
-            Refresh();
+            if (HasValidNode && similar.HasValidNode) {
+                similar.YogaNode.CopyStyleTo(YogaNode);
+                NotifyModifierUpdated();
+            }
+        }
+
+        public override ILayoutModifier CreateCopy() {
+            var copy = new YogaModifier {
+                _positionType = _positionType,
+                _alignSelf = _alignSelf,
+                _flexBasis = _flexBasis,
+                _flexGrow = _flexGrow,
+                _flexShrink = _flexShrink,
+                _position = _position,
+                _size = _size,
+                _minSize = _minSize,
+                _maxSize = _maxSize,
+                _aspectRatio = _aspectRatio,
+                _margin = _margin
+            };
+
+            return copy;
         }
 
         #endregion

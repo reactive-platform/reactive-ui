@@ -1,25 +1,14 @@
-﻿namespace Reactive.Yoga {
+﻿using JetBrains.Annotations;
+
+namespace Reactive.Yoga {
+    [PublicAPI]
     public struct YogaFrame {
-        public static readonly YogaFrame Zero = new() {
-            top = YogaValue.Zero,
-            left = YogaValue.Zero,
-            right = YogaValue.Zero,
-            bottom = YogaValue.Zero
-        };
-
-        public static readonly YogaFrame Auto = new() {
-            top = YogaValue.Auto,
-            left = YogaValue.Auto,
-            right = YogaValue.Auto,
-            bottom = YogaValue.Auto
-        };
-
-        public static readonly YogaFrame Undefined = new() {
-            top = YogaValue.Undefined,
-            left = YogaValue.Undefined,
-            right = YogaValue.Undefined,
-            bottom = YogaValue.Undefined
-        };
+        public static readonly YogaFrame Undefined = new(YogaValue.Undefined);
+        public static readonly YogaFrame Zero = new(YogaValue.Zero);
+        public static readonly YogaFrame Auto = new(YogaValue.Auto);
+        public static readonly YogaFrame MaxContent = new(YogaValue.MaxContent);
+        public static readonly YogaFrame FitContent = new(YogaValue.FitContent);
+        public static readonly YogaFrame Stretch = new(YogaValue.Stretch);
 
         public YogaFrame(
             YogaValue top,
@@ -31,6 +20,13 @@
             this.bottom = bottom;
             this.left = left;
             this.right = right;
+        }
+        
+        public YogaFrame(YogaValue vertical, YogaValue horizontal) {
+            top = vertical;
+            bottom = vertical;
+            left = horizontal;
+            right = horizontal;
         }
         
         public YogaFrame(YogaValue all) {
