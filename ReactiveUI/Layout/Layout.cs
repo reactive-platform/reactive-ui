@@ -68,12 +68,12 @@ namespace Reactive {
             _lastRecalculationTime = Time.time;
         }
 
-        public void RecalculateLayout() {
+        public void RecalculateLayoutImmediate() {
             _beingRecalculated = true;
 
             // Items without modifiers are not supposed to be controlled
             if (LayoutModifier != null && LayoutDriver?.LayoutController != null) {
-                LayoutDriver.RecalculateLayout();
+                LayoutDriver.RecalculateLayoutImmediate();
 
                 _beingRecalculated = false;
                 return;
@@ -211,7 +211,7 @@ namespace Reactive {
         }
 
         protected override void OnRecalculateLayoutSelf() {
-            RecalculateLayout();
+            RecalculateLayoutImmediate();
         }
 
         protected override void OnLayoutApply() {

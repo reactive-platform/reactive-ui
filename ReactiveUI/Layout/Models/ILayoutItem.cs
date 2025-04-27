@@ -7,7 +7,7 @@ namespace Reactive {
     /// Represents an object that can be controlled by a layout.
     /// </summary>
     [PublicAPI]
-    public interface ILayoutItem {
+    public interface ILayoutItem : ILayoutRecalculationSource {
         ILayoutDriver? LayoutDriver { get; set; }
         ILayoutModifier? LayoutModifier { get; set; }
         

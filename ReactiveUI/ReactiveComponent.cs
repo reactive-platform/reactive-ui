@@ -132,6 +132,18 @@ namespace Reactive {
             Host.EndApply();
         }
 
+        void ILayoutRecalculationSource.RecalculateLayoutImmediate() {
+            Host.RecalculateLayoutImmediate();
+        }
+
+        void ILayoutRecalculationSource.ScheduleLayoutRecalculation() {
+            Host.ScheduleLayoutRecalculation();
+        }
+        
+        protected void RecalculateLayoutImmediate() {
+            Host.RecalculateLayoutImmediate();
+        }
+        
         protected void ScheduleLayoutRecalculation() {
             Host.ScheduleLayoutRecalculation();
         }

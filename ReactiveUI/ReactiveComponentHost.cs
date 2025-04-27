@@ -60,7 +60,7 @@ namespace Reactive {
 
             private ILayoutDriver? _layoutDriver;
             private ILayoutModifier? _modifier;
-            private bool _beingRecalculated;
+            private bool _beingApplied;
 
             public int GetLayoutItemHashCode() {
                 return base.GetHashCode();
@@ -71,16 +71,16 @@ namespace Reactive {
             }
 
             public RectTransform BeginApply() {
-                if (_beingRecalculated) {
+                if (_beingApplied) {
                     throw new InvalidOperationException("Cannot begin layout application as it's already started");
                 }
 
-                _beingRecalculated = true;
+                _beingApplied = true;
                 return _rectTransform;
             }
 
             public void EndApply() {
-                _beingRecalculated = false;
+                _beingApplied = false;
                 _components.ForEach(static x => x.OnLayoutApply());
             }
 
@@ -89,19 +89,28 @@ namespace Reactive {
             #region Layout
 
             private bool _recalculationScheduled;
+            private bool _beingRecalculated;
 
             public void ScheduleLayoutRecalculation() {
                 _recalculationScheduled = true;
             }
 
-            private void RecalculateLayoutImmediate() {
+            public void RecalculateLayoutImmediate() {
+                if (_beingRecalculated) {
+                    throw new InvalidOperationException("Calling RecalculateLayoutImmediate in a layout cycle is not allowed");
+                }
+                
+                _beingRecalculated = true;
+                
                 if (LayoutModifier != null && LayoutDriver?.LayoutController != null) {
                     // If a layout driver is presented, start recalculation from this point
-                    LayoutDriver.RecalculateLayout();
+                    LayoutDriver.RecalculateLayoutImmediate();
                 } else {
                     // If not, tell own components to start recalculation (if there is a Layout or a custom layout controller) 
                     _components.ForEach(static x => x.OnRecalculateLayoutSelf());
                 }
+
+                _beingRecalculated = false;
             }
 
             private void ScheduleLayoutRecalculationAfterStateChange(bool newState) {
@@ -324,7 +333,7 @@ namespace Reactive {
                 // it means that layout controller will be able to modify rect properties
                 // which is not allowed to be performed on the OnRectTransformDimensionsChange stack.
                 // that's why we schedule recalculation to the end of this frame
-                if (!_beingRecalculated) {
+                if (!_beingApplied) {
                     _recalculationScheduled = true;
                 }
                 _components.ForEach(static x => x.OnRectDimensionsChanged());
