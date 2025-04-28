@@ -6,7 +6,7 @@ namespace Reactive;
 
 [PublicAPI]
 public static class AnimationUtils {
-    public static ISharedAnimation Animation(Action onStart, IEnumerable<IAnimation> waitFor) {
+    public static ISharedAnimation Animation(Action onStart, IEnumerable<ISharedAnimation> waitFor) {
         return new SequentialAnimation(onStart, waitFor);
     }
 }

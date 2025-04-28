@@ -9,7 +9,7 @@ namespace Reactive;
 /// </summary>
 [PublicAPI]
 public class SequentialAnimation : ISharedAnimation {
-    public SequentialAnimation(Action onStart, IEnumerable<IAnimation> animations) {
+    public SequentialAnimation(Action onStart, IEnumerable<ISharedAnimation> animations) {
         _animations = animations;
         _onStart = onStart;
     }
@@ -18,7 +18,7 @@ public class SequentialAnimation : ISharedAnimation {
 
     public event Action? AnimationFinishedEvent;
     
-    private readonly IEnumerable<IAnimation> _animations;
+    private readonly IEnumerable<ISharedAnimation> _animations;
     private readonly Action _onStart;
     private bool _isFinished;
 
@@ -43,9 +43,10 @@ public class SequentialAnimation : ISharedAnimation {
         _isFinished = true;
 
         foreach (var animation in _animations) {
+            animation.OnUpdate();
+            
             if (!animation.IsFinished) {
                 _isFinished = false;
-                break;
             }
         }
     }

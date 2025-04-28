@@ -85,7 +85,7 @@ public partial class ReactiveComponent {
 
     #region Unowned Values
 
-    protected static AnimatedValue<float> Animated(
+    protected static SharedAnimatedValue<float> Animated(
         float initialValue,
         AnimationDuration duration,
         AnimationCurve? curve = null,
@@ -94,7 +94,7 @@ public partial class ReactiveComponent {
         return Animated(initialValue, SingleValueInterpolator.Instance, duration, curve, onFinish);
     }
 
-    protected static AnimatedValue<Vector2> Animated(
+    protected static SharedAnimatedValue<Vector2> Animated(
         Vector2 initialValue,
         AnimationDuration duration,
         AnimationCurve? curve = null,
@@ -103,7 +103,7 @@ public partial class ReactiveComponent {
         return Animated(initialValue, Vector2ValueInterpolator.Instance, duration, curve, onFinish);
     }
 
-    protected static AnimatedValue<Vector3> Animated(
+    protected static SharedAnimatedValue<Vector3> Animated(
         Vector3 initialValue,
         AnimationDuration duration,
         AnimationCurve? curve = null,
@@ -112,7 +112,7 @@ public partial class ReactiveComponent {
         return Animated(initialValue, Vector3ValueInterpolator.Instance, duration, curve, onFinish);
     }
 
-    protected static AnimatedValue<Color> Animated(
+    protected static SharedAnimatedValue<Color> Animated(
         Color initialValue,
         AnimationDuration duration,
         AnimationCurve? curve = null,
@@ -121,7 +121,7 @@ public partial class ReactiveComponent {
         return Animated(initialValue, ColorValueInterpolator.Instance, duration, curve, onFinish);
     }
 
-    protected static AnimatedValue<TValue> Animated<TValue>(
+    protected static SharedAnimatedValue<TValue> Animated<TValue>(
         TValue initialValue,
         IValueInterpolator<TValue> interpolator,
         AnimationDuration duration,
@@ -135,7 +135,7 @@ public partial class ReactiveComponent {
 
     #region Animate
 
-    protected static ISharedAnimation Animation(Action onStart, params IEnumerable<IAnimation> waitFor) {
+    protected static ISharedAnimation Animation(Action onStart, params IEnumerable<ISharedAnimation> waitFor) {
         return AnimationUtils.Animation(onStart, waitFor);
     }
 

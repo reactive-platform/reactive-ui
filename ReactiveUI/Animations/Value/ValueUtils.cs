@@ -100,21 +100,21 @@ namespace Reactive {
 
         #region Unowned
 
-        public static AnimatedValue<T> Animated<T>(
+        public static SharedAnimatedValue<T> Animated<T>(
             T initialValue,
             IValueInterpolator<T> interpolator,
             AnimationDuration duration,
             AnimationCurve? curve = null,
             Action<AnimatedValue<T>>? onFinish = null
         ) {
-            return new AnimatedValue<T>(initialValue, interpolator) {
+            return new SharedAnimatedValue<T>(initialValue, interpolator) {
                 Duration = duration,
                 OnFinish = onFinish,
                 Curve = curve ?? AnimationCurve.Linear
             };
         }
 
-        public static AnimatedValue<Color> AnimatedColor(
+        public static SharedAnimatedValue<Color> AnimatedColor(
             Color initialValue,
             AnimationDuration duration,
             AnimationCurve? curve = null,
@@ -129,7 +129,7 @@ namespace Reactive {
             );
         }
 
-        public static AnimatedValue<Vector2> AnimatedVector2(
+        public static SharedAnimatedValue<Vector2> AnimatedVector2(
             Vector2 initialValue,
             AnimationDuration duration,
             AnimationCurve? curve = null,
@@ -144,7 +144,7 @@ namespace Reactive {
             );
         }
 
-        public static AnimatedValue<Vector3> AnimatedVector3(
+        public static SharedAnimatedValue<Vector3> AnimatedVector3(
             Vector3 initialValue,
             AnimationDuration duration,
             AnimationCurve? curve = null,
@@ -159,7 +159,7 @@ namespace Reactive {
             );
         }
 
-        public static AnimatedValue<float> AnimatedFloat(
+        public static SharedAnimatedValue<float> AnimatedFloat(
             float initialValue,
             AnimationDuration duration,
             AnimationCurve? curve = null,
