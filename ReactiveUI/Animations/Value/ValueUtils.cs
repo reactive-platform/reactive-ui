@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Reactive {
     [PublicAPI]
     public static class ValueUtils {
-        #region Remember
+        #region Owned
 
         public static ObservableValue<T> Remember<T>(T initialValue) {
             return new ObservableValue<T>(initialValue);
@@ -96,18 +96,82 @@ namespace Reactive {
             );
         }
 
-        public static IObjectAnimator<T> Animate<T>(
-            IReactiveModuleBinder binder,
-            Action<T, float> callback,
+        #endregion
+
+        #region Unowned
+
+        public static AnimatedValue<T> Animated<T>(
+            T initialValue,
+            IValueInterpolator<T> interpolator,
             AnimationDuration duration,
-            AnimationCurve? curve = null
+            AnimationCurve? curve = null,
+            Action<AnimatedValue<T>>? onFinish = null
         ) {
-            var animator = new ObjectAnimator<T>(callback) {
+            return new AnimatedValue<T>(initialValue, interpolator) {
                 Duration = duration,
-                Curve = curve ?? AnimationCurve.Exponential
+                OnFinish = onFinish,
+                Curve = curve ?? AnimationCurve.Linear
             };
-            binder.BindModule(animator);
-            return animator;
+        }
+
+        public static AnimatedValue<Color> AnimatedColor(
+            Color initialValue,
+            AnimationDuration duration,
+            AnimationCurve? curve = null,
+            Action<AnimatedValue<Color>>? onFinish = null
+        ) {
+            return Animated(
+                initialValue,
+                ColorValueInterpolator.Instance,
+                duration,
+                curve,
+                onFinish
+            );
+        }
+
+        public static AnimatedValue<Vector2> AnimatedVector2(
+            Vector2 initialValue,
+            AnimationDuration duration,
+            AnimationCurve? curve = null,
+            Action<AnimatedValue<Vector2>>? onFinish = null
+        ) {
+            return Animated(
+                initialValue,
+                Vector2ValueInterpolator.Instance,
+                duration,
+                curve,
+                onFinish
+            );
+        }
+
+        public static AnimatedValue<Vector3> AnimatedVector3(
+            Vector3 initialValue,
+            AnimationDuration duration,
+            AnimationCurve? curve = null,
+            Action<AnimatedValue<Vector3>>? onFinish = null
+        ) {
+            return Animated(
+                initialValue,
+                Vector3ValueInterpolator.Instance,
+                duration,
+                curve,
+                onFinish
+            );
+        }
+
+        public static AnimatedValue<float> AnimatedFloat(
+            float initialValue,
+            AnimationDuration duration,
+            AnimationCurve? curve = null,
+            Action<AnimatedValue<float>>? onFinish = null
+        ) {
+            return Animated(
+                initialValue,
+                SingleValueInterpolator.Instance,
+                duration,
+                curve,
+                onFinish
+            );
         }
 
         #endregion

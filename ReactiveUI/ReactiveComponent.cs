@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace Reactive {
     [PublicAPI]
-    public partial class ReactiveComponent : IReactiveComponent, IObservableHost, IEffectBinder, IReactiveModuleBinder {
+    public partial class ReactiveComponent : IReactiveComponent, IObservableHost, IReactiveModuleBinder {
         #region Factory
 
         [UsedImplicitly]
@@ -173,18 +173,6 @@ namespace Reactive {
         /// </summary>
         protected void StopAllCoroutines() {
             _reactiveHost!.StopAllCoroutines();
-        }
-
-        #endregion
-
-        #region Effects
-
-        public void BindEffect<T>(INotifyValueChanged<T> value, IEffect<T> effect) {
-            Host.BindEffect(value, effect);
-        }
-
-        public void UnbindEffect<T>(INotifyValueChanged<T> value, IEffect<T> effect) {
-            Host.UnbindEffect(value, effect);
         }
 
         #endregion

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Reactive {
     [PublicAPI]
-    public class AnimatedValue<T> : INotifyValueChanged<T>, IReactiveModule {
+    public class AnimatedValue<T> : INotifyValueChanged<T>, IAnimation, IReactiveModule {
         public AnimatedValue(T initialValue, IValueInterpolator<T> valueInterpolator) {
             _startValue = initialValue;
             _endValue = initialValue;
@@ -40,10 +40,13 @@ namespace Reactive {
 
         public T CurrentValue => _valueInterpolator.Lerp(_startValue, _endValue, _progress);
 
+        public bool IsFinished => _set;
+
         public AnimationDuration Duration { get; set; }
         public AnimationCurve Curve { get; set; } = AnimationCurve.Linear;
         public Action<AnimatedValue<T>>? OnFinish { get; set; }
-
+        
+        public event Action? AnimationFinishedEvent;
         public event Action<T>? ValueChangedEvent;
 
         private readonly IValueInterpolator<T> _valueInterpolator;
@@ -69,15 +72,25 @@ namespace Reactive {
             ValueChangedEvent = null;
         }
 
+        public void FinishToEnd() {
+            Progress = 1f;
+            FinishAnimation();
+        }
+        
+        public void Finish() {
+            FinishAnimation();
+        }
+        
         public void OnUpdate() {
             if (_set) return;
-            
+
             if (Duration.Unit is DurationUnit.Seconds) {
                 _elapsedTime += Time.deltaTime;
                 Progress = Mathf.Clamp01(_elapsedTime / Duration);
             } else {
                 Progress = Mathf.Lerp(Progress, 1f, Time.deltaTime * Duration);
             }
+            
             Progress = Curve.Evaluate(Progress);
             //finishing
             if (Math.Abs(1f - Progress) < 1e-6) {
@@ -88,9 +101,13 @@ namespace Reactive {
         private void FinishAnimation() {
             _set = true;
             _elapsedTime = 0f;
+            
+            AnimationFinishedEvent?.Invoke();
             OnFinish?.Invoke(this);
         }
 
-        void IReactiveModule.OnDestroy() { }
+        public static implicit operator T(AnimatedValue<T> value) {
+            return value.CurrentValue;
+        }
     }
 }

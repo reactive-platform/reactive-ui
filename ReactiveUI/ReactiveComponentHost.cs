@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Reactive {
     public partial class ReactiveComponent {
         [RequireComponent(typeof(RectTransform))]
-        private class ReactiveHost : MonoBehaviour, ILayoutItem, IEffectBinder, IReactiveModuleBinder {
+        private class ReactiveHost : MonoBehaviour, ILayoutItem, IReactiveModuleBinder {
             #region LayoutItem
 
             public ILayoutDriver? LayoutDriver {
@@ -131,78 +131,18 @@ namespace Reactive {
             }
 
             #endregion
-
-            #region Effects
-
-            private abstract class EffectBindingBase {
-                public abstract void UnbindAll();
-            }
-
-            private class EffectBinding<T> : EffectBindingBase {
-                public EffectBinding(INotifyValueChanged<T> value) {
-                    _value = value;
-                }
-
-                private readonly INotifyValueChanged<T> _value;
-                private readonly HashSet<IEffect<T>> _effects = new();
-
-                public void Bind(IEffect<T> effect) {
-                    _value.ValueChangedEvent += effect.Invoke;
-                    _effects.Add(effect);
-                }
-
-                public void Unbind(IEffect<T> effect) {
-                    if (!_effects.Contains(effect)) return;
-                    _value.ValueChangedEvent -= effect.Invoke;
-                    _effects.Remove(effect);
-                }
-
-                public override void UnbindAll() {
-                    foreach (var effect in _effects) {
-                        _value.ValueChangedEvent -= effect.Invoke;
-                    }
-                    _effects.Clear();
-                }
-            }
-
-            private readonly Dictionary<object, EffectBindingBase> _effects = new();
-
-            // TODO: Remove all this crap and use pure delegates
-            public void BindEffect<T>(INotifyValueChanged<T> value, IEffect<T> effect) {
-                EffectBinding<T> binding;
-                if (!_effects.TryGetValue(value, out var bin)) {
-                    binding = new EffectBinding<T>(value);
-                    _effects[value] = binding;
-                } else {
-                    binding = (EffectBinding<T>)bin;
-                }
-                binding.Bind(effect);
-            }
-
-            public void UnbindEffect<T>(INotifyValueChanged<T> value, IEffect<T> effect) {
-                if (!_effects.TryGetValue(value, out var bin)) return;
-                var binding = (EffectBinding<T>)bin;
-                binding.Unbind(effect);
-            }
-
-            private void UnbindAllEffects() {
-                foreach (var (_, binding) in _effects) {
-                    binding.UnbindAll();
-                }
-            }
-
-            #endregion
-
+            
             #region Modules
 
-            private readonly HashSet<IReactiveModule> _modules = new();
+            private HashSet<IReactiveModule>? _modules;
 
             public void BindModule(IReactiveModule module) {
+                _modules ??= new();
                 _modules.Add(module);
             }
 
             public void UnbindModule(IReactiveModule module) {
-                _modules.Remove(module);
+                _modules?.Remove(module);
             }
 
             #endregion
@@ -284,7 +224,7 @@ namespace Reactive {
 
             private void Update() {
                 _components.ForEach(static x => x.OnUpdate());
-                _modules.ForEach(static x => x.OnUpdate());
+                _modules?.ForEach(static x => x.OnUpdate());
             }
 
             private void LateUpdate() {
@@ -297,9 +237,7 @@ namespace Reactive {
             }
 
             private void OnDestroy() {
-                UnbindAllEffects();
                 _components.ForEach(static x => x.DestroyInternal());
-                _modules.ForEach(static x => x.OnDestroy());
                 IsDestroyed = true;
             }
 

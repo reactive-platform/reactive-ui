@@ -23,5 +23,9 @@ namespace Reactive {
         public void ClearBindings() {
             ValueChangedEvent = null;
         }
+
+        public static implicit operator T(ObservableValue<T> value) {
+            return value._value;
+        }
     }
 }

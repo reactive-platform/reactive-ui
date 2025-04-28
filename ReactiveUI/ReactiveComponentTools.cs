@@ -1,10 +1,35 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Reactive;
 
 public partial class ReactiveComponent {
-    #region Remember
+    #region Lerp
+
+    protected static float Lerp(float from, float to, float value) {
+        return Mathf.LerpUnclamped(from, to, value);
+    }
+    
+    protected static Color Lerp(Color from, Color to, float value) {
+        return Color.LerpUnclamped(from, to, value);
+    }
+    
+    protected static Vector2 Lerp(Vector2 from, Vector2 to, float value) {
+        return Vector2.LerpUnclamped(from, to, value);
+    }
+    
+    protected static Vector3 Lerp(Vector3 from, Vector3 to, float value) {
+        return Vector3.LerpUnclamped(from, to, value);
+    }
+    
+    protected static Quaternion Lerp(Quaternion from, Quaternion to, float value) {
+        return Quaternion.LerpUnclamped(from, to, value);
+    }
+
+    #endregion
+
+    #region Owned Values
 
     protected static ObservableValue<TValue> Remember<TValue>(TValue initialValue) {
         return new ObservableValue<TValue>(initialValue);
@@ -13,7 +38,7 @@ public partial class ReactiveComponent {
     protected AnimatedValue<Color> RememberAnimated(
         Color initialValue,
         AnimationDuration animationDuration,
-        Optional<AnimationCurve> curve = default,
+        AnimationCurve? curve = null,
         Action<AnimatedValue<Color>>? onFinish = null
     ) {
         return ValueUtils.RememberAnimatedColor(this, initialValue, animationDuration, curve, onFinish);
@@ -22,7 +47,7 @@ public partial class ReactiveComponent {
     protected AnimatedValue<Vector2> RememberAnimated(
         Vector2 initialValue,
         AnimationDuration animationDuration,
-        Optional<AnimationCurve> curve = default,
+        AnimationCurve? curve = null,
         Action<AnimatedValue<Vector2>>? onFinish = null
     ) {
         return ValueUtils.RememberAnimatedVector(this, initialValue, animationDuration, curve, onFinish);
@@ -31,7 +56,7 @@ public partial class ReactiveComponent {
     protected AnimatedValue<Vector3> RememberAnimated(
         Vector3 initialValue,
         AnimationDuration animationDuration,
-        Optional<AnimationCurve> curve = default,
+        AnimationCurve? curve = null,
         Action<AnimatedValue<Vector3>>? onFinish = null
     ) {
         return ValueUtils.RememberAnimatedVector(this, initialValue, animationDuration, curve, onFinish);
@@ -40,7 +65,7 @@ public partial class ReactiveComponent {
     protected AnimatedValue<float> RememberAnimated(
         float initialValue,
         AnimationDuration animationDuration,
-        Optional<AnimationCurve> curve = default,
+        AnimationCurve? curve = null,
         Action<AnimatedValue<float>>? onFinish = null
     ) {
         return ValueUtils.RememberAnimatedFloat(this, initialValue, animationDuration, curve, onFinish);
@@ -50,23 +75,69 @@ public partial class ReactiveComponent {
         TValue initialValue,
         IValueInterpolator<TValue> interpolator,
         AnimationDuration duration,
-        Optional<AnimationCurve> curve = default,
+        AnimationCurve? curve = null,
         Action<AnimatedValue<TValue>>? onFinish = null
     ) {
         return ValueUtils.RememberAnimated(this, initialValue, interpolator, duration, curve, onFinish);
     }
 
     #endregion
-    
-    #region Animate
-    
-    protected IObjectAnimator<T> Animate<T>(
-        Action<T, float> callback,
+
+    #region Unowned Values
+
+    protected static AnimatedValue<float> Animated(
+        float initialValue,
         AnimationDuration duration,
-        AnimationCurve? curve = null
+        AnimationCurve? curve = null,
+        Action<AnimatedValue<float>>? onFinish = null
     ) {
-        return ValueUtils.Animate(this, callback, duration, curve);
+        return Animated(initialValue, SingleValueInterpolator.Instance, duration, curve, onFinish);
     }
-    
+
+    protected static AnimatedValue<Vector2> Animated(
+        Vector2 initialValue,
+        AnimationDuration duration,
+        AnimationCurve? curve = null,
+        Action<AnimatedValue<Vector2>>? onFinish = null
+    ) {
+        return Animated(initialValue, Vector2ValueInterpolator.Instance, duration, curve, onFinish);
+    }
+
+    protected static AnimatedValue<Vector3> Animated(
+        Vector3 initialValue,
+        AnimationDuration duration,
+        AnimationCurve? curve = null,
+        Action<AnimatedValue<Vector3>>? onFinish = null
+    ) {
+        return Animated(initialValue, Vector3ValueInterpolator.Instance, duration, curve, onFinish);
+    }
+
+    protected static AnimatedValue<Color> Animated(
+        Color initialValue,
+        AnimationDuration duration,
+        AnimationCurve? curve = null,
+        Action<AnimatedValue<Color>>? onFinish = null
+    ) {
+        return Animated(initialValue, ColorValueInterpolator.Instance, duration, curve, onFinish);
+    }
+
+    protected static AnimatedValue<TValue> Animated<TValue>(
+        TValue initialValue,
+        IValueInterpolator<TValue> interpolator,
+        AnimationDuration duration,
+        AnimationCurve? curve = null,
+        Action<AnimatedValue<TValue>>? onFinish = null
+    ) {
+        return ValueUtils.Animated(initialValue, interpolator, duration, curve, onFinish);
+    }
+
+    #endregion
+
+    #region Animate
+
+    protected static ISharedAnimation Animation(Action onStart, params IEnumerable<IAnimation> waitFor) {
+        return AnimationUtils.Animation(onStart, waitFor);
+    }
+
     #endregion
 }
