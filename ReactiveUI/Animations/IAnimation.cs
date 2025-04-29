@@ -9,6 +9,7 @@ namespace Reactive;
 [PublicAPI]
 public interface IAnimation {
     bool IsFinished { get; }
+    float Progress { get; }
     
     event Action? AnimationFinishedEvent;
 
