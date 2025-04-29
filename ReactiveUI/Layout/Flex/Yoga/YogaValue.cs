@@ -20,27 +20,25 @@ namespace Reactive.Yoga {
         public Unit unit;
 
         public override string ToString() {
-            if (unit is Unit.Undefined) {
-                return "undefined";
-            }
+            return unit switch {
+                Unit.Undefined => "undefined",
+                Unit.Auto => "auto",
+                Unit.FitContent => "fit-content",
+                Unit.MaxContent => "max-content",
+                Unit.Stretch => "stretch",
 
-            if (unit is Unit.Auto) {
-                return "auto";
-            }
-            
-            var unt = unit switch {
-                Unit.Percent => "%",
-                Unit.Point => "pt",
-                _ => throw new ArgumentOutOfRangeException()
+                _ => unit switch {
+                    Unit.Percent => $"{value}%",
+                    Unit.Point => $"{value}pt",
+                    _ => throw new ArgumentOutOfRangeException()
+                }
             };
-            
-            return $"{value}{unt}";
         }
 
         public static YogaValue Percent(float value) {
             return new YogaValue(value, Unit.Percent);
         }
-        
+
         public static YogaValue Point(float value) {
             return new YogaValue(value, Unit.Point);
         }
@@ -50,16 +48,47 @@ namespace Reactive.Yoga {
         }
 
         public static implicit operator YogaValue(string str) {
-            var unit = Unit.Undefined;
-            var value = 0f;
-            if (str is "auto") {
-                unit = Unit.Auto;
-            } else if (str.EndsWith("%")) {
-                value = float.Parse(str.Replace("%", ""));
-                unit = Unit.Percent;
-            } else if (float.TryParse(str, out value)) {
-                unit = Unit.Point;
+            Unit unit;
+            float value = 0;
+
+            switch (str) {
+                case "undefined":
+                    unit = Unit.Undefined;
+                    break;
+                
+                case "auto":
+                    unit = Unit.Auto;
+                    break;
+                
+                case "fit-content":
+                    unit = Unit.FitContent;
+                    break;
+                
+                case "max-content":
+                    unit = Unit.MaxContent;
+                    break;
+                
+                case "stretch":
+                    unit = Unit.Stretch;
+                    break;
+
+                default: {
+                    if (str.EndsWith("%")) {
+                        value = float.Parse(str.Replace("%", ""));
+                        unit = Unit.Percent;
+                        break;
+                    }
+
+                    if (str.EndsWith("pt")) {
+                        value = float.Parse(str.Replace("pt", ""));
+                        unit = Unit.Point;
+                        break;
+                    }
+                    
+                    throw new ArgumentOutOfRangeException(nameof(str));
+                }
             }
+
             return new YogaValue(value, unit);
         }
 
