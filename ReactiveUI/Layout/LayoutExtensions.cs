@@ -157,12 +157,12 @@ namespace Reactive {
 
         public static T AsFlexGroup<T>(
             this T component,
-            FlexDirection direction = FlexDirection.Row,
-            Justify justifyContent = Justify.SpaceAround,
-            Align alignItems = Align.Stretch,
-            Align alignContent = Align.Auto,
-            Wrap wrap = Wrap.NoWrap,
-            Overflow overflow = Overflow.Visible,
+            FlexDirection? direction = null,
+            Justify? justifyContent = null,
+            Align? alignItems = null,
+            Align? alignContent = null,
+            Wrap? wrap = null,
+            Overflow? overflow = null,
             YogaFrame? padding = null,
             YogaVector? gap = null,
             bool constrainHorizontal = true,
