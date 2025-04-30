@@ -45,6 +45,10 @@ namespace Reactive.Yoga {
             return new(value);
         }
         
+        public static implicit operator YogaVector(YogaValue value) {
+            return new(value);
+        }
+        
         public static bool operator ==(YogaVector left, YogaVector right) {
             return left.x == right.x && left.y == right.y;
         }

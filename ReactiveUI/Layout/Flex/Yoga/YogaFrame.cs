@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 
 namespace Reactive.Yoga {
     [PublicAPI]
@@ -21,14 +22,14 @@ namespace Reactive.Yoga {
             this.left = left;
             this.right = right;
         }
-        
+
         public YogaFrame(YogaValue vertical, YogaValue horizontal) {
             top = vertical;
             bottom = vertical;
             left = horizontal;
             right = horizontal;
         }
-        
+
         public YogaFrame(YogaValue all) {
             top = all;
             bottom = all;
@@ -36,18 +37,33 @@ namespace Reactive.Yoga {
             right = all;
         }
 
+        public YogaValue this[int idx] {
+            get {
+                return idx switch {
+                    0 => top,
+                    1 => right,
+                    2 => bottom,
+                    3 => left,
+                    _ => throw new IndexOutOfRangeException()
+                };
+            }
+        }
+
         public YogaValue top;
         public YogaValue bottom;
         public YogaValue left;
         public YogaValue right;
 
+        public static implicit operator YogaFrame(string value) {
+            return new YogaFrame(value);
+        }
+        
         public static implicit operator YogaFrame(float value) {
-            return new YogaFrame {
-                top = value,
-                bottom = value,
-                left = value,
-                right = value
-            };
+            return new YogaFrame(value);
+        }
+        
+        public static implicit operator YogaFrame(YogaValue value) {
+            return new YogaFrame(value);
         }
     }
 }
