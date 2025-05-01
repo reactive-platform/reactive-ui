@@ -209,9 +209,9 @@ namespace Reactive {
                 }
             }
         }
-        
+
         public bool HadOverflow => HasValidNode && YogaNode.HadOverflow();
-        
+
         // Take into account that yoga can modify values on the backend, so when debugging,
         // do NOT rely on these variables, rely on properties instead.
         // These variables hold cached values for late initialization and are not intended for anything else.
@@ -230,35 +230,17 @@ namespace Reactive {
         private bool _changedCacheBeforeInit;
 
         private void RefreshMargin(YogaFrame value) {
-            if (value.top == value.bottom) {
-                YogaNode.StyleSetMargin(Edge.Vertical, value.top);
-            } else {
-                YogaNode.StyleSetMargin(Edge.Top, value.top);
-                YogaNode.StyleSetMargin(Edge.Bottom, value.bottom);
-            }
-
-            if (value.left == value.right) {
-                YogaNode.StyleSetMargin(Edge.Horizontal, value.left);
-            } else {
-                YogaNode.StyleSetMargin(Edge.Left, value.left);
-                YogaNode.StyleSetMargin(Edge.Right, value.right);
-            }
+            YogaNode.StyleSetMargin(Edge.Top, value.top);
+            YogaNode.StyleSetMargin(Edge.Bottom, value.bottom);
+            YogaNode.StyleSetMargin(Edge.Left, value.left);
+            YogaNode.StyleSetMargin(Edge.Right, value.right);
         }
 
         private void RefreshPosition(YogaFrame value) {
-            if (value.top == value.bottom) {
-                YogaNode.StyleSetPosition(Edge.Vertical, value.top);
-            } else {
-                YogaNode.StyleSetPosition(Edge.Top, value.top);
-                YogaNode.StyleSetPosition(Edge.Bottom, value.bottom);
-            }
-
-            if (value.left == value.right) {
-                YogaNode.StyleSetPosition(Edge.Horizontal, value.left);
-            } else {
-                YogaNode.StyleSetPosition(Edge.Left, value.left);
-                YogaNode.StyleSetPosition(Edge.Right, value.right);
-            }
+            YogaNode.StyleSetPosition(Edge.Top, value.top);
+            YogaNode.StyleSetPosition(Edge.Bottom, value.bottom);
+            YogaNode.StyleSetPosition(Edge.Left, value.left);
+            YogaNode.StyleSetPosition(Edge.Right, value.right);
         }
 
         private void RefreshAllProperties() {
@@ -284,7 +266,7 @@ namespace Reactive {
             if (_position.HasValue) {
                 RefreshPosition(_position.Value);
             }
-            
+
             if (_size.HasValue) {
                 YogaNode.StyleSetWidth(_size.Value.x);
                 YogaNode.StyleSetHeight(_size.Value.y);
@@ -294,16 +276,16 @@ namespace Reactive {
                 YogaNode.StyleSetMinWidth(_minSize.Value.x);
                 YogaNode.StyleSetMinHeight(_minSize.Value.y);
             }
-            
+
             if (_maxSize.HasValue) {
                 YogaNode.StyleSetMaxWidth(_maxSize.Value.x);
                 YogaNode.StyleSetMaxHeight(_maxSize.Value.y);
             }
-            
+
             if (_aspectRatio.HasValue) {
                 YogaNode.StyleSetAspectRatio(_aspectRatio.Value);
             }
-            
+
             if (_margin.HasValue) {
                 RefreshMargin(_margin.Value);
             }
@@ -322,7 +304,7 @@ namespace Reactive {
                 _node = null;
                 return;
             }
-            
+
             _node = ((YogaContext)context).YogaNode;
 
             // No need to update if nothing was changed

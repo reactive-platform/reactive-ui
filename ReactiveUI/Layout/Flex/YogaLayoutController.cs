@@ -171,7 +171,9 @@ namespace Reactive.Yoga {
         public event Action? LayoutControllerUpdatedEvent;
 
         private Overflow? _overflow;
+
         private Direction? _direction;
+
         // To match web defaults
         private FlexDirection? _flexDirection = FlexDirection.Row;
         private Wrap? _flexWrap;
@@ -190,19 +192,10 @@ namespace Reactive.Yoga {
         }
 
         private void RefreshPadding(YogaFrame value) {
-            if (value.top == value.bottom) {
-                YogaNode.StyleSetPadding(Edge.Vertical, value.top);
-            } else {
-                YogaNode.StyleSetPadding(Edge.Top, value.top);
-                YogaNode.StyleSetPadding(Edge.Bottom, value.bottom);
-            }
-
-            if (value.left == value.right) {
-                YogaNode.StyleSetPadding(Edge.Horizontal, value.left);
-            } else {
-                YogaNode.StyleSetPadding(Edge.Left, value.left);
-                YogaNode.StyleSetPadding(Edge.Right, value.right);
-            }
+            YogaNode.StyleSetPadding(Edge.Top, value.top);
+            YogaNode.StyleSetPadding(Edge.Bottom, value.bottom);
+            YogaNode.StyleSetPadding(Edge.Left, value.left);
+            YogaNode.StyleSetPadding(Edge.Right, value.right);
         }
 
         private void RefreshGap(YogaVector value) {
@@ -211,14 +204,20 @@ namespace Reactive.Yoga {
         }
 
         private void RefreshAllProperties() {
+            if (_flexDirection.HasValue) {
+                YogaNode.StyleSetFlexDirection(_flexDirection.Value);
+            }
+
+            // All properties except flexDirection are null by default
+            if (!_changedCacheBeforeInit) {
+                return;
+            }
+
             if (_overflow.HasValue) {
                 YogaNode.StyleSetOverflow(_overflow.Value);
             }
             if (_direction.HasValue) {
                 YogaNode.StyleSetDirection(_direction.Value);
-            }
-            if (_flexDirection.HasValue) {
-                YogaNode.StyleSetFlexDirection(_flexDirection.Value);
             }
             if (_flexWrap.HasValue) {
                 YogaNode.StyleSetFlexWrap(_flexWrap.Value);
@@ -256,9 +255,7 @@ namespace Reactive.Yoga {
 
             _node = ((YogaContext)context).YogaNode;
 
-            if (_changedCacheBeforeInit) {
-                RefreshAllProperties();
-            }
+            RefreshAllProperties();
         }
 
         #endregion
@@ -285,14 +282,14 @@ namespace Reactive.Yoga {
             if (!ConstrainVertical) {
                 constraints.y = float.NaN;
             }
-            
+
             YogaNode.CalculateLayout(constraints.x, constraints.y, Direction);
 
             if (YogaNode.GetHasNewLayout()) {
                 var transform = item.BeginApply();
                 // Root nodes don't need to apply position
                 YogaNode.ApplySizeTo(transform);
-                
+
                 item.EndApply();
             }
         }
