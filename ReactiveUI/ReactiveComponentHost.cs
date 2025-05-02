@@ -99,9 +99,9 @@ namespace Reactive {
                 if (_beingRecalculated) {
                     throw new InvalidOperationException("Calling RecalculateLayoutImmediate in a layout cycle is not allowed");
                 }
-                
+
                 _beingRecalculated = true;
-                
+
                 if (LayoutModifier != null && LayoutDriver?.LayoutController != null) {
                     // If a layout driver is presented, start recalculation from this point
                     LayoutDriver.RecalculateLayoutImmediate();
@@ -131,7 +131,7 @@ namespace Reactive {
             }
 
             #endregion
-            
+
             #region Modules
 
             private HashSet<IReactiveModule>? _modules;
@@ -185,7 +185,17 @@ namespace Reactive {
 
             public bool Enabled {
                 get => gameObject.activeInHierarchy;
-                set => gameObject.SetActive(value);
+                set {
+                    gameObject.SetActive(value);
+
+                    if (!gameObject.activeInHierarchy) {
+                        // When turning the object off\on in a disabled hierarchy,
+                        // OnEnable and OnDisable events are not called, so we notify listeners manually
+                        StateUpdatedEvent?.Invoke(this);
+                        // To force layout recalculation when enabled
+                        _wasActuallyDisabled = true;
+                    }
+                }
             }
 
             public bool IsStarted { get; private set; }
@@ -211,7 +221,7 @@ namespace Reactive {
             #region Events
 
             private RectTransform _rectTransform = null!;
-            private bool _wasActuallyDisabled;
+            private bool _wasActuallyDisabled = true;
 
             private void Awake() {
                 _rectTransform = GetComponent<RectTransform>();
