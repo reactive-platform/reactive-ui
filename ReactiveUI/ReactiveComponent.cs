@@ -14,20 +14,26 @@ namespace Reactive {
         #region Factory
 
         [UsedImplicitly]
-        private ReactiveComponent(bool _) { }
+        private ReactiveComponent(int _) { }
+
+        protected ReactiveComponent(bool constructImmediate) {
+            if (constructImmediate) {
+                ConstructAndInit();
+            }
+        }
 
         public ReactiveComponent() {
             ConstructAndInit();
         }
 
         private static ConstructorInfo? _lazyConstructor;
-        private static readonly object[] dummyParams = { false };
+        private static readonly object[] dummyParams = { 0 };
 
         public static T Lazy<T>() where T : ReactiveComponent, new() {
             _lazyConstructor ??= typeof(ReactiveComponent).GetConstructor(
                 ReflectionUtils.DefaultFlags,
                 null,
-                new[] { typeof(bool) },
+                new[] { typeof(int) },
                 null
             );
             return (T)_lazyConstructor!.Invoke(dummyParams);
@@ -242,8 +248,13 @@ namespace Reactive {
         /// Constructs and reparents the component if needed.
         /// </summary>
         public GameObject Use(Transform? parent = null) {
-            ValidateExternalInteraction();
-            if (!IsInitialized) ConstructAndInit();
+            if (IsDestroyed) {
+                throw new InvalidOperationException("Unable to manage the object since it's destroyed");
+            }
+
+            if (!IsInitialized) {
+                ConstructAndInit();
+            }
             
             LayoutDriver = null;
             ContentTransform.SetParent(parent, false);
@@ -251,7 +262,7 @@ namespace Reactive {
             return Content;
         }
 
-        private void ConstructAndInit() {
+        protected void ConstructAndInit() {
             if (IsInitialized) {
                 throw new InvalidOperationException();
             }
@@ -269,10 +280,6 @@ namespace Reactive {
             TransferModules();
 
             OnInitialize();
-        }
-
-        private void ValidateExternalInteraction() {
-            if (IsDestroyed) throw new InvalidOperationException("Unable to manage the object since it's destroyed");
         }
 
         protected virtual void Construct(RectTransform rect) { }
