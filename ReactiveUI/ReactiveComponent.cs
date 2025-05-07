@@ -204,7 +204,7 @@ namespace Reactive {
         }
 
         private bool LoadModules() {
-            if (!IsInitialized) {
+            if (!IsInitialized && _modules == null) {
                 _modules = HashSetPool<IReactiveModule>.Get();
             }
             return !IsInitialized;
