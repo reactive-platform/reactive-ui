@@ -16,14 +16,19 @@ namespace Reactive {
         public T Value {
             get => _endValue;
             set {
-                if (_valueInterpolator.Equals(_endValue, value)) return;
+                if (_valueInterpolator.Equals(_endValue, value)) {
+                    return;
+                }
+                
                 _startValue = CurrentValue;
                 _endValue = value;
+                
                 if (Duration.Unit is DurationUnit.TimeDeltaFactor) {
                     _progress = 0f;
                 } else {
                     _elapsedTime = 0f;
                 }
+                
                 _set = false;
             }
         }

@@ -151,26 +151,40 @@ namespace Reactive {
 
             #region Contexts
 
-            private readonly Dictionary<Type, (object context, int members)> _contexts = new();
+            private Dictionary<Type, (object context, int members)>? _contexts;
 
             public void InsertContextMember(IContextMember member) {
+                _contexts ??= new(1);
+
                 var type = member.ContextType;
-                if (type == null) return;
+                if (type == null) {
+                    return;
+                }
+
                 object context;
                 var members = 1;
+
                 if (_contexts.TryGetValue(type, out var tuple)) {
                     context = tuple.context;
                     members += tuple.members;
                 } else {
                     context = member.CreateContext();
                 }
+
                 member.ProvideContext(context);
                 _contexts[type] = (context, members);
             }
 
             public void ReleaseContextMember(IContextMember member) {
+                if (_contexts == null) {
+                    return;
+                }
+
                 var type = member.ContextType;
-                if (type == null || !_contexts.TryGetValue(type, out var tuple)) return;
+                if (type == null || !_contexts.TryGetValue(type, out var tuple)) {
+                    return;
+                }
+
                 var members = tuple.members - 1;
                 if (members == 0) {
                     _contexts.Remove(type);
@@ -178,6 +192,7 @@ namespace Reactive {
                     tuple.members = members;
                     _contexts[type] = tuple;
                 }
+
                 member.ProvideContext(null);
             }
 

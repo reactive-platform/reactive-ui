@@ -6,10 +6,7 @@ using JetBrains.Annotations;
 namespace Reactive {
     [PublicAPI]
     public static class CollectionExtensions {
-        public static void RemoveValue<TKey, TValue>(
-            this IDictionary<TKey, TValue> dictionary,
-            TValue value
-        ) {
+        public static void RemoveValue<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TValue value) {
             var item = dictionary.First(x => x.Value?.Equals(value) ?? false);
             dictionary.Remove(item.Key);
         }
@@ -41,7 +38,9 @@ namespace Reactive {
         }
         
         public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action) {
-            foreach (var item in enumerable) action(item);
+            foreach (var item in enumerable) {
+                action(item);
+            }
         }
 
         public static void Deconstruct<T1, T2>(this Tuple<T1, T2> tuple, out T1 var1, out T2 var2) {
