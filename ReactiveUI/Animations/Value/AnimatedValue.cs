@@ -10,7 +10,6 @@ namespace Reactive {
             _endValue = initialValue;
             _valueInterpolator = valueInterpolator;
             _set = false;
-            _setThisFrame = true;
             _elapsedTime = 0f;
         }
 
@@ -26,7 +25,6 @@ namespace Reactive {
                     _elapsedTime = 0f;
                 }
                 _set = false;
-                _setThisFrame = true;
             }
         }
 
@@ -39,7 +37,6 @@ namespace Reactive {
         }
 
         public T CurrentValue => _valueInterpolator.Lerp(_startValue, _endValue, _progress);
-
         public bool IsFinished => _set;
 
         public AnimationDuration Duration { get; set; }
@@ -55,17 +52,20 @@ namespace Reactive {
 
         private float _progress;
         private float _elapsedTime;
-
-        private bool _setThisFrame;
         private bool _set;
 
-        public void SetValueImmediate(T value) {
+        public void SetValueImmediate(T value, bool silent = false) {
             _set = true;
             _startValue = value;
             _endValue = value;
             _endValue = _valueInterpolator.Lerp(_startValue, _endValue, 1f);
-            Progress = 1f;
-            FinishAnimation();
+            
+            if (!silent) {
+                Progress = 1f;
+                FinishAnimation();
+            } else {
+                _progress = 1f;
+            }
         }
 
         public void ClearBindings() {
@@ -82,17 +82,19 @@ namespace Reactive {
         }
 
         void IReactiveModule.OnUpdate() {
-            if (_set) return;
+            if (_set) {
+                return;
+            }
 
             if (Duration.Unit is DurationUnit.Seconds) {
                 _elapsedTime += Time.deltaTime;
-                Progress = Mathf.Clamp01(_elapsedTime / Duration);
+                _progress = Mathf.Clamp01(_elapsedTime / Duration);
             } else {
-                Progress = Mathf.Lerp(Progress, 1f, Time.deltaTime * Duration);
+                _progress = Mathf.Lerp(Progress, 1f, Time.deltaTime * Duration);
             }
 
             Progress = Curve.Evaluate(Progress);
-            //finishing
+            // Finishing if needed
             if (Math.Abs(1f - Progress) < 1e-6) {
                 FinishAnimation();
             }
