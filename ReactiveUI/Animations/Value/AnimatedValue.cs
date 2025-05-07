@@ -9,7 +9,8 @@ namespace Reactive {
             _startValue = initialValue;
             _endValue = initialValue;
             _valueInterpolator = valueInterpolator;
-            _set = false;
+            _set = true;
+            _progress = 1f;
             _elapsedTime = 0f;
         }
 
@@ -73,6 +74,14 @@ namespace Reactive {
             }
         }
 
+        /// <summary>
+        /// Evaluates the animation on the next frame. Use this to provide default values to subscribers.
+        /// If called when the animation is running, nothing will happen.
+        /// </summary>
+        public void EvaluateNextFrame() {
+            _set = false;
+        }
+        
         public void ClearBindings() {
             ValueChangedEvent = null;
         }
