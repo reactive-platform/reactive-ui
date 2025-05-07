@@ -45,7 +45,7 @@ namespace Reactive {
         public AnimationDuration Duration { get; set; }
         public AnimationCurve Curve { get; set; } = AnimationCurve.Linear;
         public Action<AnimatedValue<T>>? OnFinish { get; set; }
-        
+
         public event Action? AnimationFinishedEvent;
         public event Action<T>? ValueChangedEvent;
 
@@ -76,12 +76,12 @@ namespace Reactive {
             Progress = 1f;
             FinishAnimation();
         }
-        
+
         public void Finish() {
             FinishAnimation();
         }
-        
-        public void OnUpdate() {
+
+        void IReactiveModule.OnUpdate() {
             if (_set) return;
 
             if (Duration.Unit is DurationUnit.Seconds) {
@@ -90,7 +90,7 @@ namespace Reactive {
             } else {
                 Progress = Mathf.Lerp(Progress, 1f, Time.deltaTime * Duration);
             }
-            
+
             Progress = Curve.Evaluate(Progress);
             //finishing
             if (Math.Abs(1f - Progress) < 1e-6) {
@@ -98,10 +98,13 @@ namespace Reactive {
             }
         }
 
+        void IReactiveModule.OnBind() { }
+        void IReactiveModule.OnUnbind() { }
+
         private void FinishAnimation() {
             _set = true;
             _elapsedTime = 0f;
-            
+
             AnimationFinishedEvent?.Invoke();
             OnFinish?.Invoke(this);
         }

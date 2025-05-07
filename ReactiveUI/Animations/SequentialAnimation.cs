@@ -18,7 +18,7 @@ public class SequentialAnimation : ISharedAnimation {
     public float Progress => _progress;
 
     public event Action? AnimationFinishedEvent;
-    
+
     private readonly IEnumerable<ISharedAnimation> _animations;
     private readonly Action _onStart;
     private bool _isFinished;
@@ -28,22 +28,22 @@ public class SequentialAnimation : ISharedAnimation {
     public void FinishToEnd() {
         _isPlaying = false;
         _isFinished = true;
-        
+
         foreach (var animation in _animations) {
             animation.FinishToEnd();
         }
-        
+
         AnimationFinishedEvent?.Invoke();
     }
 
     public void Finish() {
         _isPlaying = false;
         _isFinished = true;
-        
+
         foreach (var animation in _animations) {
             animation.Finish();
         }
-        
+
         AnimationFinishedEvent?.Invoke();
     }
 
@@ -57,17 +57,17 @@ public class SequentialAnimation : ISharedAnimation {
         if (!_isPlaying) {
             return;
         }
-        
+
         _isFinished = true;
         _progress = float.MaxValue;
 
         foreach (var animation in _animations) {
             animation.OnUpdate();
-            
+
             if (!animation.IsFinished) {
                 _isFinished = false;
             }
-            
+
             // The minimum progress determines the longest animation
             if (animation.Progress < _progress) {
                 _progress = animation.Progress;
@@ -79,4 +79,7 @@ public class SequentialAnimation : ISharedAnimation {
             _isPlaying = false;
         }
     }
+
+    void IReactiveModule.OnBind() { }
+    void IReactiveModule.OnUnbind() { }
 }

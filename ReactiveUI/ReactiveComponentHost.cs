@@ -139,10 +139,12 @@ namespace Reactive {
             public void BindModule(IReactiveModule module) {
                 _modules ??= new();
                 _modules.Add(module);
+                module.OnBind();
             }
 
             public void UnbindModule(IReactiveModule module) {
                 _modules?.Remove(module);
+                module.OnUnbind();
             }
 
             #endregion
