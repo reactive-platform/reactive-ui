@@ -29,7 +29,7 @@ namespace Reactive {
         private static ConstructorInfo? _lazyConstructor;
         private static readonly object[] dummyParams = { 0 };
 
-        public static T Lazy<T>() where T : ReactiveComponent, new() {
+        public static T LazyComponent<T>() where T : ReactiveComponent, new() {
             _lazyConstructor ??= typeof(ReactiveComponent).GetConstructor(
                 ReflectionUtils.DefaultFlags,
                 null,
