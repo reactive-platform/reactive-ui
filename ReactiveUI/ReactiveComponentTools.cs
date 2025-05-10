@@ -143,8 +143,14 @@ public partial class ReactiveComponent {
 
     #region Other
 
-    protected static Lazy<T> Lazy<T>(Func<T> accessor) {
-        return new(accessor);
+    /// <summary>
+    /// Creates a lazy value from a delegate.
+    /// </summary>
+    /// <param name="accessor">An accessor delegate.</param>
+    /// <param name="cacheLazyValue">Should the lazy struct cache a value or not.
+    /// When False, the delegate will be evaluated each time Value property is called.</param>
+    protected static Lazy<T> Lazy<T>(Func<T> accessor, bool cacheLazyValue = true) {
+        return new(accessor, cacheLazyValue);
     }
 
     #endregion

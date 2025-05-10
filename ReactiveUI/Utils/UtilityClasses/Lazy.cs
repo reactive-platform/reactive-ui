@@ -9,17 +9,25 @@ namespace Reactive;
 /// <typeparam name="T">A type of lazy value.</typeparam>
 [PublicAPI]
 public struct Lazy<T> {
-    public Lazy(Func<T> accessor) {
+    /// <summary>
+    /// Creates a lazy value from a delegate.
+    /// </summary>
+    /// <param name="accessor">An accessor delegate.</param>
+    /// <param name="cacheLazyValue">Should the lazy struct cache a value or not.
+    /// When False, the delegate will be evaluated each time Value property is called.</param>
+    public Lazy(Func<T> accessor, bool cacheLazyValue = true) {
         _accessor = accessor;
+        _cacheValue = cacheLazyValue;
     }
 
     public Lazy(T value) {
         _value = value;
+        _cacheValue = true;
     }
 
     public T Value {
         get {
-            if (_value == null) {
+            if (_value == null || !_cacheValue) {
                 if (_accessor == null) {
                     throw new InvalidOperationException("Accessor cannot be null");
                 }
@@ -32,6 +40,7 @@ public struct Lazy<T> {
     }
 
     private Func<T>? _accessor;
+    private bool _cacheValue;
     private T? _value;
     
     public static implicit operator Lazy<T>(Func<T> accessor) {
