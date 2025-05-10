@@ -140,4 +140,12 @@ public partial class ReactiveComponent {
     }
 
     #endregion
+
+    #region Other
+
+    protected static Lazy<T> Lazy<T>(Func<T> accessor) {
+        return new(accessor);
+    }
+
+    #endregion
 }
