@@ -1,4 +1,11 @@
+using JetBrains.Annotations;
+
 namespace Reactive {
+    /// <summary>
+    /// A struct that provides an optional value. Can represent undefined, null and some.
+    /// </summary>
+    /// <typeparam name="T">A type of optional value.</typeparam>
+    [PublicAPI]
     public struct Optional<T> {
         public T? Value { get; private set; }
         public bool HasValue { get; private set; }
