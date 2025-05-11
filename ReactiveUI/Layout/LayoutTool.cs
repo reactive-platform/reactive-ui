@@ -31,7 +31,7 @@ public static class LayoutTool {
     /// <param name="preferredSize">A preferred size of the node.</param>
     /// <param name="constraint">A size constraint.</param>
     /// <param name="mode">A size measurement mode.</param>
-    private static float MeasureNodeAxis(float preferredSize, float constraint, MeasureMode mode) {
+    public static float MeasureNodeAxis(float preferredSize, float constraint, MeasureMode mode) {
         //  Each axis is passed a MeasureMode as a constraint:
         //
         //  Exactly:
