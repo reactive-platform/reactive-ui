@@ -144,6 +144,11 @@ public partial class ReactiveComponent {
     #region Other
 
     /// <summary>
+    /// Returns a canvas transform.
+    /// </summary>
+    protected RectTransform CanvasTransform => (RectTransform)Canvas!.transform;
+
+    /// <summary>
     /// Creates a lazy value from a delegate.
     /// </summary>
     /// <param name="accessor">An accessor delegate.</param>
