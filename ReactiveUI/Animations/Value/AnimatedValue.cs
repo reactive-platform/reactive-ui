@@ -20,16 +20,13 @@ namespace Reactive {
                 if (_valueInterpolator.Equals(_endValue, value)) {
                     return;
                 }
-                
+
                 _startValue = CurrentValue;
                 _endValue = value;
-                
-                if (Duration.Unit is DurationUnit.TimeDeltaFactor) {
-                    _progress = 0f;
-                } else {
-                    _elapsedTime = 0f;
-                }
-                
+
+                _elapsedTime = 0f;
+                _progress = 0f;
+
                 _set = false;
             }
         }
@@ -65,7 +62,7 @@ namespace Reactive {
             _startValue = value;
             _endValue = value;
             _endValue = _valueInterpolator.Lerp(_startValue, _endValue, 1f);
-            
+
             if (!silent) {
                 Progress = 1f;
                 FinishAnimation();
@@ -81,7 +78,7 @@ namespace Reactive {
         public void EvaluateNextFrame() {
             _set = false;
         }
-        
+
         public void ClearBindings() {
             ValueChangedEvent = null;
         }
@@ -109,7 +106,7 @@ namespace Reactive {
 
             Progress = Curve.Evaluate(Progress);
             // Finishing if needed
-            if (Math.Abs(1f - Progress) < 1e-6) {
+            if (Mathf.Approximately(1f, Progress)) {
                 FinishAnimation();
             }
         }
