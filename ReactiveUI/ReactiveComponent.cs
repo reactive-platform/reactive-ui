@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -57,24 +56,6 @@ namespace Reactive {
         public string Name {
             get => Content.name;
             set => Content.name = value;
-        }
-
-        #endregion
-
-        #region Observable
-
-        private ObservableHost _observableHost = null!;
-
-        public void AddCallback<T>(string propertyName, Action<T> callback) {
-            _observableHost.AddCallback(propertyName, callback);
-        }
-
-        public void RemoveCallback<T>(string propertyName, Action<T> callback) {
-            _observableHost.RemoveCallback(propertyName, callback);
-        }
-
-        public void NotifyPropertyChanged([CallerMemberName] string? name = null) {
-            _observableHost.NotifyPropertyChanged(name);
         }
 
         #endregion
@@ -145,11 +126,11 @@ namespace Reactive {
         void ILayoutRecalculationSource.ScheduleLayoutRecalculation() {
             Host.ScheduleLayoutRecalculation();
         }
-        
+
         protected void RecalculateLayoutImmediate() {
             Host.RecalculateLayoutImmediate();
         }
-        
+
         protected void ScheduleLayoutRecalculation() {
             Host.ScheduleLayoutRecalculation();
         }
@@ -255,10 +236,10 @@ namespace Reactive {
             if (!IsInitialized) {
                 ConstructAndInit();
             }
-            
+
             LayoutDriver = null;
             ContentTransform.SetParent(parent, false);
-            
+
             return Content;
         }
 
