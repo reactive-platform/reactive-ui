@@ -27,7 +27,13 @@ namespace Reactive {
                 _elapsedTime = 0f;
                 _progress = 0f;
 
+                var shouldNotify = !_set;
                 _set = false;
+
+                if (shouldNotify) {
+                    OnStart?.Invoke(this);
+                    AnimationStartedEvent?.Invoke();
+                }
             }
         }
 
@@ -44,9 +50,12 @@ namespace Reactive {
 
         public AnimationDuration Duration { get; set; }
         public AnimationCurve Curve { get; set; } = AnimationCurve.Linear;
+
         public Action<AnimatedValue<T>>? OnFinish { get; set; }
+        public Action<AnimatedValue<T>>? OnStart { get; set; }
 
         public event Action? AnimationFinishedEvent;
+        public event Action? AnimationStartedEvent;
         public event Action<T>? ValueChangedEvent;
 
         private readonly IValueInterpolator<T> _valueInterpolator;
