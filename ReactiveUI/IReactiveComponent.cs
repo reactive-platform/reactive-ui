@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Reactive {
     [PublicAPI]
-    public interface IReactiveComponent : ILayoutItem {
+    public interface IReactiveComponent : ILayoutItem, IReactiveModuleBinder {
         GameObject Content { get; }
         RectTransform ContentTransform { get; }
 
