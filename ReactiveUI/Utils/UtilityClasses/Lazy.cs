@@ -42,6 +42,15 @@ public struct Lazy<T> {
     private Func<T>? _accessor;
     private bool _cacheValue;
     private T? _value;
+
+    /// <summary>
+    /// Evaluates a lazy value even if it's already loaded.
+    /// </summary>
+    public void Evaluate() {
+        if (_accessor != null) {
+            _value = _accessor();
+        }
+    }
     
     public static implicit operator Lazy<T>(Func<T> accessor) {
         return new(accessor);
