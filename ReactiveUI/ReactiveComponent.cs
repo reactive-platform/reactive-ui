@@ -166,6 +166,8 @@ namespace Reactive {
 
         #region Modules
 
+        IReadOnlyCollection<IReactiveModule> IReactiveModuleBinder.Modules => Host.Modules;
+        
         private HashSet<IReactiveModule>? _modules;
 
         public void BindModule(IReactiveModule module) {

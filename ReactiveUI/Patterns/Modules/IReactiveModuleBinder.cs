@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Reactive {
     /// <summary>
@@ -6,6 +7,11 @@ namespace Reactive {
     /// </summary>
     [PublicAPI]
     public interface IReactiveModuleBinder {
+        /// <summary>
+        /// Provides access to all bound modules.
+        /// </summary>
+        IReadOnlyCollection<IReactiveModule> Modules { get; }
+
         /// <summary>
         /// Binds a specified module.
         /// </summary>

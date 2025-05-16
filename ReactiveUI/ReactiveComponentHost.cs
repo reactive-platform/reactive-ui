@@ -134,6 +134,17 @@ namespace Reactive {
 
             #region Modules
 
+            public IReadOnlyCollection<IReactiveModule> Modules {
+                get {
+                    // Do not change as _modules ?? [] will produce a hashset instance instead of using Array.Empty<>
+                    if (_modules == null) {
+                        return [];
+                    }
+
+                    return _modules;
+                }
+            }
+
             private HashSet<IReactiveModule>? _modules;
 
             public void BindModule(IReactiveModule module) {
