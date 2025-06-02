@@ -8,6 +8,11 @@ namespace Reactive {
     public class ReactivePool<TKey, T> where T : IReactiveComponent, new() {
         public IReadOnlyDictionary<TKey, T> SpawnedComponents => _keyedComponents;
 
+        public Func<T>? Construct {
+            get => _reactivePool.Construct;
+            set => _reactivePool.Construct = value;
+        }
+        
         public bool DetachOnDespawn {
             get => _reactivePool.DetachOnDespawn;
             set => _reactivePool.DetachOnDespawn = value;
@@ -59,6 +64,7 @@ namespace Reactive {
     [PublicAPI]
     public class ReactivePool<T> where T : IReactiveComponent, new() {
         public IReadOnlyList<T> SpawnedComponents => _spawnedComponents;
+        public Func<T>? Construct;
         public bool DetachOnDespawn = true;
 
         private readonly Stack<T> _reservedComponents = new();
@@ -71,14 +77,14 @@ namespace Reactive {
             }
             
             for (var i = 0; i < count; i++) {
-                var comp = new T();
+                var comp = ConstructComponent();
                 _reservedComponents.Push(comp);
             }
         }
         
         public T Spawn() {
             if (!_reservedComponents.TryPop(out var comp)) {
-                comp = new();
+                comp = ConstructComponent();
             }
             if (comp!.IsDestroyed) {
                 return Spawn();
@@ -114,6 +120,10 @@ namespace Reactive {
                 _reservedComponents.Push(comp);
             }
             _spawnedComponents.Remove(comp);
+        }
+
+        private T ConstructComponent() {
+            return Construct == null ? new T() : Construct.Invoke();
         }
     }
 }
