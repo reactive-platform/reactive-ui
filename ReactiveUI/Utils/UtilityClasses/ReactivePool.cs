@@ -82,7 +82,7 @@ namespace Reactive {
             }
         }
         
-        public T Spawn() {
+        public T Spawn(bool enable = true) {
             if (!_reservedComponents.TryPop(out var comp)) {
                 comp = ConstructComponent();
             }
@@ -90,7 +90,10 @@ namespace Reactive {
                 return Spawn();
             }
             _spawnedComponents.Add(comp);
-            comp.Enabled = true;
+            
+            if (enable) {
+                comp.Enabled = true;
+            }
             return comp;
         }
 
