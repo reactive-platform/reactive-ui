@@ -135,6 +135,16 @@ namespace Reactive {
             Host.ScheduleLayoutRecalculation();
         }
 
+        /// <summary>
+        /// Exposes the specified component as the layout-first component.
+        /// This call is required in case you want to preserve leaf layout.
+        /// The component won't be overridden until you call this method with null.
+        /// </summary>
+        /// <param name="component">A component to expose.</param>
+        protected void ExposeLayoutFirstComponent(ReactiveComponent? component) {
+            Host.ExposeLayoutFirstComponent(component);
+        }
+
         #endregion
 
         #region Coroutines

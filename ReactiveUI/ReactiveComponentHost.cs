@@ -35,10 +35,7 @@ namespace Reactive {
                     if (_modifier != null) {
                         _modifier.ModifierUpdatedEvent += HandleModifierUpdated;
                         InsertContextMember(_modifier);
-
-                        // Normally the main component is the component that was created the last
-                        var primaryComponent = _components.LastOrDefault();
-                        _modifier.ExposeLayoutItem(primaryComponent);
+                        ReloadLayoutFirstComponent();
                     }
 
                     HandleModifierUpdated();
@@ -230,10 +227,31 @@ namespace Reactive {
             public bool IsDestroyed { get; private set; }
 
             private readonly List<ReactiveComponent> _components = new();
+            private ReactiveComponent? _definedExposeComponent;
+            private ReactiveComponent? _lastExposeComponent;
+
+            public void ExposeLayoutFirstComponent(ReactiveComponent? comp) {
+                if (comp != null && !_components.Contains(comp)) {
+                    throw new InvalidOperationException("Cannot expose a component that does not belong to the host");
+                }
+
+                _definedExposeComponent = comp;
+                ReloadLayoutFirstComponent();
+            }
+
+            private void ReloadLayoutFirstComponent() {
+                // Normally the main component is a component that was created the last
+                var comp = _definedExposeComponent ?? _components.LastOrDefault();
+
+                if (comp != null && comp != _lastExposeComponent) {
+                    _lastExposeComponent = comp;
+                    _modifier?.ExposeLayoutItem(comp);
+                }
+            }
 
             public void AddComponent(ReactiveComponent comp) {
                 _components.Add(comp);
-                _modifier?.ExposeLayoutItem(comp);
+                ReloadLayoutFirstComponent();
 
                 if (IsStarted) {
                     comp.OnStart();
