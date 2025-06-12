@@ -31,6 +31,7 @@ namespace Reactive {
                     }
 
                     _modifier = value;
+                    _lastExposedComponent = null;
 
                     if (_modifier != null) {
                         _modifier.ModifierUpdatedEvent += HandleModifierUpdated;
@@ -228,7 +229,7 @@ namespace Reactive {
 
             private readonly List<ReactiveComponent> _components = new();
             private ReactiveComponent? _definedExposeComponent;
-            private ReactiveComponent? _lastExposeComponent;
+            private ReactiveComponent? _lastExposedComponent;
 
             public void ExposeLayoutFirstComponent(ReactiveComponent? comp) {
                 if (comp != null && !_components.Contains(comp)) {
@@ -243,8 +244,8 @@ namespace Reactive {
                 // Normally the main component is a component that was created the last
                 var comp = _definedExposeComponent ?? _components.LastOrDefault();
 
-                if (comp != null && comp != _lastExposeComponent) {
-                    _lastExposeComponent = comp;
+                if (comp != null && comp != _lastExposedComponent) {
+                    _lastExposedComponent = comp;
                     _modifier?.ExposeLayoutItem(comp);
                 }
             }
