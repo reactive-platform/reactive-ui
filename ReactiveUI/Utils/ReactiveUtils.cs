@@ -1,3 +1,4 @@
+using System;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +9,7 @@ namespace Reactive {
         #region Sprites
 
         public static Texture2D CreateTexture(RenderTexture rt) {
-            RenderTexture active = RenderTexture.active;
+            var active = RenderTexture.active;
             RenderTexture.active = rt;
             
             var texture2D = new Texture2D(rt.width, rt.height);
@@ -23,7 +24,15 @@ namespace Reactive {
         public static Texture2D? CreateTexture(byte[] bytes) {
             if (bytes.Length == 0) return null;
             var texture = new Texture2D(1, 1, TextureFormat.RGBA32, false, false);
-            return texture.LoadImage(bytes) ? texture : null;
+            
+            try {
+                texture.LoadRawTextureData(bytes);
+            } catch (Exception ex) {
+                Debug.LogError($"Failed to create a texture:\n{ex}");
+                return null;
+            }
+            
+            return texture;
         }
 
         public static Sprite? CreateSprite(byte[] image) {
