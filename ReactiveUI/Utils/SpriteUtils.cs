@@ -1,11 +1,13 @@
 using System;
 using JetBrains.Annotations;
-using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine; 
 
 namespace Reactive {
+    /// <summary>
+    /// A class for managing sprites and textures.
+    /// </summary>
     [PublicAPI]
-    public static class ReactiveUtils {
+    public static class SpriteUtils {
         #region Sprites
 
         public static Texture2D CreateTexture(RenderTexture rt) {
