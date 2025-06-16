@@ -28,7 +28,7 @@ namespace Reactive {
             var texture = new Texture2D(1, 1, TextureFormat.RGBA32, false, false);
             
             try {
-                texture.LoadRawTextureData(bytes);
+                texture.LoadImage(bytes);
             } catch (Exception ex) {
                 Debug.LogError($"Failed to create a texture:\n{ex}");
                 return null;
