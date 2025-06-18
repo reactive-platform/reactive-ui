@@ -9,7 +9,7 @@ namespace Reactive {
             this T comp,
             INotifyValueChanged<TValue> value,
             Expression<Func<T, TValue>> expression,
-            bool applyImmediately = true
+            bool applyImmediately = false
         ) where T : IReactiveComponent {
             var setter = expression.GeneratePropertySetter();
 
@@ -20,7 +20,7 @@ namespace Reactive {
             this T comp,
             INotifyValueChanged<TValue> value,
             Action onEffect,
-            bool applyImmediately = true
+            bool applyImmediately = false
         ) where T : IReactiveComponent {
             return Animate(comp, value, (_, _) => onEffect(), applyImmediately);
         }
@@ -29,7 +29,7 @@ namespace Reactive {
             this T comp,
             INotifyValueChanged<TValue> value,
             Action<T, TValue> onEffect,
-            bool applyImmediately = true
+            bool applyImmediately = false
         ) where T : IReactiveComponent {
             void Closure(TValue val) {
                 // Return if component is not valid yet
