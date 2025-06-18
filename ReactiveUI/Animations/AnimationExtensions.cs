@@ -8,25 +8,28 @@ namespace Reactive {
         public static T Animate<T, TValue>(
             this T comp,
             INotifyValueChanged<TValue> value,
-            Expression<Func<T, TValue>> expression
+            Expression<Func<T, TValue>> expression,
+            bool applyImmediately = true
         ) where T : IReactiveComponent {
             var setter = expression.GeneratePropertySetter();
 
-            return Animate(comp, value, setter);
+            return Animate(comp, value, setter, applyImmediately);
         }
 
         public static T Animate<T, TValue>(
             this T comp,
             INotifyValueChanged<TValue> value,
-            Action onEffect
+            Action onEffect,
+            bool applyImmediately = true
         ) where T : IReactiveComponent {
-            return Animate(comp, value, (_, _) => onEffect());
+            return Animate(comp, value, (_, _) => onEffect(), applyImmediately);
         }
 
         public static T Animate<T, TValue>(
             this T comp,
             INotifyValueChanged<TValue> value,
-            Action<T, TValue> onEffect
+            Action<T, TValue> onEffect,
+            bool applyImmediately = true
         ) where T : IReactiveComponent {
             void Closure(TValue val) {
                 // Return if component is not valid yet
@@ -44,6 +47,10 @@ namespace Reactive {
             }
 
             value.ValueChangedEvent += Closure;
+            
+            if (applyImmediately) {
+                Closure(value.Value);
+            }
 
             return comp;
         }

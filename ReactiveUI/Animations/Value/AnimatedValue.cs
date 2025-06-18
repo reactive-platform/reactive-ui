@@ -45,6 +45,8 @@ namespace Reactive {
             }
         }
 
+        T INotifyValueChanged<T>.Value => CurrentValue;
+
         public T CurrentValue => _valueInterpolator.Lerp(_startValue, _endValue, _progress);
         public bool IsFinished => _set;
 
