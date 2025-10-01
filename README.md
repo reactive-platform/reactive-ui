@@ -4,7 +4,7 @@ Each `ReactiveComponent` returns a `GameObject` instance, so you can easily wrap
 
 ## Roadmap
 This roadmap covers not just this repo, but rather the whole reactive sdk set. Here it is:
-- [ ] Release the first version;
+- [x] Release the first version;
 - [ ] Refactor names for simplicity, so `ObservableValue<T>` becomes `State<T>`;
 - [ ] Rework modal system (Already WIP);
 - [ ] Remove components like `ColoredButton` and `ButtonBase` in exchange for `Clickable` and similar wrappers;
