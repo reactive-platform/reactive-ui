@@ -3,8 +3,8 @@ using JetBrains.Annotations;
 
 namespace Reactive {
     [PublicAPI]
-    public class ObservableValue<T> : INotifyValueChanged<T> {
-        public ObservableValue(T initialValue) {
+    public class State<T> : IState<T> {
+        public State(T initialValue) {
             _value = initialValue;
         }
 
@@ -24,7 +24,7 @@ namespace Reactive {
             ValueChangedEvent = null;
         }
 
-        public static implicit operator T(ObservableValue<T> value) {
+        public static implicit operator T(State<T> value) {
             return value._value;
         }
     }

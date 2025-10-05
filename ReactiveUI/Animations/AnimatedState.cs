@@ -3,9 +3,13 @@ using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Reactive {
+    /// <summary>
+    /// An animated reactive state.
+    /// </summary>
+    /// <typeparam name="T">A type of the state.</typeparam>
     [PublicAPI]
-    public class AnimatedValue<T> : INotifyValueChanged<T>, IAnimation, IReactiveModule {
-        public AnimatedValue(T initialValue, IValueInterpolator<T> valueInterpolator) {
+    public class AnimatedState<T> : IState<T>, IReactiveModule {
+        public AnimatedState(T initialValue, IValueInterpolator<T> valueInterpolator) {
             _startValue = initialValue;
             _endValue = initialValue;
             _valueInterpolator = valueInterpolator;
@@ -31,8 +35,7 @@ namespace Reactive {
                 _set = false;
 
                 if (shouldNotify) {
-                    OnStart?.Invoke(this);
-                    AnimationStartedEvent?.Invoke();
+                    OnStart?.Invoke(CurrentValue);
                 }
             }
         }
@@ -45,7 +48,7 @@ namespace Reactive {
             }
         }
 
-        T INotifyValueChanged<T>.Value => CurrentValue;
+        T IState<T>.Value => CurrentValue;
 
         public T CurrentValue => _valueInterpolator.Lerp(_startValue, _endValue, _progress);
         public bool IsFinished => _set;
@@ -53,11 +56,9 @@ namespace Reactive {
         public AnimationDuration Duration { get; set; }
         public AnimationCurve Curve { get; set; } = AnimationCurve.Linear;
 
-        public Action<AnimatedValue<T>>? OnFinish { get; set; }
-        public Action<AnimatedValue<T>>? OnStart { get; set; }
+        public Action<T>? OnFinish { get; set; }
+        public Action<T>? OnStart { get; set; }
 
-        public event Action? AnimationFinishedEvent;
-        public event Action? AnimationStartedEvent;
         public event Action<T>? ValueChangedEvent;
 
         private readonly IValueInterpolator<T> _valueInterpolator;
@@ -90,19 +91,6 @@ namespace Reactive {
             _set = false;
         }
 
-        public void ClearBindings() {
-            ValueChangedEvent = null;
-        }
-
-        public void FinishToEnd() {
-            Progress = 1f;
-            FinishAnimation();
-        }
-
-        public void Finish() {
-            FinishAnimation();
-        }
-
         void IReactiveModule.OnUpdate() {
             if (_set) {
                 return;
@@ -129,12 +117,11 @@ namespace Reactive {
             _set = true;
             _elapsedTime = 0f;
 
-            AnimationFinishedEvent?.Invoke();
-            OnFinish?.Invoke(this);
+            OnFinish?.Invoke(CurrentValue);
         }
 
-        public static implicit operator T(AnimatedValue<T> value) {
-            return value.CurrentValue;
+        public static implicit operator T(AnimatedState<T> state) {
+            return state.CurrentValue;
         }
     }
 }

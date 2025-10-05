@@ -31,112 +31,54 @@ public partial class ReactiveComponent {
 
     #region Owned Values
 
-    protected static ObservableValue<TValue> Remember<TValue>(TValue initialValue) {
-        return new ObservableValue<TValue>(initialValue);
+    protected static State<TValue> Remember<TValue>(TValue initialValue) {
+        return new State<TValue>(initialValue);
     }
 
-    protected AnimatedValue<Color> RememberAnimated(
+    protected AnimatedState<Color> RememberAnimated(
         Color initialValue,
         AnimationDuration animationDuration,
         AnimationCurve? curve = null,
-        Action<AnimatedValue<Color>>? onFinish = null
+        Action<Color>? onFinish = null
     ) {
-        return ValueUtils.RememberAnimatedColor(this, initialValue, animationDuration, curve, onFinish);
+        return StateUtils.RememberAnimatedColor(this, initialValue, animationDuration, curve, onFinish);
     }
 
-    protected AnimatedValue<Vector2> RememberAnimated(
+    protected AnimatedState<Vector2> RememberAnimated(
         Vector2 initialValue,
         AnimationDuration animationDuration,
         AnimationCurve? curve = null,
-        Action<AnimatedValue<Vector2>>? onFinish = null
+        Action<Vector2>? onFinish = null
     ) {
-        return ValueUtils.RememberAnimatedVector(this, initialValue, animationDuration, curve, onFinish);
+        return StateUtils.RememberAnimatedVector(this, initialValue, animationDuration, curve, onFinish);
     }
 
-    protected AnimatedValue<Vector3> RememberAnimated(
+    protected AnimatedState<Vector3> RememberAnimated(
         Vector3 initialValue,
         AnimationDuration animationDuration,
         AnimationCurve? curve = null,
-        Action<AnimatedValue<Vector3>>? onFinish = null
+        Action<Vector3>? onFinish = null
     ) {
-        return ValueUtils.RememberAnimatedVector(this, initialValue, animationDuration, curve, onFinish);
+        return StateUtils.RememberAnimatedVector(this, initialValue, animationDuration, curve, onFinish);
     }
 
-    protected AnimatedValue<float> RememberAnimated(
+    protected AnimatedState<float> RememberAnimated(
         float initialValue,
         AnimationDuration animationDuration,
         AnimationCurve? curve = null,
-        Action<AnimatedValue<float>>? onFinish = null
+        Action<float>? onFinish = null
     ) {
-        return ValueUtils.RememberAnimatedFloat(this, initialValue, animationDuration, curve, onFinish);
+        return StateUtils.RememberAnimatedFloat(this, initialValue, animationDuration, curve, onFinish);
     }
 
-    protected AnimatedValue<TValue> RememberAnimated<TValue>(
+    protected AnimatedState<TValue> RememberAnimated<TValue>(
         TValue initialValue,
         IValueInterpolator<TValue> interpolator,
         AnimationDuration duration,
         AnimationCurve? curve = null,
-        Action<AnimatedValue<TValue>>? onFinish = null
+        Action<TValue>? onFinish = null
     ) {
-        return ValueUtils.RememberAnimated(this, initialValue, interpolator, duration, curve, onFinish);
-    }
-
-    #endregion
-
-    #region Unowned Values
-
-    protected static SharedAnimatedValue<float> Animated(
-        float initialValue,
-        AnimationDuration duration,
-        AnimationCurve? curve = null,
-        Action<AnimatedValue<float>>? onFinish = null
-    ) {
-        return Animated(initialValue, SingleValueInterpolator.Instance, duration, curve, onFinish);
-    }
-
-    protected static SharedAnimatedValue<Vector2> Animated(
-        Vector2 initialValue,
-        AnimationDuration duration,
-        AnimationCurve? curve = null,
-        Action<AnimatedValue<Vector2>>? onFinish = null
-    ) {
-        return Animated(initialValue, Vector2ValueInterpolator.Instance, duration, curve, onFinish);
-    }
-
-    protected static SharedAnimatedValue<Vector3> Animated(
-        Vector3 initialValue,
-        AnimationDuration duration,
-        AnimationCurve? curve = null,
-        Action<AnimatedValue<Vector3>>? onFinish = null
-    ) {
-        return Animated(initialValue, Vector3ValueInterpolator.Instance, duration, curve, onFinish);
-    }
-
-    protected static SharedAnimatedValue<Color> Animated(
-        Color initialValue,
-        AnimationDuration duration,
-        AnimationCurve? curve = null,
-        Action<AnimatedValue<Color>>? onFinish = null
-    ) {
-        return Animated(initialValue, ColorValueInterpolator.Instance, duration, curve, onFinish);
-    }
-
-    protected static SharedAnimatedValue<TValue> Animated<TValue>(
-        TValue initialValue,
-        IValueInterpolator<TValue> interpolator,
-        AnimationDuration duration,
-        AnimationCurve? curve = null,
-        Action<AnimatedValue<TValue>>? onFinish = null
-    ) {
-        return ValueUtils.Animated(initialValue, interpolator, duration, curve, onFinish);
-    }
-
-    #endregion
-
-    #region Animate
-
-    protected static ISharedAnimation Animation(Action onStart, params IEnumerable<ISharedAnimation> waitFor) {
-        return AnimationUtils.Animation(onStart, waitFor);
+        return StateUtils.RememberAnimated(this, initialValue, interpolator, duration, curve, onFinish);
     }
 
     #endregion
