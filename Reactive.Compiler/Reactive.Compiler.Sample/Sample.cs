@@ -1,0 +1,28 @@
+using UnityEngine;
+
+namespace Reactive.Compiler.Sample;
+
+public class Sample : ReactiveComponent {
+    protected override GameObject Construct() {
+        var text = Remember("");
+        var color = RememberAnimated(Color.blue, 200.ms());
+        
+        return new Label {
+            sText = text.Map(x => $"Hello, {x}!"),
+            sColor = color
+        }.Use();
+    }
+}
+
+public class Sample2 : ReactiveComponent {
+    private State<string> _text = null!;
+    
+    protected override GameObject Construct() {
+        _text = Remember("");
+        
+        return new Label {
+            sText = _text.Map(x => $"Hello, {x}!"),
+            sColor = _text.Map(_ => Color.blue)
+        }.Use();
+    }
+}
