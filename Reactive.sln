@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveUI", "ReactiveUI\ReactiveUI.csproj", "{D0230F06-CBBB-4479-B6EE-B54D78D14D6B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactive", "Reactive\Reactive.csproj", "{D0230F06-CBBB-4479-B6EE-B54D78D14D6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
