@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using JetBrains.Annotations;
+using Reactive.Compiler;
 using UnityEngine;
 using UnityEngine.Pool;
 using Object = UnityEngine.Object;
@@ -275,8 +276,10 @@ namespace Reactive {
             OnInitialize();
         }
 
+        [StateGen]
         protected virtual void Construct(RectTransform rect) { }
 
+        [StateGen]
         protected virtual GameObject Construct() {
             var go = new GameObject();
             var rect = go.AddComponent<RectTransform>();

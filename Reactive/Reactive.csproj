@@ -8,5 +8,8 @@
         <AssemblyName>Reactive</AssemblyName>
         <RootNamespace>Reactive</RootNamespace>
     </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Reactive.Compiler.Models\Reactive.Compiler.Models.csproj" />
+    </ItemGroup>
     <Import Project="..\ReactiveUI.Unity.targets"/>
 </Project>

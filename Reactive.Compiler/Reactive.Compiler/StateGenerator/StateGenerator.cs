@@ -21,7 +21,7 @@ internal class StateGenerator : ISourceGenerator {
             .Distinct()
             .GroupBy(
                 x => x.targetProp,
-                x => x.prefix,
+                x => x.genName,
                 SymbolEqualityComparer.Default
             )
             .GroupBy(
@@ -43,12 +43,12 @@ internal class StateGenerator : ISourceGenerator {
     private static string GenerateTypeExtension(ISymbol type, IEnumerable<IGrouping<ISymbol?, string>> propGroups) {
         var inner = new StringBuilder();
 
-        foreach (var prefixGroup in propGroups) {
-            var prop = prefixGroup.Key!;
+        foreach (var nameGroup in propGroups) {
+            var prop = nameGroup.Key!;
             var propType = SyntaxExtensions.GetReturnType(prop);
             var propName = prop.Name;
             
-            foreach (var prefix in prefixGroup) {
+            foreach (var name in nameGroup) {
                 var definition = """
                     public {0}<{1}> {2} {{
                         set {{
@@ -63,7 +63,7 @@ internal class StateGenerator : ISourceGenerator {
                     definition,
                     StateGeneratorUtils.StatePath, // State<>
                     propType,                      // State target type (State<T>)
-                    prefix + propName,             // Prop name
+                    name,                          // Prop name
                     propName                       // Target prop name
                 );
                 

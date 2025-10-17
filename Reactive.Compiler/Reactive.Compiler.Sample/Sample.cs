@@ -17,12 +17,13 @@ public class Sample : ReactiveComponent {
 public class Sample2 : ReactiveComponent {
     private State<string> _text = null!;
     
+    [StateGen(Patterns = ["state_{}", "st{}"])]
     protected override GameObject Construct() {
         _text = Remember("");
         
         return new Label {
-            sText = _text.Map(x => $"Hello, {x}!"),
-            sColor = _text.Map(_ => Color.blue)
+            state_Text = _text.Map(x => $"Hello, {x}!"),
+            stColor = _text.Map(_ => Color.blue),
         }.Use();
     }
 }
