@@ -1,26 +1,30 @@
 <Project>
     <PropertyGroup>
         <!-- Can be replaced by requiring project if needed -->
-        <ReactiveDir>..\reactive-ui\ReactiveUI\</ReactiveDir>
-        <ReactiveProject>$(ReactiveDir)\ReactiveUI.csproj</ReactiveProject>
+        <ReactiveDir>..\reactive-ui\</ReactiveDir>
+        <ReactiveProjects>
+            $(ReactiveDir)\Reactive\Reactive.csproj;
+            $(ReactiveDir)\Reactive.Compiler\Reactive.Compiler\Reactive.Compiler.csproj;
+            $(ReactiveDir)\Reactive.Compiler.Models\Reactive.Compiler.Models.csproj
+        </ReactiveProjects>
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="Reactive">
-            <HintPath>$(ReactiveDir)\bin\$(Configuration)\$(TargetFramework)\Reactive.dll</HintPath>
+            <HintPath>$(ReactiveDir)\Reactive\bin\$(Configuration)\$(TargetFramework)\Reactive.dll</HintPath>
         </Reference>
     </ItemGroup>
     <Target Name="BuildReactiveUI" BeforeTargets="PrepareForBuild">
         <Message Importance="high" Text="Started building project: ReactiveUI"/>
         <!-- Restoring nugets -->
         <Message Importance="high" Text="Restoring nugets..."/>
-        <MSBuild Projects="$(ReactiveProject)" Targets="Restore"/>
+        <MSBuild Projects="$(ReactiveProjects)" Targets="Restore"/>
         <!-- Building -->
         <Message Importance="high" Text="Unity assemblies directory: $(UnityAssembliesDir)"/>
         <Message Importance="high" Text="Building..."/>
-        <MSBuild Projects="$(ReactiveProject)"
+        <MSBuild Projects="$(ReactiveProjects)"
                  Properties="Configuration=$(Configuration);UnityAssembliesDir=$(UnityAssembliesDir)"
                  RebaseOutputs="True"/>
     </Target>
     <!-- Importing unity references -->
-    <Import Project="$(ReactiveDir)\..\ReactiveUI.Unity.targets"/>
+    <Import Project="$(ReactiveDir)\ReactiveUI.Unity.targets"/>
 </Project>
