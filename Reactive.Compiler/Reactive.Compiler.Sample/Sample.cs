@@ -6,7 +6,7 @@ public class Sample : ReactiveComponent {
     protected override GameObject Construct() {
         var text = Remember("");
         var color = RememberAnimated(Color.blue, 200.ms());
-        
+
         return new Label {
             sText = text.Map(x => $"Hello, {x}!"),
             sColor = color
@@ -16,11 +16,12 @@ public class Sample : ReactiveComponent {
 
 public class Sample2 : ReactiveComponent {
     private State<string> _text = null!;
-    
-    [StateGen(Patterns = ["state_{}", "st{}"])]
+
+    // Try changing to state_} and {}: it won't compile
+    [StateGen(Patterns = ["state_{}", "st{}", "s_{}"])]
     protected override GameObject Construct() {
         _text = Remember("");
-        
+
         return new Label {
             state_Text = _text.Map(x => $"Hello, {x}!"),
             stColor = _text.Map(_ => Color.blue),

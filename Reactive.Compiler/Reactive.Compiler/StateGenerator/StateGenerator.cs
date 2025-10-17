@@ -1,12 +1,16 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Reactive.Compiler;
 
+//TODO: rewrite to incremental
 [Generator]
+[SuppressMessage("Usage", "RS1035")]
+[SuppressMessage("Usage", "RS1042")]
 internal class StateGenerator : ISourceGenerator {
     public void Initialize(GeneratorInitializationContext context) {
         context.RegisterForSyntaxNotifications(() => new StateSyntaxReceiver());
