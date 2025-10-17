@@ -2,9 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactive", "Reactive\Reactive.csproj", "{D0230F06-CBBB-4479-B6EE-B54D78D14D6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactive.Compiler", "Reactive.Compiler\Reactive.Compiler\Reactive.Compiler.csproj", "{A254E26A-8BB9-4BCF-961A-4ED807F01DCB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactive.Compiler", "Reactive.Compiler\Reactive.Compiler.csproj", "{A254E26A-8BB9-4BCF-961A-4ED807F01DCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactive.Compiler.Sample", "Reactive.Compiler\Reactive.Compiler.Sample\Reactive.Compiler.Sample.csproj", "{59A10833-B28C-4E3A-8CFA-BEA343CC9FA8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactive.Compiler.Sample", "Reactive.Compiler.Sample\Reactive.Compiler.Sample.csproj", "{59A10833-B28C-4E3A-8CFA-BEA343CC9FA8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reactive.Compiler.Models", "Reactive.Compiler.Models\Reactive.Compiler.Models.csproj", "{70F822D2-42EE-4CF9-BDCD-8BB001E3A123}"
 EndProject
