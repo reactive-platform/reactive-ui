@@ -11,5 +11,5 @@
     <ItemGroup>
       <ProjectReference Include="..\Reactive.Compiler.Models\Reactive.Compiler.Models.csproj" />
     </ItemGroup>
-    <Import Project="..\ReactiveUI.Unity.targets"/>
+    <Import Project="..\Reactive.Unity.targets"/>
 </Project>

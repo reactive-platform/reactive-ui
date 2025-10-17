@@ -10,5 +10,5 @@
         <ProjectReference Include="..\Reactive\Reactive.csproj"/>
         <ProjectReference Include="..\Reactive.Compiler\Reactive.Compiler.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     </ItemGroup>
-    <Import Project="..\ReactiveUI.Unity.targets"/>
+    <Import Project="..\Reactive.Unity.targets"/>
 </Project>

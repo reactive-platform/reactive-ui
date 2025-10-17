@@ -4,7 +4,7 @@
         <ReactiveDir>..\reactive-ui\</ReactiveDir>
         <ReactiveProjects>
             $(ReactiveDir)\Reactive\Reactive.csproj;
-            $(ReactiveDir)\Reactive.Compiler\Reactive.Compiler\Reactive.Compiler.csproj;
+            $(ReactiveDir)\Reactive.Compiler\Reactive.Compiler.csproj;
             $(ReactiveDir)\Reactive.Compiler.Models\Reactive.Compiler.Models.csproj
         </ReactiveProjects>
     </PropertyGroup>
@@ -26,5 +26,5 @@
                  RebaseOutputs="True"/>
     </Target>
     <!-- Importing unity references -->
-    <Import Project="$(ReactiveDir)\ReactiveUI.Unity.targets"/>
+    <Import Project="$(ReactiveDir)\Reactive.Unity.targets"/>
 </Project>
