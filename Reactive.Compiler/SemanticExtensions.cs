@@ -36,8 +36,7 @@ internal static class SemanticExtensions {
     }
 
     public static AttributeData? GetDerivedAttribute(this IMethodSymbol symbol, INamedTypeSymbol attribute) {
-        var methodName = symbol.Name;
-        ISymbol? currentMethod = symbol;
+        IMethodSymbol? currentMethod = symbol;
 
         do {
             var attrs = currentMethod.GetAttributes();
@@ -47,7 +46,7 @@ internal static class SemanticExtensions {
                 return attr;
             }
 
-            currentMethod = symbol.ContainingType.BaseType?.GetMembers(methodName).FirstOrDefault();
+            currentMethod = currentMethod.OverriddenMethod;
         } while (currentMethod != null);
 
         return null;
