@@ -5,7 +5,7 @@ namespace Reactive.Compiler.Sample;
 public class Sample : ReactiveComponent {
     protected override GameObject Construct() {
         var text = Remember("");
-        var color = RememberAnimated(Color.blue, 200.ms());
+        var color = RememberAnimated(Color.blue, 200.ms);
 
         return new Label {
             sText = text.Map(x => $"Hello, {x}!"),

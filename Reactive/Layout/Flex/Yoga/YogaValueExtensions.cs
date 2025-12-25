@@ -5,19 +5,13 @@ namespace Reactive.Yoga;
 // ReSharper disable InconsistentNaming
 [PublicAPI]
 public static class YogaValueExtensions {
-    public static YogaValue pt(this float val) {
-        return new YogaValue(val, Unit.Point);
+    extension(float f) {
+        public YogaValue pt => new(f, Unit.Point);
+        public YogaValue pct => new(f, Unit.Percent);
     }
-
-    public static YogaValue pt(this int val) {
-        return new YogaValue(val, Unit.Point);
-    }
-
-    public static YogaValue pct(this float val) {
-        return new YogaValue(val, Unit.Percent);
-    }
-
-    public static YogaValue pct(this int val) {
-        return new YogaValue(val, Unit.Percent);
+    
+    extension(int f) {
+        public YogaValue pt => new(f, Unit.Point);
+        public YogaValue pct => new(f, Unit.Percent);
     }
 }
