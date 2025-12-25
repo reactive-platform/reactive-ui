@@ -1,3 +1,4 @@
+using Reactive.Yoga;
 using UnityEngine;
 
 namespace Reactive.Compiler.Sample;
@@ -7,9 +8,36 @@ public class Sample : ReactiveComponent {
         var text = Remember("");
         var color = RememberAnimated(Color.blue, 200.ms);
 
-        return new Label {
-            sText = text.Map(x => $"Hello, {x}!"),
-            sColor = color
+        return new Layout {
+            FlexController = {
+                FlexDirection = FlexDirection.Column,
+                ConstrainHorizontal = false
+            },
+            
+            FlexItem = {
+                Size = new() { y = 20.pt },
+            },
+
+            Children = {
+                new Label {
+                    Do = x => x
+                        .On(text, Debug.Log)
+                        .On(color, x => Debug.Log(x)),
+                    
+                    DoAll = [
+                        x => Debug.Log(x),
+                        x => Debug.Log(x),
+                        x => Debug.Log(x),
+                    ],
+
+                    FlexItem = {
+                        Size = new() { x = 10.pt }
+                    },
+
+                    sText = text.Map(x => $"Hello, {x}!"),
+                    sColor = color,
+                }
+            }
         }.Use();
     }
 }
