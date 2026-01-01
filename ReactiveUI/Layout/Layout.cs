@@ -11,25 +11,30 @@ namespace Reactive {
         #region Layout Controller
 
         public ILayoutController? LayoutController {
-            get => _layoutController;
+            get {
+                ComponentDefaults.LayoutController.AssignOptional(ref _layoutController);
+                return _layoutController.Value;
+            }
             set {
-                if (_layoutController != null) {
-                    _layoutController.RemoveAllChildren();
-                    _layoutController.LayoutControllerUpdatedEvent -= ScheduleLayoutRecalculation;
-                    ReleaseContextMember(_layoutController);
+                var oldController = _layoutController.Value;
+                
+                if (oldController != null) {
+                    oldController.RemoveAllChildren();
+                    oldController.LayoutControllerUpdatedEvent -= ScheduleLayoutRecalculation;
+                    ReleaseContextMember(oldController);
                 }
 
-                _layoutController = value;
+                _layoutController = Optional<ILayoutController?>.Some(value);
 
-                if (_layoutController != null) {
-                    InsertContextMember(_layoutController);
-                    _layoutController.LayoutControllerUpdatedEvent += ScheduleLayoutRecalculation;
+                if (value != null) {
+                    InsertContextMember(value);
+                    value.LayoutControllerUpdatedEvent += ScheduleLayoutRecalculation;
 
                     var index = 0;
                     foreach (var child in _childrenOrdered) {
                         // Components without modifiers are not added to the hierarchy
                         if (child.LayoutModifier != null) {
-                            _layoutController.InsertChild(child, index);
+                            value.InsertChild(child, index);
                             index++;
                         }
                     }
@@ -37,13 +42,14 @@ namespace Reactive {
             }
         }
 
-        private ILayoutController? _layoutController;
+        private Optional<ILayoutController?> _layoutController;
         private bool _beingRecalculated;
 
         // Guard for requests from other components
         private float _lastRecalculationTime;
 
         private void RecalculateLayoutInternal() {
+            var layoutController = LayoutController;
             var time = Time.time;
             // Used to prevent multiple recalculations
             // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -51,7 +57,7 @@ namespace Reactive {
                 return;
             }
 
-            if (_layoutController == null || Children.Count == 0) {
+            if (layoutController == null || Children.Count == 0) {
                 return;
             }
 
@@ -62,8 +68,8 @@ namespace Reactive {
                 constraints = new Vector2(float.NaN, float.NaN);
             }
             
-            _layoutController.Recalculate(this, constraints);
-            _layoutController.ApplyChildren();
+            layoutController.Recalculate(this, constraints);
+            layoutController.ApplyChildren();
 
             _lastRecalculationTime = Time.time;
         }
@@ -106,10 +112,11 @@ namespace Reactive {
             item.ModifierUpdatedEvent += HandleChildModifierUpdated;
             _childrenOrdered.Add(item);
 
-            if (_layoutController != null) {
-                var index = _layoutController!.ChildCount;
+            var layoutController = LayoutController;
+            if (layoutController != null) {
+                var index = layoutController.ChildCount;
 
-                _layoutController.InsertChild(item, index);
+                layoutController.InsertChild(item, index);
             }
 
             ScheduleLayoutRecalculation();
@@ -123,7 +130,7 @@ namespace Reactive {
             item.ModifierUpdatedEvent -= HandleChildModifierUpdated;
             _childrenOrdered.Remove(item);
 
-            _layoutController?.RemoveChild(item);
+            LayoutController?.RemoveChild(item);
             ScheduleLayoutRecalculation();
 
             OnChildrenUpdated();
@@ -136,22 +143,23 @@ namespace Reactive {
         }
 
         private void HandleChildModifierUpdated(ILayoutItem item) {
-            if (_beingRecalculated || _layoutController == null) {
+            var layoutController = LayoutController;
+            if (_beingRecalculated || layoutController == null) {
                 return;
             }
 
-            var hasChild = _layoutController.HasChild(item);
+            var hasChild = layoutController.HasChild(item);
 
             if (item.LayoutModifier == null) {
                 if (hasChild) {
                     // Here we remove the child from the layout controller exclusively to add it again later
-                    _layoutController.RemoveChild(item);
+                    layoutController.RemoveChild(item);
                 }
             } else {
                 if (!hasChild) {
                     var index = _childrenOrdered.FindLayoutItemIndex(item);
                     // It is crucial to maintain the same order as it can break the whole layout
-                    _layoutController.InsertChild(item, index);
+                    layoutController.InsertChild(item, index);
                 }
             }
 
@@ -221,7 +229,7 @@ namespace Reactive {
             }
 
             if (_children.Count > 0) {
-                _layoutController?.ApplyChildren();
+                LayoutController?.ApplyChildren();
             }
         }
 

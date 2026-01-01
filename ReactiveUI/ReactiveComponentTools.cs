@@ -158,5 +158,12 @@ public partial class ReactiveComponent {
         return new(accessor, cacheLazyValue);
     }
 
+    /// <summary>
+    /// Creates a scope with overrides for default values.
+    /// </summary>
+    protected static ContextScope Scope(params ContextPropChange[] changes) {
+        return ContextScope.Declare(changes);
+    }
+
     #endregion
 }

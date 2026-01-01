@@ -20,6 +20,17 @@ namespace Reactive {
             return HasValue ? Value! : defaultValue;
         }
 
+        public static Optional<T> Some(T? value) {
+            return new() {
+                Value = value,
+                HasValue = true
+            };
+        }
+
+        public static Optional<T> None() {
+            return default;
+        }
+
         public static implicit operator bool(Optional<T> value) {
             return value.HasValue;
         }
@@ -29,10 +40,7 @@ namespace Reactive {
         }
 
         public static implicit operator Optional<T>(T? value) {
-            return new() {
-                Value = value,
-                HasValue = true
-            };
+            return Some(value);
         }
     }
 }

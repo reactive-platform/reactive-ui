@@ -20,22 +20,27 @@ namespace Reactive {
                     _layoutDriver?.Children.Add(this);
                 }
             }
-
+            
             public ILayoutModifier? LayoutModifier {
-                get => _modifier;
+                get {
+                    ComponentDefaults.LayoutModifier.AssignOptional(ref _modifier);
+                    return _modifier.Value;
+                }
                 set {
-                    if (_modifier != null) {
-                        _modifier.ExposeLayoutItem(null);
-                        _modifier.ModifierUpdatedEvent -= HandleModifierUpdated;
-                        ReleaseContextMember(_modifier);
+                    var oldModifier = _modifier.Value;
+
+                    if (oldModifier != null) {
+                        oldModifier.ExposeLayoutItem(null);
+                        oldModifier.ModifierUpdatedEvent -= HandleModifierUpdated;
+                        ReleaseContextMember(oldModifier);
                     }
 
-                    _modifier = value;
+                    _modifier = Optional<ILayoutModifier?>.Some(value);
                     _lastExposedComponent = null;
 
-                    if (_modifier != null) {
-                        _modifier.ModifierUpdatedEvent += HandleModifierUpdated;
-                        InsertContextMember(_modifier);
+                    if (value != null) {
+                        value.ModifierUpdatedEvent += HandleModifierUpdated;
+                        InsertContextMember(value);
                         ReloadLayoutFirstComponent();
                     }
 
@@ -57,7 +62,7 @@ namespace Reactive {
             public event Action<ILayoutItem>? StateUpdatedEvent;
 
             private ILayoutDriver? _layoutDriver;
-            private ILayoutModifier? _modifier;
+            private Optional<ILayoutModifier?> _modifier;
             private bool _beingApplied;
 
             public int GetLayoutItemHashCode() {
@@ -246,7 +251,7 @@ namespace Reactive {
 
                 if (comp != null && comp != _lastExposedComponent) {
                     _lastExposedComponent = comp;
-                    _modifier?.ExposeLayoutItem(comp);
+                    _modifier.Value?.ExposeLayoutItem(comp);
                 }
             }
 
