@@ -5,12 +5,12 @@ Each `ReactiveComponent` returns a `GameObject` instance, so you can easily wrap
 ## Roadmap
 This roadmap covers not just this repo, but rather the whole reactive sdk set. Here it is:
 - [x] Release the first version;
-- [ ] Refactor names for simplicity, so `ObservableValue<T>` becomes `State<T>`;
+- [X] Refactor names for simplicity, so `ObservableValue<T>` becomes `State<T>`;
 - [ ] Rework modal system (Already WIP);
 - [ ] Remove components like `ColoredButton` and `ButtonBase` in exchange for `Clickable` and similar wrappers;
 - After C# 14 release:
-- [ ] Replace `Animate` method with compiler-generated property extensions, so binding states will be as easy as writing `sText = _state`;
-- [ ] Add more state tools like `Map(x => x.Property)`;
+- [X] Replace `Animate` method with compiler-generated property extensions, so binding states will be as easy as writing `sText = _state`;
+- [X] Add more state tools like `Map(x => x.Property)`;
 - [ ] Replace current NotifyPropertyChanged pattern with compiler-generated type-safe events;
 - [ ] Add API for layout animations `.AsFlexItem(onApply: x => myAnimatedSize.Value = x.Size)`.
 
