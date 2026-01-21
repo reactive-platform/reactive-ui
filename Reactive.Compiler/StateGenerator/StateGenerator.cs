@@ -50,7 +50,9 @@ internal class StateGenerator : IIncrementalGenerator {
                 if (type == null) return;
 
                 var ext = GenerateTypeExtension(type, typeGroup);
-                var file = $"Reactive_{type.Name}StateExt.g.cs";
+                var identifier = GetTypeIdentifier(type);
+                
+                var file = $"Reactive_{identifier}_StateExt.g.cs";
                 spc.AddSource(file, ext);
             }
         );
@@ -180,15 +182,27 @@ internal class StateGenerator : IIncrementalGenerator {
 
         var outer = """
             [System.CodeDom.Compiler.GeneratedCode("Reactive_StateGenerator", "1.0")]
-            internal static class Reactive_{0}StateGenExt {{
+            internal static class Reactive_{0}_StateGenExt {{
                 extension({1} obj) {{
             {2}
                 }}
             }}
             """;
 
-        outer = string.Format(outer, type.Name, type, inner.ToString().TrimEnd());
+        var typeIdentifier = GetTypeIdentifier(type);
+        
+        outer = string.Format(outer, typeIdentifier, type, inner.ToString().TrimEnd());
 
         return outer;
+    }
+
+    private static string GetTypeIdentifier(ISymbol type) {
+         return type
+            .ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+            .Replace("global::", "")
+            .Replace(".", "_")
+            .Replace("<", "_")
+            .Replace(">", "")
+            .Replace(",", "_");
     }
 }
