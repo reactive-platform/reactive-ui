@@ -1,3 +1,6 @@
+# NOTICE
+## This repo is just an archive. All reactive libraries have moved to the [MONOREPO](https://github.com/reactive-platform/reactive-mono)
+
 ## About
 Reactive UI is unity library that is made specifically for modding, with performance, convenience and simplicity in mind. It's based on the meta's Yoga layout engine that allows building powerful layouts similar to those you can achieve when using css.
 Each `ReactiveComponent` returns a `GameObject` instance, so you can easily wrap existing components and flawlessly integrate with another UI libraries. Read more on: https://reactiveui.beatleader.com/.
